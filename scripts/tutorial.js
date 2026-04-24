@@ -1,5 +1,4 @@
 // Tutorial Prompt, Tutorial Round Setup, Guidance, and Completion Rewards
-// TUTORIAL SYSTEM (complete rewrite)
 // ═══════════════════════════════════════════════════════
 let _tutWaitingForAction = false;
 let TUT = { active:false, step:0, blocked:true };
@@ -166,10 +165,7 @@ function _tutHighlight(sel, darken = true, scrollTarget = true){
      e.style.position = '';
      if (e.id === 'rollBtn') {
        e.style.opacity = '';
-       e.style.filter = '';
-       e.style.background = '';
-       e.style.color = '';
-       e.style.boxShadow = '';
+       e.classList.remove('tut-roll-bright');
      }
   });
   let bd = document.getElementById('tutBackdrop');
@@ -198,10 +194,7 @@ function _tutHighlight(sel, darken = true, scrollTarget = true){
      el.style.zIndex = '745';
      if (el.id === 'rollBtn') {
        el.style.opacity = '1';
-       el.style.filter = 'none';
-       el.style.background = 'var(--c-tee)';
-       el.style.color = '#fff';
-       el.style.boxShadow = '0 8px 24px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16)';
+       el.classList.add('tut-roll-bright');
      }
      
      // Elevate parent header if target is inside it to break stacking context
