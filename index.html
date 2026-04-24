@@ -36,7 +36,7 @@
     <div class="menu-logo"><img class="brand-logo-img" src="assets/dicegolf-logo.png" alt="Dice Golf"></div>
     <div style="font-family:'Sen', sans-serif;font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:20px;">CREATE YOUR PROFILE</div>
     <input class="onboard-input" id="onboardInput" placeholder="ENTER YOUR NAME" maxlength="12" autocomplete="off" spellcheck="false">
-    <button class="menu-btn-play" onclick="createFirstProfile()" style="margin-top:12px;">START PLAYING</button>
+    <button class="menu-btn-play" id="onboardStartBtn" style="margin-top:12px;">START PLAYING</button>
   </div>
 </div>
 
@@ -44,7 +44,7 @@
   <div class="menu-bg-grass"></div>
   <div id="floatingEntities"></div>
 
-  <button onclick="openProfileModal()" style="position:absolute;top:calc(env(safe-area-inset-top) + 16px);right:24px;display:flex;align-items:center;gap:8px;z-index:110;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:4px 12px 4px 4px;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.15s;">
+  <button id="activeProfileBtn" style="position:absolute;top:calc(env(safe-area-inset-top) + 16px);right:24px;display:flex;align-items:center;gap:8px;z-index:110;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:4px 12px 4px 4px;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.15s;">
     <div id="menuProfileIconBtn" style="width:28px;height:28px;border-radius:50%;background:var(--c-fwy);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 4px rgba(0,0,0,0.3);">👤</div>
     <span id="menuProfileName" style="font-family:'Bebas Neue', cursive;font-size:16px;letter-spacing:1px;color:var(--text);padding-bottom:1px;"></span>
   </button>
@@ -55,11 +55,11 @@
   <br>
   
   <div class="menu-btns" id="menuBtns">
-    <button class="menu-btn-play" id="menuContinueBtn" onclick="continueGame()" style="display:none;background:#1a5f8a;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;padding:12px;"></button>
-    <button class="menu-btn-play" id="menuPlayBtn" onclick="navToPlayMode()" style="padding:20px 16px; font-size:28px; min-height:84px;">⛳ PLAY</button>
+    <button class="menu-btn-play" id="menuContinueBtn" style="display:none;background:#1a5f8a;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;padding:12px;"></button>
+    <button class="menu-btn-play" id="menuPlayBtn" style="padding:20px 16px; font-size:28px; min-height:84px;">⛳ PLAY</button>
     <div style="display:flex; gap:10px;">
-      <button class="menu-btn-play" id="menuVersusBtn" onclick="navToVersusSetup()" style="flex:1; background:linear-gradient(135deg,#1a5f8a,#2a3a6e);box-shadow:0 4px 20px rgba(30,95,138,.4); font-size:20px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;"><span style="font-size:24px;line-height:1;">🆚</span> VERSUS</button>
-      <button class="menu-btn-sec" id="menuSettingsBtn" onclick="openSettings()" style="flex:1; font-size:20px; letter-spacing:2px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(255,255,255,0.05); border-radius:18px;"><span class="menu-settings-icon" aria-hidden="true"></span> SETTINGS</button>
+      <button class="menu-btn-play" id="menuVersusBtn" style="flex:1; background:linear-gradient(135deg,#1a5f8a,#2a3a6e);box-shadow:0 4px 20px rgba(30,95,138,.4); font-size:20px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;"><span style="font-size:24px;line-height:1;">🆚</span> VERSUS</button>
+      <button class="menu-btn-sec" id="menuSettingsBtn" style="flex:1; font-size:20px; letter-spacing:2px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(255,255,255,0.05); border-radius:18px;"><span class="menu-settings-icon" aria-hidden="true"></span> SETTINGS</button>
     </div>
   </div>
 </div>
@@ -171,7 +171,7 @@
   <div class="vs-turn-icon" id="vsTurnIcon">🏌️</div>
   <div class="vs-turn-name" id="vsTurnName">PLAYER 1</div>
   <div class="vs-turn-sub" id="vsTurnSub">HOLE 1 · PAR 4</div>
-  <button class="vs-turn-btn" id="vsTurnBtn" onclick="vsStartTurn()">READY</button>
+  <button class="vs-turn-btn" id="vsTurnBtn">READY</button>
 </div>
 
 <!-- SINGLE ROUND START TRANSITION -->
@@ -180,7 +180,7 @@
   <div class="vs-turn-name" id="rsTurnName">PLAYER</div>
   <div class="vs-turn-sub" id="rsTurnSub">HOLE 1 · PAR 4</div>
   <div class="vs-turn-meta" id="rsTurnMeta">HOLE 1 · PAR 4</div>
-  <button class="vs-turn-btn" onclick="startSingleRoundFromSplash()">READY</button>
+  <button class="vs-turn-btn" id="singleRoundReadyBtn">READY</button>
 </div>
 
 <div class="setup-screen" id="playModeScreen" style="display:none">
@@ -335,13 +335,13 @@
 <div class="app" id="mainApp" style="display:none">
 <header>
   <div class="logo-row">
-    <button class="setup-back-btn" id="gameBackBtn" onclick="openGameScreenMenu()" aria-label="Back">&#8592;</button>
+    <button class="setup-back-btn" id="gameBackBtn" aria-label="Back">&#8592;</button>
     <div class="logo game-brand" id="gameBrand">
       <img class="brand-logo-img brand-logo-game" src="assets/dicegolf_cropped.png" alt="Dice Golf">
       <span class="game-brand-course" id="gameBrandCourse">LITTLE PINES</span>
     </div>
     <div style="display:flex;align-items:center;gap:4px;">
-      <button id="gameSettingsBtn" onclick="openSettings(true)" style="background-color:rgba(255,255,255,.08);border:1px solid var(--border);color:transparent;border-radius:7px;width:32px;height:32px;font-size:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;line-height:1;" title="Settings" aria-label="Settings"></button>
+      <button id="gameSettingsBtn" style="background-color:rgba(255,255,255,.08);border:1px solid var(--border);color:transparent;border-radius:7px;width:32px;height:32px;font-size:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;line-height:1;" title="Settings" aria-label="Settings"></button>
     </div>
   </div>
 </header>
@@ -391,8 +391,8 @@
   <div class="dc"><div class="dc-lbl">Row</div><div class="die" id="die1"><div class="die-pips" id="dp1"></div></div></div>
   <div class="dc"><div class="dc-lbl">Col</div><div class="die" id="die2"><div class="die-pips" id="dp2"></div></div></div>
   <div class="roll-col">
-    <button class="btn-roll shot-btn-visible" id="rollBtn" onclick="doRoll()">ROLL</button>
-    <button class="btn-roll shot-btn-hidden" id="nextShotBtn" onclick="doNextShot()" style="background:var(--c-tee);">NEXT SHOT</button>
+    <button class="btn-roll shot-btn-visible" id="rollBtn">ROLL</button>
+    <button class="btn-roll shot-btn-hidden" id="nextShotBtn" style="background:var(--c-tee);">NEXT SHOT</button>
   </div>
 </div>
 
@@ -410,7 +410,7 @@
   <div class="log-list" id="logList"></div>
 </div>
 
-<div class="sec-title" id="legendToggleBtn" style="margin:0 16px 7px; cursor:pointer;" onclick="toggleLegend()">
+<div class="sec-title" id="legendToggleBtn" style="margin:0 16px 7px; cursor:pointer;">
   ZONE LEGEND <span id="legendArrow">▾</span>
 </div>
 <div class="legend" id="legend" style="display:grid;">
@@ -509,6 +509,10 @@
 
 <script src="scripts/ui/animations.js"></script>
 <script src="scripts/config.js"></script>
+<script src="scripts/system/haptics.js"></script>
+<script src="scripts/system/audio.js"></script>
+<script src="scripts/system/viewport.js"></script>
+<script src="scripts/utils.js"></script>
 <script src="scripts/app.js"></script>
 <script src="scripts/ui/navigation.js"></script>
 <script src="scripts/courses.js"></script>
@@ -524,7 +528,6 @@
 <script src="scripts/profiles/achievements.js"></script>
 <script src="scripts/profiles/history.js"></script>
 <script src="scripts/profiles/profile-settings.js"></script>
-<script src="scripts/profiles.js"></script>
 <script src="scripts/ui/modals.js"></script>
 <script src="scripts/wildcards.js"></script>
 <script src="scripts/storage.js"></script>
@@ -542,9 +545,9 @@
     <div class="profile-body">
       <div class="settings-section-title">APPEARANCE</div>
       <div style="display:flex;gap:6px;margin-bottom:16px;">
-        <button id="themeBtn-dark" onclick="setTheme('dark')" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">🌙 DARK</button>
-        <button id="themeBtn-light" onclick="setTheme('light')" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">☀️ LIGHT</button>
-        <button id="themeBtn-system" onclick="setTheme('system')" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">🔄 SYSTEM</button>
+        <button id="themeBtn-dark" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">🌙 DARK</button>
+        <button id="themeBtn-light" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">☀️ LIGHT</button>
+        <button id="themeBtn-system" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">🔄 SYSTEM</button>
       </div>
       <div class="settings-section-title tight">GAME OPTIONS</div>
       <div class="settings-row">
@@ -552,42 +555,42 @@
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🔊 SOUND</div>
           <div class="settings-row-desc">Shot sound effects</div>
         </div>
-        <div class="toggle-switch" id="soundToggle" onclick="setSoundPref(!soundEnabled())"><div class="toggle-knob"></div></div>
+        <div class="toggle-switch" id="soundToggle"><div class="toggle-knob"></div></div>
       </div>
       <div class="settings-row">
         <div>
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">📳 VIBRATIONS</div>
           <div class="settings-row-desc">Haptic feedback on shots &amp; events</div>
         </div>
-        <div class="toggle-switch" id="vibToggle" onclick="setVibPref(!vibEnabled())"><div class="toggle-knob"></div></div>
+        <div class="toggle-switch" id="vibToggle"><div class="toggle-knob"></div></div>
       </div>
       <div class="settings-row">
         <div>
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🪇 SHAKE TO ROLL</div>
           <div class="settings-row-desc">Shake your phone to roll the dice</div>
         </div>
-        <div class="toggle-switch" id="shakeToggle" onclick="setRollMode(getRollMode()==='haptic'?'classic':'haptic')"><div class="toggle-knob"></div></div>
+        <div class="toggle-switch" id="shakeToggle"><div class="toggle-knob"></div></div>
       </div>
       <div class="settings-row">
         <div>
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🃏 WILDCARDS</div>
           <div class="settings-row-desc">Roll doubles to earn wildcard cards</div>
         </div>
-        <div class="toggle-switch" id="wcToggle" onclick="setWcPref(!wcEnabled())"><div class="toggle-knob"></div></div>
+        <div class="toggle-switch" id="wcToggle"><div class="toggle-knob"></div></div>
       </div>
       <div class="settings-row">
         <div>
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">&#x1F7E8; HIDE ZONE LEGEND</div>
           <div class="settings-row-desc">Remove the panel from the game</div>
         </div>
-        <div class="toggle-switch" id="zoneLegendToggle" onclick="setLegendPref(!legendHiddenEnabled())"><div class="toggle-knob"></div></div>
+        <div class="toggle-switch" id="zoneLegendToggle"><div class="toggle-knob"></div></div>
       </div>
       <div class="settings-row">
         <div>
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">📏 DISTANCE</div>
           <div class="settings-row-desc">Unit of measurement</div>
         </div>
-        <div class="txt-toggle" id="metricsToggle" onclick="setMetricsPref(getMetrics()==='yards'?'meters':'yards')">
+        <div class="txt-toggle" id="metricsToggle">
           <div class="txt-toggle-knob"></div>
           <div class="txt-lbl lbl-l">YDS</div>
           <div class="txt-lbl lbl-r">M</div>
@@ -598,7 +601,7 @@
           <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🏷️ CELL LABELS</div>
           <div class="settings-row-desc">Show zone name on the grid always</div>
         </div>
-        <div class="txt-toggle" id="labelsToggle" onclick="setCellLabelModeDirect(getCellLabelMode()==='tap'?'always':'tap')">
+        <div class="txt-toggle" id="labelsToggle">
           <div class="txt-toggle-knob"></div>
           <div class="txt-lbl lbl-l">TAP</div>
           <div class="txt-lbl lbl-r">YES</div>
@@ -694,7 +697,7 @@
 </div>
 
 
-<button class="wc-fab" id="wcFab" onclick="openWcDrawer()">
+<button class="wc-fab" id="wcFab">
   <div class="wc-fab-icon">🃏</div>
   <div class="wc-fab-count" id="wcFabCount">0/3</div>
   <div class="wc-fab-slots">
@@ -704,7 +707,7 @@
   </div>
 </button>
 
-<div class="wc-backdrop" id="wcBackdrop" onclick="closeWcDrawer()"></div>
+<div class="wc-backdrop" id="wcBackdrop"></div>
 
 <div class="wc-drawer" id="wcDrawer">
   <div class="wc-drawer-head">
@@ -717,7 +720,7 @@
   <div class="wc-drawer-slots" id="wcDrawerSlots"></div>
   <div class="wc-info-panel" id="wcInfoPanel">
     <div class="wc-info-head">
-      <button id="wcInfoBackBtn" onclick="closeWcInfo()" class="setup-back-btn" style="width:28px;height:28px;font-size:16px;" aria-label="Back">&#8592;</button>
+      <button id="wcInfoBackBtn" class="setup-back-btn" style="width:28px;height:28px;font-size:16px;" aria-label="Back">&#8592;</button>
       <div style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:#fff;" id="wcInfoTitle">ABOUT WILDCARDS</div>
     </div>
     <div class="wc-info-body">
@@ -730,7 +733,7 @@
 <div class="wc-reveal" id="wcReveal">
   <div class="wc-reveal-rarity" id="wcRevealRarity">RARE</div>
   <div class="wc-reveal-title">WILDCARD!</div>
-  <div class="wc-card-wrap" id="wcCardWrap" onclick="revealWcCard()">
+  <div class="wc-card-wrap" id="wcCardWrap">
     <div class="wc-card" id="wcCard">
       <div class="wc-card-face wc-card-back">🃏</div>
       <div class="wc-card-face wc-card-front">
@@ -743,7 +746,7 @@
   <div class="wc-reveal-action-zone">
     <div class="wc-reveal-hint" id="wcRevealHint">TAP CARD TO REVEAL</div>
     <div class="wc-reveal-actions" id="wcRevealActions" style="display:none;">
-      <button class="wc-equip-btn" id="wcEquipBtn" onclick="equipWildcard()">EQUIP</button>
+      <button class="wc-equip-btn" id="wcEquipBtn">EQUIP</button>
     </div>
   </div>
 </div>
@@ -773,7 +776,7 @@
     <div class="hio-die" id="hioDie1">?</div>
     <div class="hio-die" id="hioDie2">?</div>
   </div>
-  <button class="hio-roll-btn" id="hioRollBtn" onclick="doHioRoll()">🎲 ROLL FOR IT</button>
+  <button class="hio-roll-btn" id="hioRollBtn">🎲 ROLL FOR IT</button>
   <div class="hio-result" id="hioResult" style="display:none;"></div>
 </div>
 
