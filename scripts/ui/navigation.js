@@ -172,7 +172,3 @@ function hideScreen(id){
     delete window._screenHideTimers[id];
   }, 260);
 }
-
-// ═══════════════════════════════════════
-// SOUND SYSTEM
-// ═══════════════════════════════════════
