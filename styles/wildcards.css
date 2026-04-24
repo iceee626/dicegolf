@@ -15,7 +15,17 @@
 }
 .wc-fab.visible{display:flex;}
 .wc-fab:hover{background:linear-gradient(135deg,#9b3fbe,#6a2a8e);}
-.wc-fab-icon{font-size:18px;line-height:1;}
+.wc-fab-icon{font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;}
+.wc-wildcard-icon{
+  display:inline-block;
+  flex-shrink:0;
+  background:url('../assets/wildcard.svg') center/contain no-repeat;
+}
+.wc-wildcard-icon-fab{
+  width:22px;
+  height:22px;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));
+}
 .wc-fab-count{font-family:'Bebas Neue',cursive;font-size:12px;letter-spacing:1px;}
 .wc-fab-slots{display:flex;flex-direction:column;gap:3px;margin-top:2px;}
 .wc-fab-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.25);transition:background .2s;}
@@ -85,7 +95,12 @@
   background:linear-gradient(135deg,#7b2f9e,#4a1a6e);
   padding:16px;display:flex;align-items:center;justify-content:space-between;
 }
-.wc-drawer-title{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;color:#fff;}
+.wc-drawer-title{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;color:#fff;display:flex;align-items:center;gap:8px;}
+.wc-wildcard-icon-title{
+  width:22px;
+  height:22px;
+  filter:drop-shadow(0 2px 5px rgba(0,0,0,.35));
+}
 .wc-drawer-head .mode-info-btn{background-size:15px 15px;background-position:center;}
 .wc-drawer-close{background:rgba(224,82,82,.24);border:1px solid rgba(255,82,82,.55);color:#ffd7d7;width:28px;height:28px;border-radius:7px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .wc-drawer-close:hover{background:rgba(224,82,82,.36);border-color:rgba(255,82,82,.8);}
@@ -191,8 +206,12 @@
 .wc-card-back{
   background:linear-gradient(135deg,#7b2f9e 0%,#2a0a4e 50%,#7b2f9e 100%);
   border:2px solid rgba(240,192,64,.4);
-  font-size:56px;
   box-shadow:0 8px 32px rgba(123,47,158,.6);
+}
+.wc-wildcard-icon-card{
+  width:76px;
+  height:76px;
+  filter:drop-shadow(0 6px 14px rgba(0,0,0,.42));
 }
 .wc-card-back::before{
   content:'';position:absolute;inset:8px;
