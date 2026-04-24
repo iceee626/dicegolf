@@ -159,7 +159,7 @@ function _tutScrollHighlightedElement(el, attempt = 0){
   }, attempt === 0 ? 60 : 120);
 }
 
-function _tutHighlight(sel, darken = true){
+function _tutHighlight(sel, darken = true, scrollTarget = true){
   document.querySelectorAll('.tut-pulse').forEach(e => {
      e.classList.remove('tut-pulse', 'tut-elevate', 'tut-relative');
      e.style.zIndex = '';
@@ -197,7 +197,7 @@ function _tutHighlight(sel, darken = true){
      if(parentHeader) parentHeader.style.zIndex = '745';
      
      // Robust scrolling calculation for iOS Safari compatibility
-     if (!scrolled) {
+     if (!scrolled && scrollTarget) {
          _tutScrollHighlightedElement(el);
          scrolled = true;
      }
@@ -207,6 +207,17 @@ function _tutHighlight(sel, darken = true){
   else bd.classList.remove('show');
 }
 
+
+function _tutScrollToDefaultTop(){
+  setTimeout(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  }, 60);
+}
+
+function _tutHighlightForAction(sel, darken = false){
+  _tutHighlight(sel, darken, false);
+  _tutScrollToDefaultTop();
+}
 function _tutEscapeHtml(text){
   return String(text||'')
     .replace(/&/g,'&amp;')
@@ -225,7 +236,7 @@ function _tutFormatText(text){
 
 function _tutShowTip(title, text, btnLabel, highlight, darken = true, position = 'bottom'){
   _tutBlockInput(true);
-  _tutHighlight(highlight || null, darken);
+  _tutHighlight(highlight || null, darken, true);
   const ov = document.getElementById('tutOverlay');
   ov.classList.remove('top', 'middle');
   
@@ -283,8 +294,7 @@ function tutAdvance(){
     if(_tutStep === 6){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('after_shot', ()=>{ tutAdvance(); });
       return;
     }
@@ -300,55 +310,47 @@ function tutAdvance(){
     if(_tutStep === 9){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false);
       _tutWaitFor('next_shot_clicked', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 10){
       _tutShowTip('GETTING CLOSER', 'Notice how the grid changed. Because you are closer to the hole, you now have more **Fairway** cells and a better chance of a good result. Let\'s roll your **approach shot**!', 'PROCEED', '.grid-wrap', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 11){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('after_shot', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 12){
       _tutShowTip('GREAT APPROACH!', 'You landed on the **Green** — the smooth surface around the hole where putting happens. On harder holes you will see more challenging zones like **Rough**, **Sand**, **Chip**, and sometimes **Water**, all of which can make your next shot more difficult. Tap **NEXT SHOT** to load the putting grid and finish the hole.', 'GOT IT', '#nextShotBtn', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 13){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false);
       _tutWaitFor('next_shot_clicked', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 14){
       _tutShowTip('PUTTING TIME!', 'Now it’s all about **putting**. The grid shows **1-Putt** (green, 1 stroke to finish), **2-Putt** (yellow, 2 strokes), and **3-Putt** (red, 3 strokes) cells. Aim always for **1-Putt**!', 'PUTT FOR BIRDIE', '.grid-wrap', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 15){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('after_putt_shot', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 16){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false); 
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false); 
       _tutWaitFor('hole_complete', ()=>{ tutAdvance(); });
       return;
     }
@@ -377,8 +379,7 @@ function tutAdvance(){
     if(_tutStep === 2){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('wc_revealed', ()=>{ tutAdvance(); }); 
       return;
     }
@@ -389,7 +390,7 @@ function tutAdvance(){
     if(_tutStep === 4){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#wcReveal', false);
+      _tutHighlightForAction('#wcReveal', false);
       _tutWaitFor('wc_equipped', ()=>{ tutAdvance(); });
       return;
     }
@@ -400,21 +401,18 @@ function tutAdvance(){
     if(_tutStep === 6){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false);
       _tutWaitFor('next_shot_clicked', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 7){
       _tutShowTip('WATCH OUT!', 'You avoided the first hazards. Now, roll your approach shot to try and reach the green. Keep clear of the **water**!', 'PROCEED', '#rollBtn', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 8){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('after_shot', ()=>{ tutAdvance(); });
       return;
     }
@@ -425,62 +423,54 @@ function tutAdvance(){
     if(_tutStep === 10){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#wcFab', true);
+      _tutHighlightForAction('#wcFab', true);
       _tutWaitFor('wc_used', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 11){
       _tutShowTip('PENALTY REMOVED!', 'Your **Wildcard** saved you a stroke! Now tap **NEXT SHOT** to continue.', 'THANKS!', '#nextShotBtn', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 12){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false);
       _tutWaitFor('next_shot_clicked', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 13){
       _tutShowTip('RECOVERY SHOT', 'You still have to replay the shot from the same spot, so this is your recovery chance. Roll again to try landing on the **Green**.', 'GOT IT', '#rollBtn', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 14){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('after_shot', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 15){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false);
       _tutWaitFor('next_shot_clicked', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 16){
       _tutShowTip('FINISH THE HOLE', 'Great, you have a chance for **Birdie** now! **ROLL** to putt.', 'PROCEED', '#rollBtn', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 17){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('after_putt_shot', ()=>{ tutAdvance(); });
       return;
     }
     if(_tutStep === 18){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#nextShotBtn', false); // Highlight the FINISH HOLE button
-      scrollToGrid();
+      _tutHighlightForAction('#nextShotBtn', false); // Highlight the FINISH HOLE button
       _tutWaitFor('hole_complete', ()=>{ tutAdvance(); });
       return;
     }
@@ -500,14 +490,12 @@ function tutAdvance(){
   if(hi === 2){
     if(_tutStep === 0){
       _tutShowTip('HOLE 3 — PAR 3', 'Par 3 holes are shorter and more direct. You tee off straight at the **Green**. This grid includes a special ⛳ **"Hole In!"** cell. Land on it for a chance at a **hole-in-one**! Tap **ROLL** to proceed.', 'ROLL', '#rollBtn', true);
-      scrollToGrid();
       return;
     }
     if(_tutStep === 1){
       _tutHideTip();
       _tutBlockInput(false);
-      _tutHighlight('#rollBtn', false);
-      scrollToGrid();
+      _tutHighlightForAction('#rollBtn', false);
       _tutWaitFor('hole_complete', ()=>{ tutAdvance(); });
       return;
     }
