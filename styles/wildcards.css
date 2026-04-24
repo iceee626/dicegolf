@@ -86,6 +86,7 @@
   padding:16px;display:flex;align-items:center;justify-content:space-between;
 }
 .wc-drawer-title{font-family:'Bebas Neue',cursive;font-size:20px;letter-spacing:3px;color:#fff;}
+.wc-drawer-head .mode-info-btn{background-size:15px 15px;background-position:center;}
 .wc-drawer-close{background:rgba(224,82,82,.24);border:1px solid rgba(255,82,82,.55);color:#ffd7d7;width:28px;height:28px;border-radius:7px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .wc-drawer-close:hover{background:rgba(224,82,82,.36);border-color:rgba(255,82,82,.8);}
 .wc-drawer-close:active{transform:translateY(1px) scale(.95);}
