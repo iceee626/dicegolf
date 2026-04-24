@@ -31,12 +31,12 @@ body.theme-light .app::before{
 body.theme-light .tv-bar{background:var(--tv-bar-bg);}
 body.theme-light .tv-row1{background:var(--tv-row1-bg);}
 body.theme-light .menu-screen,body.theme-light .diff-screen,body.theme-light .name-screen{background:var(--dark);}
-body.theme-light .wc-drawer{background:#f8f0ff;border-left:1px solid #d4b8f0;}
-body.theme-light .wc-slot{background:rgba(0,0,0,.04);border-color:rgba(123,47,158,.3);}
-body.theme-light .wc-slot-name{color:#5a1a8e;}
-body.theme-light .wc-slot-desc{color:rgba(0,0,0,.5);}
-body.theme-light .wc-slot.empty{background:rgba(0,0,0,.02);}
-body.theme-light .wc-slot-empty-txt{color:rgba(0,0,0,.4);}
+body.theme-light .wc-drawer{background:#1a0e28;border-left:1px solid #4a2a6e;}
+body.theme-light .wc-slot{background:rgba(255,255,255,.05);border-color:rgba(123,47,158,.4);}
+body.theme-light .wc-slot-name{color:#e0c0ff;}
+body.theme-light .wc-slot-desc{color:rgba(255,255,255,.5);}
+body.theme-light .wc-slot.empty{background:rgba(255,255,255,.05);}
+body.theme-light .wc-slot-empty-txt{color:rgba(255,255,255,.25);}
 body.theme-light .menu-btn-sec{background:rgba(0,0,0,.05);}
 body.theme-light .hio-overlay{background:rgba(255,255,255,.97);}
 body.theme-light .hio-title{color:#8a6000;}
@@ -46,9 +46,9 @@ body.theme-light .hist-modal{background:rgba(240,244,248,.97);}
 body.theme-light .profile-modal{background:rgba(240,244,248,.97);}
 body.theme-light .summary-modal{background:linear-gradient(180deg,var(--course-bg-top) 0%,var(--course-bg-bottom) 100%);}
 body.theme-light .setup-back-btn,
-body.theme-light .profile-hub-back{background-image:url('../assets/back.svg');}
-body.theme-light .mode-info-btn{background-image:url('../assets/info.svg');}
-body.theme-light #gameBackBtn{background-image:url('../assets/back.svg');}
+body.theme-light .profile-hub-back{background-image:url('../assets/back-light.svg');}
+body.theme-light .mode-info-btn{background-image:url('../assets/info-light.svg');}
+body.theme-light #gameBackBtn{background-image:url('../assets/back-light.svg');}
 body.theme-light .onboard-input{background:rgba(0,0,0,.04);}
 body.theme-light .onboard-input::placeholder{color:rgba(28,33,40,.45);}
 body.theme-light #menuSettingsBtn{color:#fff!important;}
