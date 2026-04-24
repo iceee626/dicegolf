@@ -1,0 +1,84 @@
+{
+  "name": "DiceGolf",
+  "short_name": "DiceGolf",
+  "id": "./",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d1117",
+  "theme_color": "#0d1117",
+  "description": "DiceGolf - mobile golf dice game.",
+  "icons": [
+    {
+      "src": "icons/icon_20pt@1x_20px.png",
+      "sizes": "20x20",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_20pt@2x_40px.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_20pt@3x_60px.png",
+      "sizes": "60x60",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_29pt@1x_29px.png",
+      "sizes": "29x29",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_29pt@2x_58px.png",
+      "sizes": "58x58",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_29pt@3x_87px.png",
+      "sizes": "87x87",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_40pt@1x_40px.png",
+      "sizes": "40x40",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_40pt@2x_80px.png",
+      "sizes": "80x80",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_40pt@3x_120px.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_76pt@1x_76px.png",
+      "sizes": "76x76",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_76pt@2x_152px.png",
+      "sizes": "152x152",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_83pt@2x_167px.png",
+      "sizes": "167x167",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_60pt@3x_180px.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon_1024pt@1x_1024px.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}

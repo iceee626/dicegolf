@@ -1,0 +1,970 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DiceGolf">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0d1117">
+<title>DiceGolf</title>
+<script src="scripts/bootstrap.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sen:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon_60pt@3x_180px.png">
+<link rel="apple-touch-icon" sizes="152x152" href="icons/icon_76pt@2x_152px.png">
+<link rel="apple-touch-icon" sizes="167x167" href="icons/icon_83pt@2x_167px.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon_60pt@3x_180px.png">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/menu.css">
+<link rel="stylesheet" href="styles/game.css">
+<link rel="stylesheet" href="styles/modals.css">
+<link rel="stylesheet" href="styles/wildcards.css">
+<link rel="stylesheet" href="styles/versus.css">
+<link rel="stylesheet" href="styles/tutorial.css">
+</head>
+<body class="startup-no-anim">
+<div class="orientation-lock" id="orientationLockOverlay" aria-live="polite">
+  <div class="orientation-lock-card">
+    <div class="orientation-lock-title">PORTRAIT ONLY</div>
+    <div class="orientation-lock-sub">Rotate your device back to portrait to keep playing.</div>
+  </div>
+</div>
+<div class="menu-screen" id="onboardScreen" style="display:none;">
+  <div class="menu-content onboard-content">
+    <div class="menu-logo"><img class="brand-logo-img" src="assets/dicegolf-logo.png" alt="Dice Golf"></div>
+    <div style="font-family:'Sen', sans-serif;font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:20px;">CREATE YOUR PROFILE</div>
+    <input class="onboard-input" id="onboardInput" placeholder="ENTER YOUR NAME" maxlength="12" autocomplete="off" spellcheck="false">
+    <button class="menu-btn-play" onclick="createFirstProfile()" style="margin-top:12px;">START PLAYING</button>
+  </div>
+</div>
+
+<div class="menu-screen" id="menuScreen" style="display:none;">
+  <div class="menu-bg-grass"></div>
+  <div id="floatingEntities"></div>
+
+  <button onclick="openProfileModal()" style="position:absolute;top:calc(env(safe-area-inset-top) + 16px);right:24px;display:flex;align-items:center;gap:8px;z-index:110;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:30px;padding:4px 12px 4px 4px;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.15s;">
+    <div id="menuProfileIconBtn" style="width:28px;height:28px;border-radius:50%;background:var(--c-fwy);display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 2px 4px rgba(0,0,0,0.3);">👤</div>
+    <span id="menuProfileName" style="font-family:'Bebas Neue', cursive;font-size:16px;letter-spacing:1px;color:var(--text);padding-bottom:1px;"></span>
+  </button>
+  
+  <div class="menu-content">
+  <div class="menu-logo"><img class="brand-logo-img" src="assets/dicegolf-logo.png" alt="Dice Golf"></div>
+  <div id="menuActiveProfile" style="display:none;"></div>
+  <br>
+  
+  <div class="menu-btns" id="menuBtns">
+    <button class="menu-btn-play" id="menuContinueBtn" onclick="continueGame()" style="display:none;background:#1a5f8a;flex-direction:column;align-items:center;justify-content:center;line-height:1.2;padding:12px;"></button>
+    <button class="menu-btn-play" id="menuPlayBtn" onclick="navToPlayMode()" style="padding:20px 16px; font-size:28px; min-height:84px;">⛳ PLAY</button>
+    <div style="display:flex; gap:10px;">
+      <button class="menu-btn-play" id="menuVersusBtn" onclick="navToVersusSetup()" style="flex:1; background:linear-gradient(135deg,#1a5f8a,#2a3a6e);box-shadow:0 4px 20px rgba(30,95,138,.4); font-size:20px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;"><span style="font-size:24px;line-height:1;">🆚</span> VERSUS</button>
+      <button class="menu-btn-sec" id="menuSettingsBtn" onclick="openSettings()" style="flex:1; font-size:20px; letter-spacing:2px; padding:20px 10px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; background:rgba(255,255,255,0.05); border-radius:18px;"><span class="menu-settings-icon" aria-hidden="true"></span> SETTINGS</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- TUTORIAL PROMPT -->
+<div class="tut-prompt" id="tutPrompt">
+  <div class="tut-prompt-card">
+    <div style="font-size:48px;margin-bottom:12px;">⛳</div>
+    <div class="tut-prompt-title">PLAY TUTORIAL?</div>
+    <div class="tut-prompt-desc">New to DiceGolf? Start with the short 3-hole tutorial to learn the basics of zones, dice rolls, penalties, wildcards, and putting. It only takes a few minutes.</div>
+    <div class="tut-prompt-btns">
+      <button style="background:var(--c-fwy);color:#fff;" onclick="startTutorial()">PLAY TUTORIAL</button>
+      <button style="background:rgba(255,255,255,.08);color:var(--muted);border:1px solid var(--border);" onclick="skipTutorial()">SKIP</button>
+    </div>
+  </div>
+</div>
+
+<!-- TUTORIAL OVERLAY (tips during tutorial) -->
+<div class="tut-overlay" id="tutOverlay">
+  <div class="tut-overlay-title" id="tutOverlayTitle"></div>
+  <div class="tut-overlay-text" id="tutOverlayText"></div>
+  <button class="tut-overlay-btn" id="tutOverlayBtn" onclick="tutNext()">GOT IT</button>
+</div>
+
+<!-- VERSUS MODE SETUP -->
+<div class="setup-screen" id="versusSetupScreen" style="display:none">
+  <div class="setup-card" style="max-width:380px;">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" onclick="navBack('menuScreen')" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">VERSUS MODE</div>
+      <button class="mode-info-btn" style="position:static;" onclick="openModeInfo('versus')">&#9432;</button>
+    </div>
+    <div class="vs-setup-players">
+      <div class="vs-player-card">
+        <div class="vs-player-label">PLAYER 1</div>
+        <div class="vs-player-row">
+          <button class="vs-icon-btn" id="vs1Icon" onclick="toggleVsEmoji(1)">🏌️</button>
+          <input class="onboard-input" id="vs1Name" placeholder="NAME" maxlength="10" autocomplete="off" spellcheck="false" style="font-size:18px;padding:10px 12px;">
+        </div>
+        <div class="vs-emoji-picker" id="vs1Emoji"></div>
+      </div>
+      <div class="vs-player-card">
+        <div class="vs-player-label">PLAYER 2</div>
+        <div class="vs-player-row">
+          <button class="vs-icon-btn" id="vs2Icon" onclick="toggleVsEmoji(2)">⛳</button>
+          <input class="onboard-input" id="vs2Name" placeholder="NAME" maxlength="10" autocomplete="off" spellcheck="false" style="font-size:18px;padding:10px 12px;">
+        </div>
+        <div class="vs-emoji-picker" id="vs2Emoji"></div>
+      </div>
+    </div>
+    <button class="menu-btn-play" style="width:100%;font-size:18px;" onclick="navToVsOptions()">NEXT</button>
+  </div>
+</div>
+
+<!-- VERSUS OPTIONS SCREEN -->
+<div class="setup-screen" id="vsOptionsScreen" style="display:none">
+  <div class="setup-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" onclick="navBack('versusSetupScreen')" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">GAME OPTIONS</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    
+    <div class="setup-group">
+      <span class="setup-lbl">FORMAT</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="vsFormatStroke" onclick="vsSetFormat('stroke')">🏆 STROKE PLAY</button>
+        <button class="diff-btn" id="vsFormatMatch" onclick="vsSetFormat('match')">⚔️ MATCH PLAY</button>
+      </div>
+    </div>
+    
+    <div class="setup-group">
+      <span class="setup-lbl">ROUNDS</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="vsR-1" onclick="vsSetRounds(1)">ONE</button>
+        <button class="diff-btn" id="vsR-2" onclick="vsSetRounds(2)">TWO</button>
+        <button class="diff-btn" id="vsR-3" onclick="vsSetRounds(3)">THREE</button>
+        <button class="diff-btn" id="vsR-4" onclick="vsSetRounds(4)">FOUR</button>
+      </div>
+    </div>
+
+    <div class="setup-group">
+      <span class="setup-lbl">HOLES</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="vsH-18" onclick="vsSetHoles('18')">18 HOLES</button>
+        <button class="diff-btn" id="vsH-front" onclick="vsSetHoles('front')">FRONT 9</button>
+        <button class="diff-btn" id="vsH-back" onclick="vsSetHoles('back')">BACK 9</button>
+      </div>
+    </div>
+    
+    <div class="setup-group">
+      <span class="setup-lbl">DIFFICULTY</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="vsDiff-1" onclick="vsSetDiff(1)">EASY</button>
+        <button class="diff-btn" id="vsDiff-2" onclick="vsSetDiff(2)">MEDIUM</button>
+        <button class="diff-btn" id="vsDiff-3" onclick="vsSetDiff(3)">HARD</button>
+      </div>
+    </div>
+    
+    <button class="menu-btn-play" style="width:100%;font-size:18px;" onclick="vsStartFromOptions()">NEXT</button>
+  </div>
+</div>
+
+<!-- VERSUS TURN TRANSITION -->
+<div class="vs-turn-screen" id="vsTurnScreen">
+  <div class="vs-turn-icon" id="vsTurnIcon">🏌️</div>
+  <div class="vs-turn-name" id="vsTurnName">PLAYER 1</div>
+  <div class="vs-turn-sub" id="vsTurnSub">HOLE 1 · PAR 4</div>
+  <button class="vs-turn-btn" id="vsTurnBtn" onclick="vsStartTurn()">READY</button>
+</div>
+
+<!-- SINGLE ROUND START TRANSITION -->
+<div class="vs-turn-screen" id="roundStartScreen">
+  <div class="vs-turn-icon" id="rsTurnIcon">🏌️</div>
+  <div class="vs-turn-name" id="rsTurnName">PLAYER</div>
+  <div class="vs-turn-sub" id="rsTurnSub">HOLE 1 · PAR 4</div>
+  <div class="vs-turn-meta" id="rsTurnMeta">HOLE 1 · PAR 4</div>
+  <button class="vs-turn-btn" onclick="startSingleRoundFromSplash()">READY</button>
+</div>
+
+<div class="setup-screen" id="playModeScreen" style="display:none">
+  <div class="setup-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" onclick="navBack('menuScreen')" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">SELECT MODE</div>
+      <button class="mode-info-btn" style="position:static;" onclick="openModeInfo('play')">&#9432;</button>
+    </div>
+    <div class="mode-menu">
+      <button class="menu-btn-sec mode-menu-card" onclick="navToModeDifficulty('single')">
+        <div class="mode-menu-copy">
+          <span class="mode-menu-title">SINGLE ROUND</span>
+          <span class="mode-menu-sub">Quick  play • 18 holes</span>
+        </div>
+        <span class="mode-menu-icon">⛳</span>
+      </button>
+      <button class="menu-btn-sec mode-menu-card" onclick="navToModeDifficulty('tournament')">
+        <div class="mode-menu-copy">
+          <span class="mode-menu-title">TOURNAMENT</span>
+          <span class="mode-menu-sub">Full golf event • 4 rounds</span>
+        </div>
+        <span class="mode-menu-icon">🏆</span>
+      </button>
+      <button class="menu-btn-sec mode-menu-card" disabled>
+        <div class="mode-menu-copy">
+          <span class="mode-menu-title">PRO TOUR</span>
+          <span class="mode-menu-sub">Season format • coming soon</span>
+        </div>
+        <span class="mode-menu-icon">🌎</span>
+      </button>
+      <button class="menu-btn-sec mode-menu-card" onclick="navToCustom()">
+        <div class="mode-menu-copy">
+          <span class="mode-menu-title">CUSTOM GAME</span>
+          <span class="mode-menu-sub">Configure your own experience</span>
+        </div>
+        <span class="mode-menu-icon">⚙️</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="setup-screen" id="customScreen" style="display:none">
+  <div class="setup-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" onclick="navBack('playModeScreen')" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">GAME OPTIONS</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    
+    <div class="setup-group">
+      <span class="setup-lbl">ROUNDS</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="cr-1" onclick="setCustomRounds(1)">ONE</button>
+        <button class="diff-btn" id="cr-2" onclick="setCustomRounds(2)">TWO</button>
+        <button class="diff-btn" id="cr-3" onclick="setCustomRounds(3)">THREE</button>
+        <button class="diff-btn" id="cr-4" onclick="setCustomRounds(4)">FOUR</button>
+      </div>
+    </div>
+    
+    <div class="setup-group">
+      <span class="setup-lbl">HOLES</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="ch-18" onclick="setCustomHoles('18')">18 HOLES</button>
+        <button class="diff-btn" id="ch-front" onclick="setCustomHoles('front')">FRONT 9</button>
+        <button class="diff-btn" id="ch-back" onclick="setCustomHoles('back')">BACK 9</button>
+      </div>
+    </div>
+
+    <div class="setup-group">
+      <span class="setup-lbl">OPPONENT</span>
+      <div class="diff-row">
+        <button class="diff-btn active">SOLO</button>
+        <button class="diff-btn" disabled>VS CPU</button>
+      </div>
+    </div>
+    
+    <div class="setup-group">
+      <span class="setup-lbl">DIFFICULTY</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="cdiff-btn-1" onclick="setCustomDiff(1)">EASY</button>
+        <button class="diff-btn" id="cdiff-btn-2" onclick="setCustomDiff(2)">MEDIUM</button>
+        <button class="diff-btn" id="cdiff-btn-3" onclick="setCustomDiff(3)">HARD</button>
+      </div>
+    </div>
+
+    <button class="menu-btn-play" style="width:100%;font-size:18px;" onclick="navToCourse('custom')">NEXT</button>
+  </div>
+</div>
+
+<div class="setup-screen" id="courseScreen" style="display:none">
+  <div class="setup-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" onclick="navBackFromCourse()" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">SELECT COURSE</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    
+    <button class="course-btn" id="courseLittlePinesBtn" data-course-id="little-pines" onclick="selectCourse('little-pines')">
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--text);">LITTLE PINES GC</div>
+        <div style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">PAR 72 · WOODLAND</div>
+      </div>
+      <div style="font-size:24px;">🌲</div>
+    </button>
+    
+    <button class="course-btn" id="coursePacificBeachBtn" data-course-id="pacific-beach" onclick="selectCourse('pacific-beach')">
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--text);">PACIFIC BEACH</div>
+        <div style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">PAR 71 · COASTAL</div>
+      </div>
+      <div style="font-size:24px;">🌊</div>
+    </button>
+
+    <button class="course-btn" id="courseDesertLinksBtn" data-course-id="desert-golf-links" onclick="selectCourse('desert-golf-links')">
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--text);">DESERT GOLF LINKS</div>
+        <div style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">PAR 71 · DESERT</div>
+      </div>
+      <div style="font-size:24px;">🌵</div>
+    </button>
+
+    <button class="course-btn" id="courseSeptembraNationalBtn" data-course-id="septembra-national" onclick="selectCourse('septembra-national')">
+      <div>
+        <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--text);">SEPTEMBRA NATIONAL</div>
+        <div style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">PAR 72 · MAJOR VENUE</div>
+      </div>
+      <div style="font-size:24px;">🌺</div>
+    </button>
+    <button class="menu-btn-play" id="vsCourseTeeOffBtn" onclick="teeOffFromCourse()" style="display:none;width:100%;font-size:20px;margin-top:12px;">TEE OFF</button>
+  </div>
+</div>
+
+<div class="setup-screen" id="diffScreen" style="display:none">
+  <div class="setup-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" onclick="navBack('playModeScreen')" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">DIFFICULTY</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      <button class="diff-btn active" id="diff-btn-1" onclick="setDiff(1)" style="padding:16px;font-size:20px;">EASY</button>
+      <button class="diff-btn" id="diff-btn-2" onclick="setDiff(2)" style="padding:16px;font-size:20px;">MEDIUM</button>
+      <button class="diff-btn" id="diff-btn-3" onclick="setDiff(3)" style="padding:16px;font-size:20px;">HARD</button>
+    </div>
+    
+    <button class="menu-btn-play" style="width:100%;font-size:20px;" onclick="showCourseAfterDiff()">NEXT</button>
+  </div>
+</div>
+
+<div class="app" id="mainApp" style="display:none">
+<header>
+  <div class="logo-row">
+    <button class="setup-back-btn" id="gameBackBtn" onclick="openGameScreenMenu()" aria-label="Back">&#8592;</button>
+    <div class="logo game-brand" id="gameBrand">
+      <img class="brand-logo-img brand-logo-game" src="assets/dicegolf_cropped.png" alt="Dice Golf">
+      <span class="game-brand-course" id="gameBrandCourse">LITTLE PINES</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:4px;">
+      <button id="gameSettingsBtn" onclick="openSettings(true)" style="background-color:rgba(255,255,255,.08);border:1px solid var(--border);color:transparent;border-radius:7px;width:32px;height:32px;font-size:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;line-height:1;" title="Settings" aria-label="Settings"></button>
+    </div>
+  </div>
+</header>
+<!-- Scorecard removed from game screen (still present in HOLE COMPLETE + SUMMARY) -->
+<div style="display:none;">
+  <div class="sc-inner">
+    <div class="sc-row sc-head" id="scHeadRow"><div></div></div>
+    <div class="sc-row sc-body" id="parRow"><div class="sc-lbl">PAR</div></div>
+    <div class="sc-row sc-body" id="scoreRow"><div class="sc-lbl">YOU</div></div>
+  </div>
+</div>
+
+<div class="hole-hero">
+  <div class="hole-hero-top">
+    <div class="hole-hero-copy">
+      <div class="hole-meta-row">
+        <div class="hole-title" id="holeName">HOLE 1</div>
+        <div class="hole-meta">
+          <span class="hole-yards" style="color:var(--muted);margin:0 2px;">•</span>
+          <span class="hole-yards" id="holeYards">387 yds</span>
+          <span class="hole-yards" style="color:var(--muted);margin:0 2px;">•</span>
+          <span style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">Difficulty</span>
+          <span class="stars" id="holeStars"><span class="star empty">☆</span><span class="star empty">☆</span><span class="star empty">☆</span></span>
+        </div>
+      </div>
+      <div class="hole-score-row">
+        <div class="par-block">
+          <div class="par-word">PAR</div>
+          <div class="par-num" id="holePar">4</div>
+        </div>
+        <div class="hole-hero-distance" id="yrdNum">387 yds</div>
+      </div>
+    </div>
+  </div>
+  <div class="hole-hero-bottom">
+    <div class="yrd-track"><div class="yrd-fill" id="yrdFill" style="width:100%"></div></div>
+    <div class="yrd-lbl" id="yrdLbl">to hole</div>
+  </div>
+</div>
+
+<div class="grid-section">
+  <div class="sec-title" id="gridTitle">Tee Shot Grid</div>
+  <div class="grid-wrap"><div class="grid-axes" id="gridAxes"></div></div>
+</div>
+
+<div class="dice-row">
+  <div class="dc"><div class="dc-lbl">Row</div><div class="die" id="die1"><div class="die-pips" id="dp1"></div></div></div>
+  <div class="dc"><div class="dc-lbl">Col</div><div class="die" id="die2"><div class="die-pips" id="dp2"></div></div></div>
+  <div class="roll-col">
+    <button class="btn-roll shot-btn-visible" id="rollBtn" onclick="doRoll()">ROLL</button>
+    <button class="btn-roll shot-btn-hidden" id="nextShotBtn" onclick="doNextShot()" style="background:var(--c-tee);">NEXT SHOT</button>
+  </div>
+</div>
+
+<div class="result-panel" id="resultPanel">
+  <div class="res-chip" id="resChip" style="background:var(--border)">🎲</div>
+  <div class="res-info">
+    <div class="res-title" id="resTitle" style="color:var(--muted)">Ready to tee off</div>
+    <div class="res-sub" id="resSub">Roll the dice</div>
+  </div>
+  <div class="res-badge" id="resBadge"></div>
+</div>
+
+<div class="log-section">
+  <div class="sec-title">Shot Log</div>
+  <div class="log-list" id="logList"></div>
+</div>
+
+<div class="sec-title" id="legendToggleBtn" style="margin:0 16px 7px; cursor:pointer;" onclick="toggleLegend()">
+  ZONE LEGEND <span id="legendArrow">▾</span>
+</div>
+<div class="legend" id="legend" style="display:grid;">
+</div>
+</div>
+<div class="profile-modal" id="gameMenuModal" style="z-index:700;">
+  <div class="profile-card" style="max-width:320px;">
+    <div class="profile-body" style="padding:20px;">
+      <div style="font-family:'Bebas Neue',cursive;font-size:24px;letter-spacing:1px;color:var(--text);text-align:center;margin-bottom:14px;white-space:nowrap;">What would you like to do?</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button onclick="resumeGameScreenMenu()" style="width:100%;background:#1a5f8a;color:#fff;border:1px solid rgba(30,95,138,.7);border-radius:10px;padding:12px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;cursor:pointer;box-shadow:0 4px 14px rgba(30,95,138,.35), inset 0 1px 0 rgba(255,255,255,.06);">RESUME</button>
+        <button onclick="saveAndMenuFromGameScreen()" style="width:100%;background:var(--c-fwy);color:#fff;border:none;border-radius:10px;padding:12px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;cursor:pointer;">SAVE &amp; MENU</button>
+        <button onclick="abandonFromGameScreenMenu()" style="width:100%;background:transparent;color:#ff8080;border:1px solid rgba(255,82,82,.35);border-radius:10px;padding:12px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;cursor:pointer;">ABANDON</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="summary-modal" id="summaryModal">
+  <div class="summary-card">
+    <div class="sum-head">
+      <button class="setup-back-btn" id="sumBackBtn" onclick="summaryGoBack()" style="position:static;transform:none;display:none;" aria-label="Back">&#8592;</button>
+      <div class="sum-title" id="sumTitle" style="flex:1;text-align:center;">SUMMARY</div>
+      <span class="sum-head-spacer" id="sumHeadSpacer"></span>
+    </div>
+    <div class="sum-body" id="sumBody"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="ov">
+    <div class="ov-emoji" id="ovEmoji">⛳</div>
+    <div class="ov-title" id="ovTitle">HOLE COMPLETE</div>
+    <div class="ov-namerow" id="ovNameRow"></div>
+    <div class="ov-statsrow" id="ovStatsRow"></div>
+    <button class="ov-btn" id="ovBtn" onclick="nextHole()">CONTINUE</button>
+    <button class="ov-btn" id="ovSummaryBtn" style="display:none;margin-top:8px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--text);" onclick="openSummaryTransition(S.currentRound,'overlay')">VIEW SUMMARY</button>
+    <button class="ov-btn" id="ovPlayAgainBtn" style="display:none;margin-top:8px;background:var(--c-fwy);" onclick="">PLAY AGAIN</button>
+  </div>
+</div>
+
+<div class="hc-screen" id="hcScreen">
+  <div class="hc-header">
+    <span id="hcHoleTitle">HOLE 1 COMPLETE</span>
+    <div class="hc-rnd-badge" id="hcRndBadge">ROUND 1</div>
+  </div>
+  <div class="hc-card" id="hcScoreCard">
+    <div class="hc-card-row">
+      <div class="hc-card-left">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <div class="hc-card-icon" id="hcIcon">🐦</div>
+          <div class="hc-card-title" id="hcTitle">BIRDIE!</div>
+        </div>
+        <div class="hc-card-sub" id="hcSub">3 STROKES · PAR 4</div>
+      </div>
+      <div class="hc-card-tot-wrap" id="hcTot">
+        <span class="hc-card-tot-lbl">TOTAL</span>
+        <div class="hc-card-tot">
+          <span id="hcTotSpan" style="color:#52c87a">-1</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="hcMidSection" style="flex:1; display:flex; flex-direction:column; min-height:0; padding-bottom:12px;">
+    <div class="sec-title" style="flex-shrink:0;">SHOT REPLAY</div>
+    <div id="hcShotTrailCard" style="flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:10px 12px;margin-bottom:8px;overflow:hidden;">
+      <div id="hcShotTrail" style="display:flex;align-items:center;justify-content:flex-start;gap:8px;padding:2px 0;flex-wrap:nowrap;overflow-x:auto;"></div>
+    </div>
+    <div id="hcShotDetailCard" style="flex-shrink:0;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px;margin-bottom:12px;min-height:66px;display:flex;align-items:center;">
+      <div id="hcShotDetail" style="width:100%;display:flex;align-items:center;gap:12px;"></div>
+    </div>
+    <div class="sec-title" style="flex-shrink:0;">SCORECARD</div>
+    <div class="sc-wrap" style="margin-bottom:0; flex-shrink:0;">
+      <div class="sc-inner">
+        <div class="sc-row sc-head" id="hcScHead"></div>
+        <div class="sc-row sc-body" id="hcScPar"><div class="sc-lbl">PAR</div></div>
+        <div class="sc-row sc-body" id="hcScYou"><div class="sc-lbl">YOU</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="hc-btn-wrap" style="padding-top:4px;">
+    <button class="menu-btn-play" id="hcBtn" onclick="nextHole()" style="width:100%; font-size:24px;">HOLE 2 →</button>
+  </div>
+</div>
+
+<div class="hist-modal" id="histModal">
+  <div class="hist-card">
+    <div class="hist-head">
+      <div class="hist-htitle" id="histTitle">HOLE 1 RECAP</div>
+      <button class="hist-close" onclick="closeHist()">✕</button>
+    </div>
+    <div class="hist-body" id="histBody"></div>
+  </div>
+</div>
+
+
+<script src="scripts/ui/animations.js"></script>
+<script src="scripts/config.js"></script>
+<script src="scripts/app.js"></script>
+<script src="scripts/courses.js"></script>
+<script src="scripts/state.js"></script>
+<script src="scripts/ui/screens.js"></script>
+<script src="scripts/ui/scorecard.js"></script>
+<script src="scripts/profiles.js"></script>
+<script src="scripts/ui/modals.js"></script>
+<script src="scripts/wildcards.js"></script>
+<script src="scripts/storage.js"></script>
+<script src="scripts/rules.js"></script>
+<script src="scripts/tutorial.js"></script>
+<script src="scripts/versus.js"></script>
+
+<div class="profile-modal" id="settingsModal">
+  <div class="profile-card">
+    <div class="profile-head">
+      <div class="profile-head-title">SETTINGS</div>
+      <button class="profile-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div class="profile-body">
+      <div class="settings-section-title">APPEARANCE</div>
+      <div style="display:flex;gap:6px;margin-bottom:16px;">
+        <button id="themeBtn-dark" onclick="setTheme('dark')" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">🌙 DARK</button>
+        <button id="themeBtn-light" onclick="setTheme('light')" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">☀️ LIGHT</button>
+        <button id="themeBtn-system" onclick="setTheme('system')" style="flex:1;border-radius:8px;padding:9px 4px;font-family:'Sen', sans-serif;font-size:10px;letter-spacing:1px;cursor:pointer;border:1px solid var(--border);transition:all .15s;">🔄 SYSTEM</button>
+      </div>
+      <div class="settings-section-title tight">GAME OPTIONS</div>
+      <div class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🔊 SOUND</div>
+          <div class="settings-row-desc">Shot sound effects</div>
+        </div>
+        <div class="toggle-switch" id="soundToggle" onclick="setSoundPref(!soundEnabled())"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">📳 VIBRATIONS</div>
+          <div class="settings-row-desc">Haptic feedback on shots &amp; events</div>
+        </div>
+        <div class="toggle-switch" id="vibToggle" onclick="setVibPref(!vibEnabled())"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🪇 SHAKE TO ROLL</div>
+          <div class="settings-row-desc">Shake your phone to roll the dice</div>
+        </div>
+        <div class="toggle-switch" id="shakeToggle" onclick="setRollMode(getRollMode()==='haptic'?'classic':'haptic')"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🃏 WILDCARDS</div>
+          <div class="settings-row-desc">Roll doubles to earn wildcard cards</div>
+        </div>
+        <div class="toggle-switch" id="wcToggle" onclick="setWcPref(!wcEnabled())"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">&#x1F7E8; HIDE ZONE LEGEND</div>
+          <div class="settings-row-desc">Remove the panel from the game</div>
+        </div>
+        <div class="toggle-switch" id="zoneLegendToggle" onclick="setLegendPref(!legendHiddenEnabled())"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">📏 DISTANCE</div>
+          <div class="settings-row-desc">Unit of measurement</div>
+        </div>
+        <div class="txt-toggle" id="metricsToggle" onclick="setMetricsPref(getMetrics()==='yards'?'meters':'yards')">
+          <div class="txt-toggle-knob"></div>
+          <div class="txt-lbl lbl-l">YDS</div>
+          <div class="txt-lbl lbl-r">M</div>
+        </div>
+      </div>
+      <div class="settings-row no-divider">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">🏷️ CELL LABELS</div>
+          <div class="settings-row-desc">Show zone name on the grid always</div>
+        </div>
+        <div class="txt-toggle" id="labelsToggle" onclick="setCellLabelModeDirect(getCellLabelMode()==='tap'?'always':'tap')">
+          <div class="txt-toggle-knob"></div>
+          <div class="txt-lbl lbl-l">TAP</div>
+          <div class="txt-lbl lbl-r">YES</div>
+        </div>
+      </div>
+      <div id="settingsTutorialHdr" class="settings-section-title tight spaced-top">TUTORIAL</div>
+      <div id="settingsTutorialRow" class="settings-row">
+        <div>
+          <div style="font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:1px;color:var(--text);">📖 TUTORIAL</div>
+<div class="settings-row-desc">Learn how to play DiceGolf</div>
+        </div>
+        <button onclick="closeSettings(startTutorialFromSettings)" style="background:rgba(255,255,255,.1);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-family:'Sen', sans-serif;font-size:11px;letter-spacing:1px;cursor:pointer;min-width:52px;">PLAY</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="profile-modal" id="editProfileModal" style="z-index:650;">
+  <div class="profile-card" style="max-width:360px;">
+    <div class="profile-head">
+      <div class="profile-head-title">EDIT PROFILE</div>
+      <button class="profile-close" onclick="closeEditProfile()">✕</button>
+    </div>
+    <div class="profile-body">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px;">
+        <div id="editProfileIconPreview" style="width:52px;height:52px;border-radius:50%;background:var(--c-tee);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;cursor:pointer;border:2px solid var(--border);" onclick="focusIconPicker()">🏌️</div>
+        <div style="flex:1;">
+          <div style="font-family:'Sen', sans-serif;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:5px;">DISPLAY NAME</div>
+         <input class="profile-new-input" id="editProfileName" placeholder="YOUR NAME" maxlength="10" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+      <div style="font-family:'Sen', sans-serif;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;">CHOOSE ICON</div>
+      <div id="editProfileEmojiGrid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px;padding:2px;"></div>
+      <div class="profile-new-row">
+        <button class="profile-save-btn" onclick="saveEditProfile()">SAVE</button>
+        <button class="profile-cancel-btn" onclick="closeEditProfile()">CANCEL</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="profile-modal" id="profileModal">
+  <div class="profile-card">
+    <div class="profile-head">
+      <div class="profile-head-title">PROFILES</div>
+      <button class="profile-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div class="profile-body">
+      <div class="profile-slots" id="profileSlots"></div>
+      <div class="profile-new-form" id="profileNewForm">
+        <input class="profile-new-input" id="profileNewInput" placeholder="YOUR NAME" maxlength="10" autocomplete="off" spellcheck="false" style="margin-bottom:4px;" oninput="document.getElementById('newNameCount').textContent=this.value.length+'/10'">
+        <div id="newNameCount" style="font-family:'Sen', sans-serif;font-size:9px;color:var(--muted);text-align:right;margin-bottom:6px;">0/10</div>
+        <div class="profile-new-row">
+          <button class="profile-save-btn" onclick="saveNewProfile()">CREATE</button>
+          <button class="profile-cancel-btn" onclick="cancelNewProfile()">CANCEL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="profile-modal" id="profileHubModal">
+  <div class="profile-hub">
+    <svg width="0" height="0" style="position:absolute;pointer-events:none;">
+      <defs>
+        <linearGradient id="phRingGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#4ed67c"></stop>
+          <stop offset="100%" stop-color="#f0c040"></stop>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="profile-hub-head">
+      <button class="setup-back-btn profile-hub-back" id="profileHubBackBtn" onclick="profileHubBackToHome()" aria-label="Back" style="visibility:hidden;pointer-events:none;">&#8592;</button>
+      <div class="profile-hub-title">PROFILE</div>
+      <button class="profile-hub-close" onclick="closeProfileModal()">✕</button>
+    </div>
+    <div class="profile-hub-views">
+      <section class="profile-hub-view active" id="profileHubViewHome"></section>
+      <section class="profile-hub-view" id="profileHubViewStats"></section>
+      <section class="profile-hub-view" id="profileHubViewAchievements"></section>
+    </div>
+  </div>
+</div>
+
+<div class="profile-modal" id="xpRewardModal">
+  <div class="profile-card" style="max-width:390px;">
+    <div class="profile-head">
+      <div class="profile-head-title" id="xpRewardTitle">GAINED XP</div>
+    </div>
+    <div class="xp-modal-body" id="xpRewardBody"></div>
+  </div>
+</div>
+
+
+<button class="wc-fab" id="wcFab" onclick="openWcDrawer()">
+  <div class="wc-fab-icon">🃏</div>
+  <div class="wc-fab-count" id="wcFabCount">0/3</div>
+  <div class="wc-fab-slots">
+    <div class="wc-fab-dot" id="wcDot0"></div>
+    <div class="wc-fab-dot" id="wcDot1"></div>
+    <div class="wc-fab-dot" id="wcDot2"></div>
+  </div>
+</button>
+
+<div class="wc-backdrop" id="wcBackdrop" onclick="closeWcDrawer()"></div>
+
+<div class="wc-drawer" id="wcDrawer">
+  <div class="wc-drawer-head">
+    <div class="wc-drawer-title">🃏 WILDCARDS</div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="mode-info-btn" style="position:static;width:28px;height:28px;font-size:14px;margin:0;" onclick="openWcInfo()">&#9432;</button>
+      <button class="wc-drawer-close" onclick="closeWcDrawer()">✕</button>
+    </div>
+  </div>
+  <div class="wc-drawer-slots" id="wcDrawerSlots"></div>
+  <div class="wc-info-panel" id="wcInfoPanel">
+    <div class="wc-info-head">
+      <button id="wcInfoBackBtn" onclick="closeWcInfo()" class="setup-back-btn" style="width:28px;height:28px;font-size:16px;" aria-label="Back">&#8592;</button>
+      <div style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:#fff;" id="wcInfoTitle">ABOUT WILDCARDS</div>
+    </div>
+    <div class="wc-info-body">
+      <div class="wc-info-list" id="wcInfoList"></div>
+      <div class="wc-detail-panel" id="wcInfoDetail"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wc-reveal" id="wcReveal">
+  <div class="wc-reveal-rarity" id="wcRevealRarity">RARE</div>
+  <div class="wc-reveal-title">WILDCARD!</div>
+  <div class="wc-card-wrap" id="wcCardWrap" onclick="revealWcCard()">
+    <div class="wc-card" id="wcCard">
+      <div class="wc-card-face wc-card-back">🃏</div>
+      <div class="wc-card-face wc-card-front">
+        <div class="wc-front-icon" id="wcFrontIcon">⭐</div>
+        <div class="wc-front-name" id="wcFrontName">WILDCARD</div>
+        <div class="wc-front-desc" id="wcFrontDesc">Description</div>
+      </div>
+    </div>
+  </div>
+  <div class="wc-reveal-action-zone">
+    <div class="wc-reveal-hint" id="wcRevealHint">TAP CARD TO REVEAL</div>
+    <div class="wc-reveal-actions" id="wcRevealActions" style="display:none;">
+      <button class="wc-equip-btn" id="wcEquipBtn" onclick="equipWildcard()">EQUIP</button>
+    </div>
+  </div>
+</div>
+<div class="tv-bar" id="tvBar">
+  <div class="tv-row1">
+    <div class="tv-icon-box">🏌️</div>
+    <div class="tv-nameblock">
+      <div class="tv-playername" id="tvName">PLAYER</div>
+      <div class="tv-holeinfo" id="tvHoleInfo">HOLE 1 · PAR 4</div>
+    </div>
+    <div class="tv-shots" id="tvShots"></div>
+    <div class="tv-totalbox">
+      <div class="tv-total-num" id="tvTotal">E</div>
+      <div class="tv-total-lbl">Total</div>
+    </div>
+  </div>
+  <div class="tv-row2" id="tvRow2">
+    <div class="tv-putt-status" id="tvPuttStatus">For Par</div>
+  </div>
+</div>
+
+<div class="hio-overlay" id="hioOverlay">
+  <div class="hio-ball" id="hioBall"><img src="assets/golf_ball.png" style="width:56px;height:56px;object-fit:contain;"></div>
+  <div class="hio-title">THE BALL IS IN THE AIR!</div>
+  <div class="hio-sub" id="hioSub">ROLL DOUBLES TO HOLE IT</div>
+  <div class="hio-dice-row">
+    <div class="hio-die" id="hioDie1">?</div>
+    <div class="hio-die" id="hioDie2">?</div>
+  </div>
+  <button class="hio-roll-btn" id="hioRollBtn" onclick="doHioRoll()">🎲 ROLL FOR IT</button>
+  <div class="hio-result" id="hioResult" style="display:none;"></div>
+</div>
+
+<div class="profile-modal" id="confirmModal" style="z-index:700;">
+  <div class="profile-card" style="max-width:300px;">
+    <div class="profile-body" style="padding:20px;">
+      <div id="confirmMsg" style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:var(--text);text-align:center;margin-bottom:20px;"></div>
+      <div style="display:flex;gap:10px;">
+        <button id="confirmYes" style="flex:1;background:rgba(255,255,255,.08);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:12px;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;cursor:pointer;">YES</button>
+        <button onclick="closeConfirm()" style="flex:1;background:#e05252;color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;cursor:pointer;">NO</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="profile-modal" id="alertModal" style="z-index:700;">
+  <div class="profile-card" style="max-width:300px;">
+    <div class="profile-body" style="padding:20px;">
+      <div id="alertMsg" style="font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;color:var(--text);text-align:center;margin-bottom:20px;"></div>
+      <button onclick="document.getElementById('alertModal').classList.remove('show')" style="width:100%;background:var(--c-fwy);color:#fff;border:none;border-radius:8px;padding:12px;font-family:'Bebas Neue',cursive;font-size:16px;letter-spacing:2px;cursor:pointer;">OK</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PLAY MODE INFO POPUP -->
+<div class="mode-info-overlay" id="playModeInfoOverlay" onclick="closeModeInfo('play')">
+  <div class="mode-info-card" onclick="event.stopPropagation()">
+    <div class="mode-info-head">
+      <div class="mode-info-head-title">GAME MODES</div>
+      <button class="mode-info-close" onclick="closeModeInfo('play')">✕</button>
+    </div>
+    <div class="mode-info-body compact-top">
+      <div class="mode-info-section">
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🏌️</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">SINGLE ROUND</div>
+            <div class="mode-info-desc">A classic 18-hole round of golf. Your score is recorded against par. A straightforward way to enjoy a full round without committing to a longer event.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🏆</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">TOURNAMENT</div>
+            <div class="mode-info-desc">Compete across 4 rounds on the same course in a full-length golf event. Every stroke counts, and the lowest cumulative score at the end takes the title.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🌎</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">PRO TOUR</div>
+            <div class="mode-info-desc">A season-long competitive format with multiple events, rankings, and progression. Face tougher fields and climb the leaderboard.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">⚙️</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">CUSTOM GAME</div>
+            <div class="mode-info-desc">Build your own setup. Mix and match number of rounds (1, 2, 3, or 4), holes (18, Front 9, Back 9), and difficulty (Easy / Medium / Hard). Ideal if you want full control over your experience.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mode-info-section">
+        <div class="mode-info-section-title">🎯 DIFFICULTY</div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon"><span class="mode-info-diff-dot easy"></span></div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">EASY</div>
+            <div class="mode-info-desc">Generous grids with more fairway and green cells, plus fewer hazards overall. Great for learning the game and achieving the lowest scores.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon"><span class="mode-info-diff-dot medium"></span></div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">MEDIUM</div>
+            <div class="mode-info-desc">Balanced grids with a healthy mix of fairway, rough, sand, and water. This is the standard challenge, offering a fair test without being overly punishing.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon"><span class="mode-info-diff-dot hard"></span></div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">HARD</div>
+            <div class="mode-info-desc">Tight grids packed with hazards and OB cells. Every roll matters, and smart Wildcard use can be the difference between surviving a hole and dropping shots. Best suited for experienced players.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mode-info-section">
+    <div class="mode-info-section-title">⛳ COURSES</div>
+    <div class="mode-info-row">
+      <div class="mode-info-icon">🌲</div>
+      <div class="mode-info-text">
+        <div class="mode-info-name">LITTLE PINES GC</div>
+        <div class="mode-info-desc">A friendly woodland course and the easiest place to begin. Tree-lined holes shape many tee shots, but the layout is generally forgiving. It still has a few demanding holes that can catch you out.</div>
+      </div>
+    </div>
+    <div class="mode-info-row">
+      <div class="mode-info-icon">🌊</div>
+      <div class="mode-info-text">
+        <div class="mode-info-name">PACIFIC BEACH</div>
+        <div class="mode-info-desc">A coastal course where water is never far away. Expect more water hazards, exposed holes, and constant pressure to manage risk. It rewards controlled play, but one loose shot can change a round quickly.</div>
+      </div>
+    </div>
+    <div class="mode-info-row">
+      <div class="mode-info-icon">🌵</div>
+      <div class="mode-info-text">
+        <div class="mode-info-name">DESERT GOLF LINKS</div>
+        <div class="mode-info-desc">Set in the desert, this course features wider fairways and a more open look from the tee. That extra space comes with a tradeoff: sand bunkers appear often, and recovery play can become a major part of the challenge.</div>
+      </div>
+    </div>
+    <div class="mode-info-row">
+      <div class="mode-info-icon">🌺</div>
+      <div class="mode-info-text">
+        <div class="mode-info-name">SEPTEMBRA NATIONAL</div>
+        <div class="mode-info-desc">A classic championship-style course inspired by the famous layouts of Georgia. Many holes demand thoughtful positioning, with tricky approaches and demanding greens that put a premium on control and nerve.</div>
+      </div>
+    </div>
+  </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERSUS MODE INFO POPUP -->
+<div class="mode-info-overlay" id="versusModeInfoOverlay" onclick="closeModeInfo('versus')">
+  <div class="mode-info-card" onclick="event.stopPropagation()">
+    <div class="mode-info-head" style="background:linear-gradient(135deg,#1a5f8a,#2a3a6e);">
+      <div class="mode-info-head-title">VERSUS MODE</div>
+      <button class="mode-info-close" onclick="closeModeInfo('versus')">✕</button>
+    </div>
+    <div class="mode-info-body compact-top">
+      <div class="mode-info-section">
+        <div class="mode-info-row" style="border-bottom:1px solid var(--border);padding:0 0 12px;margin-bottom:4px;">
+          <div class="mode-info-text">
+            <div class="mode-info-desc" style="font-size:12px;line-height:1.6;">Versus Mode lets two players compete head-to-head on the same device, taking turns hole by hole. Both players play on the same grid layouts for a fair match. Choose your names, icons, and game options, then tee off!</div>
+          </div>
+        </div>
+      </div>
+      <div class="mode-info-section">
+        <div class="mode-info-section-title">🏌️ HOW IT WORKS</div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🔄</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">TURN-BASED PLAY</div>
+            <div class="mode-info-desc">Players alternate by hole. Player 1 plays the full hole first, then Player 2 plays the same hole on the same grid layout.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🎲</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">SHARED GRIDS</div>
+            <div class="mode-info-desc">Both players face identical grid layouts for fair competition — same zones, same challenge. Only your dice rolls differ.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🃏</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">WILDCARDS</div>
+            <div class="mode-info-desc">Each player has their own wildcard hand. Roll doubles to earn a wildcard for yourself. Use them strategically to gain an edge. Wildcards can be turned off in Settings.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mode-info-section">
+        <div class="mode-info-section-title"><span class="mode-info-section-title-icon"><img src="assets/golf_ball.png" alt=""></span>GAME FORMATS</div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🏆</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">STROKE PLAY</div>
+            <div class="mode-info-desc">The classic format. Count every stroke across all selected holes and rounds. The lowest total score wins. A single bad hole won't end the match, keep fighting back!</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">⚔️</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">MATCH PLAY</div>
+            <div class="mode-info-desc">Quadruple bogey on a hole will not end your chances. Each hole is its own contest: the lower score wins the hole, and the lead is shown as ‘X Up.’ The match ends when one side is ahead by more holes than remain. One round only.</div>
+          </div>
+        </div>
+      </div>
+      <div class="mode-info-section">
+        <div class="mode-info-section-title">📋 MATCH SETTINGS</div>
+         <div class="mode-info-row">
+          <div class="mode-info-icon">🥊</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">ROUNDS</div>
+            <div class="mode-info-desc">In Stroke Play, choose between 1 and 4 rounds. More rounds mean a longer competition and a bigger test of consistency.</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">⛳</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">HOLE SELECTION</div>
+            <div class="mode-info-desc">Choose 18 holes, the Front 9 (holes 1–9), or the Back 9 (holes 10–18) on a selected course. Then? Tee off!</div>
+          </div>
+        </div>
+        <div class="mode-info-row">
+          <div class="mode-info-icon">⚙️</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">DIFFICULTY</div>
+            <div class="mode-info-desc">Easy, Medium, and Hard change hazard distribution equally for both players. Higher difficulty means tighter, more punishing grids.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
