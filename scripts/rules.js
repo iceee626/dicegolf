@@ -13,9 +13,14 @@ function showHoleInConfirmation(row, col, snapGrid){
   setHioBallGraphic();
   document.getElementById('hioDie1').textContent='?';
   document.getElementById('hioDie2').textContent='?';
-  document.getElementById('hioResult').style.display='none';
-  document.getElementById('hioRollBtn').style.display='block';
-  document.getElementById('hioRollBtn').disabled=false;
+  const hioResult=document.getElementById('hioResult');
+  hioResult.style.display='block';
+  hioResult.style.visibility='hidden';
+  hioResult.textContent='';
+  const hioRollBtn=document.getElementById('hioRollBtn');
+  hioRollBtn.style.display='block';
+  hioRollBtn.style.visibility='visible';
+  hioRollBtn.disabled=false;
   const isHaptic=getRollMode()==='haptic'&&_shakePermissionGranted;
   document.getElementById('hioSub').textContent=isHaptic?'SHAKE OR TAP TO ROLL DOUBLES':'ROLL DOUBLES TO HOLE IT';
   document.getElementById('hioOverlay').classList.add('show');
@@ -24,7 +29,7 @@ function showHoleInConfirmation(row, col, snapGrid){
 
 function doHioRoll(){
   const btn=document.getElementById('hioRollBtn');
-  btn.disabled=true;btn.style.display='none';
+  btn.disabled=true;btn.style.visibility='hidden';
   let r1=Math.ceil(Math.random()*6), r2=Math.ceil(Math.random()*6);
   // Tutorial: force doubles for guaranteed HIO
   if(TUT.active){ r1=3; r2=3; }
@@ -50,6 +55,7 @@ function resolveHio(r1, r2){
   document.getElementById('hioBall').style.animation='none';
   setHioBallGraphic();
   resultEl.style.display='block';
+  resultEl.style.visibility='visible';
   if(isDoubles){
     resultEl.textContent='HOLE IN ONE!!!';
     resultEl.className='hio-result success';
