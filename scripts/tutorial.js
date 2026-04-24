@@ -164,7 +164,13 @@ function _tutHighlight(sel, darken = true, scrollTarget = true){
      e.classList.remove('tut-pulse', 'tut-elevate', 'tut-relative');
      e.style.zIndex = '';
      e.style.position = '';
-     if (e.id === 'rollBtn') e.style.opacity = ''; // Restore original opacity
+     if (e.id === 'rollBtn') {
+       e.style.opacity = '';
+       e.style.filter = '';
+       e.style.background = '';
+       e.style.color = '';
+       e.style.boxShadow = '';
+     }
   });
   let bd = document.getElementById('tutBackdrop');
   if (!bd) {
@@ -190,7 +196,13 @@ function _tutHighlight(sel, darken = true, scrollTarget = true){
      // Force elevation inline to guarantee it pops over the backdrop
      el.style.position = window.getComputedStyle(el).position === 'static' ? 'relative' : window.getComputedStyle(el).position;
      el.style.zIndex = '745';
-     if (el.id === 'rollBtn') el.style.opacity = '1'; // Prevent button from appearing dark when disabled
+     if (el.id === 'rollBtn') {
+       el.style.opacity = '1';
+       el.style.filter = 'none';
+       el.style.background = 'var(--c-tee)';
+       el.style.color = '#fff';
+       el.style.boxShadow = '0 8px 24px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.16)';
+     }
      
      // Elevate parent header if target is inside it to break stacking context
      const parentHeader = el.closest('header');
@@ -249,6 +261,20 @@ function _tutShowTip(title, text, btnLabel, highlight, darken = true, position =
   ov.classList.add('show');
 }
 
+
+function _tutShowTipAtTop(title, text, btnLabel, highlight, darken = true, position = 'bottom'){
+  _tutBlockInput(true);
+  _tutHighlight(highlight || null, darken, false);
+  _tutScrollToDefaultTop();
+  const ov = document.getElementById('tutOverlay');
+  ov.classList.remove('top', 'middle');
+  if(position === 'top') ov.classList.add('top');
+  else if(position === 'middle') ov.classList.add('middle');
+  document.getElementById('tutOverlayTitle').textContent = title;
+  document.getElementById('tutOverlayText').innerHTML = _tutFormatText(text);
+  document.getElementById('tutOverlayBtn').textContent = btnLabel || 'GOT IT';
+  ov.classList.add('show');
+}
 function _tutHideTip(){
   document.getElementById('tutOverlay').classList.remove('show');
   _tutHighlight(null);
@@ -276,7 +302,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 2){
-      _tutShowTip('TV SCOREBOARD', 'At the bottom, this TV scoreboard tracks your **shots** and your **running score** for the round.', 'GOT IT', '#tvBar', true);
+      _tutShowTipAtTop('TV SCOREBOARD', 'At the bottom, this TV scoreboard tracks your **shots** and your **running score** for the round.', 'GOT IT', '#tvBar', true);
       return;
     }
     if(_tutStep === 3){
@@ -326,7 +352,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 12){
-      _tutShowTip('GREAT APPROACH!', 'You landed on the **Green** — the smooth surface around the hole where putting happens. On harder holes you will see more challenging zones like **Rough**, **Sand**, **Chip**, and sometimes **Water**, all of which can make your next shot more difficult. Tap **NEXT SHOT** to load the putting grid and finish the hole.', 'GOT IT', '#nextShotBtn', true);
+      _tutShowTipAtTop('GREAT APPROACH!', 'You landed on the **Green** — the smooth surface around the hole where putting happens. On harder holes you will see more challenging zones like **Rough**, **Sand**, **Chip**, and sometimes **Water**, all of which can make your next shot more difficult. Tap **NEXT SHOT** to load the putting grid and finish the hole.', 'GOT IT', '#nextShotBtn', true);
       return;
     }
     if(_tutStep === 13){
@@ -373,7 +399,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 1){
-      _tutShowTip('WILDCARDS!', 'If you roll doubles, such as two 3s, you earn a **Wildcard**! Wildcards give you special abilities and can change the outcome of a hole. To see the full list, open the **Wildcard drawer** on the right, and tap the **"i"** at the top. Tap **ROLL** to continue.', 'PROCEED', '#rollBtn', true);
+      _tutShowTipAtTop('WILDCARDS!', 'If you roll doubles, such as two 3s, you earn a **Wildcard**! Wildcards give you special abilities and can change the outcome of a hole. To see the full list, open the **Wildcard drawer** on the right, and tap the **"i"** at the top. Tap **ROLL** to continue.', 'PROCEED', '#rollBtn', true);
       return;
     }
     if(_tutStep === 2){
@@ -395,7 +421,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 5){
-      _tutShowTip('NEXT SHOT', 'Your **Phantom Stroke** is now stored in the drawer on the right. You can keep up to **3 wildcards** at the same time. When you are ready, tap **NEXT SHOT** to continue playing.', 'PROCEED', '#nextShotBtn', true);
+      _tutShowTipAtTop('NEXT SHOT', 'Your **Phantom Stroke** is now stored in the drawer on the right. You can keep up to **3 wildcards** at the same time. When you are ready, tap **NEXT SHOT** to continue playing.', 'PROCEED', '#nextShotBtn', true);
       return;
     }
     if(_tutStep === 6){
@@ -406,7 +432,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 7){
-      _tutShowTip('WATCH OUT!', 'You avoided the first hazards. Now, roll your approach shot to try and reach the green. Keep clear of the **water**!', 'PROCEED', '#rollBtn', true);
+      _tutShowTipAtTop('WATCH OUT!', 'You avoided the first hazards. Now, roll your approach shot to try and reach the green. Keep clear of the **water**!', 'PROCEED', '#rollBtn', true);
       return;
     }
     if(_tutStep === 8){
@@ -428,7 +454,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 11){
-      _tutShowTip('PENALTY REMOVED!', 'Your **Wildcard** saved you a stroke! Now tap **NEXT SHOT** to continue.', 'THANKS!', '#nextShotBtn', true);
+      _tutShowTipAtTop('PENALTY REMOVED!', 'Your **Wildcard** saved you a stroke! Now tap **NEXT SHOT** to continue.', 'THANKS!', '#nextShotBtn', true);
       return;
     }
     if(_tutStep === 12){
@@ -439,7 +465,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 13){
-      _tutShowTip('RECOVERY SHOT', 'You still have to replay the shot from the same spot, so this is your recovery chance. Roll again to try landing on the **Green**.', 'GOT IT', '#rollBtn', true);
+      _tutShowTipAtTop('RECOVERY SHOT', 'You still have to replay the shot from the same spot, so this is your recovery chance. Roll again to try landing on the **Green**.', 'GOT IT', '#rollBtn', true);
       return;
     }
     if(_tutStep === 14){
@@ -457,7 +483,7 @@ function tutAdvance(){
       return;
     }
     if(_tutStep === 16){
-      _tutShowTip('FINISH THE HOLE', 'Great, you have a chance for **Birdie** now! **ROLL** to putt.', 'PROCEED', '#rollBtn', true);
+      _tutShowTipAtTop('FINISH THE HOLE', 'Great, you have a chance for **Birdie** now! **ROLL** to putt.', 'PROCEED', '#rollBtn', true);
       return;
     }
     if(_tutStep === 17){
@@ -489,7 +515,7 @@ function tutAdvance(){
   
   if(hi === 2){
     if(_tutStep === 0){
-      _tutShowTip('HOLE 3 — PAR 3', 'Par 3 holes are shorter and more direct. You tee off straight at the **Green**. This grid includes a special ⛳ **"Hole In!"** cell. Land on it for a chance at a **hole-in-one**! Tap **ROLL** to proceed.', 'ROLL', '#rollBtn', true);
+      _tutShowTipAtTop('HOLE 3 — PAR 3', 'Par 3 holes are shorter and more direct. You tee off straight at the **Green**. This grid includes a special ⛳ **"Hole In!"** cell. Land on it for a chance at a **hole-in-one**! Tap **ROLL** to proceed.', 'ROLL', '#rollBtn', true);
       return;
     }
     if(_tutStep === 1){
