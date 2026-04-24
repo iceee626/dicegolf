@@ -214,25 +214,48 @@ function resetGameState(){
 
 const ROUND_SPLASH_REPLAY_CLASS = 'vs-turn-replay';
 
-function getRoundStartSplashReplayElements(){
+function getSplashReplayElements(screenId){
+  const screen = document.getElementById(screenId);
+  if(!screen) return [];
   return [
-    document.getElementById('rsTurnIcon'),
-    document.getElementById('rsTurnName'),
-    document.getElementById('rsTurnSub'),
-    document.getElementById('rsTurnMeta'),
-    document.querySelector('#roundStartScreen .vs-turn-btn')
+    screen.querySelector('.vs-turn-icon'),
+    screen.querySelector('.vs-turn-name'),
+    screen.querySelector('.vs-turn-sub'),
+    screen.querySelector('.vs-turn-meta'),
+    screen.querySelector('.vs-turn-btn')
   ].filter(Boolean);
 }
 
+function resetSplashReplay(screenId){
+  getSplashReplayElements(screenId).forEach(el=>el.classList.remove(ROUND_SPLASH_REPLAY_CLASS));
+}
+
+function replaySplashAnimation(screenId){
+  const screen = document.getElementById(screenId);
+  const els = getSplashReplayElements(screenId);
+  els.forEach(el=>el.classList.remove(ROUND_SPLASH_REPLAY_CLASS));
+  void screen?.offsetWidth;
+  els.forEach(el=>el.classList.add(ROUND_SPLASH_REPLAY_CLASS));
+}
+
+function getRoundStartSplashReplayElements(){
+  return getSplashReplayElements('roundStartScreen');
+}
+
 function resetRoundStartSplashReplay(){
-  getRoundStartSplashReplayElements().forEach(el=>el.classList.remove(ROUND_SPLASH_REPLAY_CLASS));
+  resetSplashReplay('roundStartScreen');
 }
 
 function replayRoundStartSplashAnimation(){
-  const els = getRoundStartSplashReplayElements();
-  els.forEach(el=>el.classList.remove(ROUND_SPLASH_REPLAY_CLASS));
-  void document.getElementById('roundStartScreen')?.offsetWidth;
-  els.forEach(el=>el.classList.add(ROUND_SPLASH_REPLAY_CLASS));
+  replaySplashAnimation('roundStartScreen');
+}
+
+function resetVersusTurnSplashReplay(){
+  resetSplashReplay('vsTurnScreen');
+}
+
+function replayVersusTurnSplashAnimation(){
+  replaySplashAnimation('vsTurnScreen');
 }
 let _roundStartFadeTimer = null;
 let _roundStartFadeHandler = null;
