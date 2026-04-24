@@ -244,11 +244,13 @@ function vsShowTurnScreen(){
   try{ hideMainAppImmediate(); }catch{}
   const tvBar = document.getElementById('tvBar');
   if(tvBar) tvBar.classList.remove('show');
+  if(typeof replayVersusTurnSplashAnimation === 'function') replayVersusTurnSplashAnimation();
   document.getElementById('vsTurnScreen').classList.add('show');
 }
 
 function vsStartTurn(){
   document.getElementById('vsTurnScreen').classList.remove('show');
+  if(typeof resetVersusTurnSplashReplay === 'function') resetVersusTurnSplashReplay();
   revealMainApp();
   const p = VS.players[VS.currentPlayer];
   PLAYER_NAME = p.name;
