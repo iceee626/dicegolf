@@ -398,7 +398,7 @@ function updateMenuContinueBtn(){
         const p2Html = escapeHtml(p2);
         const holeDisplay = save.holeIdx + 1;
         const format = save.vsState.format === 'match' ? 'MATCH PLAY' : 'STROKE PLAY';
-        btn.innerHTML=`<div>▶ CONTINUE VERSUS</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${format} · H${holeDisplay} · ${p1Html} vs ${p2Html}</div>`;
+        btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> CONTINUE VERSUS</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${format} · H${holeDisplay} · ${p1Html} vs ${p2Html}</div>`;
         btn.style.display='flex';
         btn.classList.add('menu-glow');
     } else {
@@ -428,7 +428,7 @@ function updateMenuContinueBtn(){
         const cName = courseCfg.shortName || courseCfg.name;
         const holeDisplay = save.holeIdx + 1;
         
-        btn.innerHTML=`<div>▶ CONTINUE</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${cName} · R${rnd} · H${holeDisplay} · ${diffStr}</div>`;
+        btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> CONTINUE</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${cName} · R${rnd} · H${holeDisplay} · ${diffStr}</div>`;
         btn.style.display='flex';
         btn.classList.add('menu-glow');
     }
@@ -436,6 +436,3 @@ function updateMenuContinueBtn(){
     btn.style.display='none';
   }
 }
-
-
-// ═══════════════════════════════════════
