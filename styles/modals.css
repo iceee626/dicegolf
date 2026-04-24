@@ -106,7 +106,7 @@
   width:100%;max-width:300px;
 }
 @keyframes hio-pulse{from{transform:scale(1);box-shadow:0 0 10px rgba(240,192,64,.3)}to{transform:scale(1.04);box-shadow:0 0 24px rgba(240,192,64,.7)}}
-.hio-result{font-family:'Bebas Neue',cursive;font-size:clamp(36px,10vw,52px);letter-spacing:4px;text-align:center;animation:popin .5s cubic-bezier(.34,1.56,.64,1);}
+.hio-result{min-height:62px;font-family:'Bebas Neue',cursive;font-size:clamp(36px,10vw,52px);letter-spacing:4px;text-align:center;animation:popin .5s cubic-bezier(.34,1.56,.64,1);}
 .hio-result.success{color:#f0c040;text-shadow:0 0 40px rgba(240,192,64,1);}
 .hio-result.fail{color:var(--muted);}
 
