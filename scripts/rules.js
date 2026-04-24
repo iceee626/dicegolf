@@ -57,7 +57,7 @@ function resolveHio(r1, r2){
   resultEl.style.display='block';
   resultEl.style.visibility='visible';
   if(isDoubles){
-    resultEl.textContent='HOLE IN ONE!!!';
+    resultEl.textContent='HOLE IN ONE!';
     resultEl.className='hio-result success';
     document.getElementById('hioSub').textContent='🎉 UNBELIEVABLE!';
     playSound('putt', 1.0);
