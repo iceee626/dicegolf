@@ -212,6 +212,28 @@ function resetGameState(){
   if(typeof wcReset==='function')wcReset();
 }
 
+const ROUND_SPLASH_REPLAY_CLASS = 'vs-turn-replay';
+
+function getRoundStartSplashReplayElements(){
+  return [
+    document.getElementById('rsTurnIcon'),
+    document.getElementById('rsTurnName'),
+    document.getElementById('rsTurnSub'),
+    document.getElementById('rsTurnMeta'),
+    document.querySelector('#roundStartScreen .vs-turn-btn')
+  ].filter(Boolean);
+}
+
+function resetRoundStartSplashReplay(){
+  getRoundStartSplashReplayElements().forEach(el=>el.classList.remove(ROUND_SPLASH_REPLAY_CLASS));
+}
+
+function replayRoundStartSplashAnimation(){
+  const els = getRoundStartSplashReplayElements();
+  els.forEach(el=>el.classList.remove(ROUND_SPLASH_REPLAY_CLASS));
+  void document.getElementById('roundStartScreen')?.offsetWidth;
+  els.forEach(el=>el.classList.add(ROUND_SPLASH_REPLAY_CLASS));
+}
 let _roundStartFadeTimer = null;
 let _roundStartFadeHandler = null;
 function clearRoundStartSplash(){
@@ -228,6 +250,7 @@ function clearRoundStartSplash(){
   screen.classList.remove('show');
   screen.classList.remove('single-round-start');
   screen.classList.remove('fade-out');
+  resetRoundStartSplashReplay();
 }
 
 function returnToMenu(opts={}){
@@ -320,6 +343,7 @@ function showSingleRoundSplash(){
   if(rsMeta) rsMeta.textContent = `${roundPrefix}HOLE ${S.holeIdx + 1} · PAR ${h.par}`;
   setMainAppConcealed(true);
   hideMainAppImmediate();
+  replayRoundStartSplashAnimation();
   if(screen) screen.classList.add('show');
 }
 
