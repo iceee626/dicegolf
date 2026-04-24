@@ -106,7 +106,6 @@ function bindStaticUiEvents(){
   bindClick('wcBackdrop', closeWcDrawer);
   bindClick('wcInfoOpenBtn', openWcInfo);
   bindClick('wcDrawerCloseBtn', closeWcDrawer);
-  bindClick('wcInfoBackBtn', closeWcInfo);
   bindClick('wcCardWrap', revealWcCard);
   bindClick('wcEquipBtn', equipWildcard);
   bindClick('hioRollBtn', doHioRoll);
