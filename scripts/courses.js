@@ -144,9 +144,9 @@ const T_APP_CATH_M  = ()=>cells(['grn',23],['chip',3],['rgh',6],['sand',4]);
 const T_APP_CATH_H  = ()=>cells(['grn',18],['chip',4],['rgh',8],['sand',6]);
 
 // Pacific tee — course-specific hard-mode tuning without changing shared templates
-const T_PAC_TEE_OPEN_SOFT_E = ()=>cells(['fwy',30],['rgh',6]);
-const T_PAC_TEE_OPEN_SOFT_M = ()=>cells(['fwy',28],['rgh',7],['sand',1]);
-const T_PAC_TEE_OPEN_SOFT_H = ()=>cells(['fwy',26],['rgh',8],['sand',2]);
+const T_PAC_TEE_OPEN_SOFT_E = ()=>cells(['fwy',31],['rgh',4],['sand',1]);
+const T_PAC_TEE_OPEN_SOFT_M = ()=>cells(['fwy',29],['rgh',5],['sand',2]);
+const T_PAC_TEE_OPEN_SOFT_H = ()=>cells(['fwy',27],['rgh',6],['sand',3]);
 const T_PAC_TEE_H2_E        = ()=>cells(['fwy',28],['rgh',6],['sand',2]);
 const T_PAC_TEE_H2_M        = ()=>cells(['fwy',25],['rgh',8],['sand',3]);
 const T_PAC_TEE_H2_H        = ()=>cells(['fwy',22],['rgh',10],['sand',4]);
@@ -169,14 +169,14 @@ const T_PAC_FIRST_H2_H      = ()=>cells(['fwy',18],['rgh',10],['sand',4],['grn',
 const T_PAC_FIRST_NOFWY_E   = ()=>cells(['grn',24],['chip',5],['sand',3],['rgh',4]);
 const T_PAC_FIRST_NOFWY_M   = ()=>cells(['grn',21],['chip',5],['sand',5],['rgh',5]);
 const T_PAC_FIRST_NOFWY_H   = ()=>cells(['grn',18],['chip',6],['sand',6],['rgh',6]);
-const T_PAC_FIRST_H8_E      = ()=>cells(['fwy',26],['rgh',4],['chip',2],['h2o',1],['sand',1],['grn',2]);
-const T_PAC_FIRST_H8_M      = ()=>cells(['fwy',23],['rgh',5],['chip',3],['h2o',1],['sand',2],['grn',2]);
-const T_PAC_FIRST_H8_H      = ()=>cells(['fwy',20],['rgh',7],['chip',3],['h2o',1],['sand',3],['grn',2]);
+const T_PAC_FIRST_H8_E      = ()=>cells(['grn',26],['rgh',3],['chip',2],['h2o',1],['sand',2],['fwy',2]);
+const T_PAC_FIRST_H8_M      = ()=>cells(['grn',23],['rgh',4],['chip',3],['h2o',1],['sand',3],['fwy',2]);
+const T_PAC_FIRST_H8_H      = ()=>cells(['grn',20],['rgh',6],['chip',3],['h2o',1],['sand',4],['fwy',2]);
 
 // Pacific coastal fairway — ocean pressure without OB for the closing hole
-const T_PAC_FAR_COAST_E     = ()=>cells(['fwy',24],['rgh',6],['h2o',2],['sand',4]);
-const T_PAC_FAR_COAST_M     = ()=>cells(['fwy',20],['rgh',7],['h2o',4],['sand',5]);
-const T_PAC_FAR_COAST_H     = ()=>cells(['fwy',16],['rgh',8],['h2o',6],['sand',6]);
+const T_PAC_FAR_COAST_E     = ()=>cells(['fwy',20],['rgh',4],['h2o',2],['sand',4],['grn',6]);
+const T_PAC_FAR_COAST_M     = ()=>cells(['fwy',18],['rgh',5],['h2o',3],['sand',5],['grn',5]);
+const T_PAC_FAR_COAST_H     = ()=>cells(['fwy',16],['rgh',6],['h2o',4],['sand',6],['grn',4]);
 
 // ── ROUGH ──────────────────────────────────────────────────
 const T_RGH_FAR_E   = ()=>cells(['fwy',28],['rgh',8]);
@@ -257,17 +257,17 @@ const COURSES={
       {name:'HOLE 2', yards:509,par:5,baseDiff:2,diff:2,layout:'open',teeLayout:'pacHole2',firstFwyLayout:'pacHole2'},
       {name:'HOLE 3', yards:397,par:4,baseDiff:2,diff:2,layout:'bunkerFwy',firstFwyLayout:'pacNoFairway'},
       {name:'HOLE 4', yards:333,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',teeLayout:'pacHole4',appLayout:'bunkerGreen'},
-      {name:'HOLE 5', yards:189,par:3,baseDiff:3,diff:3,layout:'open',par3Layout:'open'},
+      {name:'HOLE 5', yards:189,par:3,baseDiff:2,diff:1,layout:'open',par3Layout:'open'},
       {name:'HOLE 6', yards:498,par:5,baseDiff:2,diff:1,layout:'open',teeLayout:'pacHole6',farLayout:'bunkerFwy',appLayout:'bunkerFwy'},
       {name:'HOLE 7', yards:107,par:3,baseDiff:2,diff:1,layout:'open'},
       {name:'HOLE 8', yards:416,par:4,baseDiff:3,diff:3,layout:'open',teeLayout:'pacHole8',firstFwyLayout:'pacHole8'},
       {name:'HOLE 9', yards:483,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
-      {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
+      {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'pacHole4'},
       {name:'HOLE 11',yards:370,par:4,baseDiff:1,diff:1,layout:'open',teeLayout:'pacOpenEasy',appLayout:'bunkerGreen'},
       {name:'HOLE 12',yards:202,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
-      {name:'HOLE 13',yards:401,par:4,baseDiff:3,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',appLayout:'bunkerFwy'},
+      {name:'HOLE 13',yards:401,par:4,baseDiff:3,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy'},
       {name:'HOLE 14',yards:559,par:5,baseDiff:2,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
-      {name:'HOLE 15',yards:393,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',teeLayout:'pacBfwyMed',appLayout:'bunkerGreen'},
+      {name:'HOLE 15',yards:393,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',teeLayout:'pacBfwyMed'},
       {name:'HOLE 16',yards:400,par:4,baseDiff:2,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',appLayout:'doglegs'},
       {name:'HOLE 17',yards:182,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
       {name:'HOLE 18',yards:541,par:5,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'coastalPacific',appLayout:'coastalPacific'},
