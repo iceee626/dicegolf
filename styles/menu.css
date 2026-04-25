@@ -482,7 +482,7 @@ body.nav-back .setup-screen.visible{ transform:translateX(0) scale(1); opacity:1
 .xp-modal-body{padding:14px;}
 .xp-modal-note{font-family:'Sen',sans-serif;font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;text-align:center;}
 .settings-section-title{font-family:'Sen', sans-serif;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:12px;}
-.settings-section-title.tight{margin-bottom:8px;}
+.settings-section-title.tight{margin-bottom:12px;}
 .settings-section-title.spaced-top{margin-top:18px;}
 .settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
 .settings-row.no-divider{border-bottom:none;}
