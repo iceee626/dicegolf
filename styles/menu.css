@@ -485,5 +485,6 @@ body.nav-back .setup-screen.visible{ transform:translateX(0) scale(1); opacity:1
 .settings-section-title.tight{margin-bottom:12px;}
 .settings-section-title.spaced-top{margin-top:18px;}
 .settings-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);}
+.settings-section-title + .settings-row{padding-top:0;}
 .settings-row.no-divider{border-bottom:none;}
 .settings-row-desc{font-family:'Sen', sans-serif;font-size:12px;color:var(--muted);margin-top:2px;}
