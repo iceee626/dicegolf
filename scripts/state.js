@@ -434,6 +434,8 @@ function _setShotBtnState(showNext, immediate=false){
   if(!showNext && _holdFinishBtn){
     roll.textContent='FINISH HOLE';
     next.textContent='FINISH HOLE';
+    roll.classList.add('finish-hole-state');
+    next.classList.add('finish-hole-state');
     setVisible(roll, false, true);
     setVisible(next, true, true);
     return;
@@ -442,7 +444,11 @@ function _setShotBtnState(showNext, immediate=false){
   const target = showNext ? next : roll;
   const other = showNext ? roll : next;
   const targetDisabled = showNext ? false : !!S.rolling;
-  if(!showNext) roll.textContent='ROLL';
+  if(!showNext){
+    roll.textContent='ROLL';
+    roll.classList.remove('finish-hole-state');
+    next.classList.remove('finish-hole-state');
+  }
 
   // Fire morph pulse on the wrapping slot when a real swap happens (not an immediate init)
   const isRealSwap = !immediate && other.classList.contains('shot-btn-visible') && !target.classList.contains('shot-btn-visible');
