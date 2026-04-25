@@ -17,6 +17,7 @@ function showHoleInConfirmation(row, col, snapGrid){
   hioResult.style.display='block';
   hioResult.style.visibility='hidden';
   hioResult.textContent='';
+  document.getElementById('hioOverlay').classList.remove('hio-rolled');
   const hioRollBtn=document.getElementById('hioRollBtn');
   hioRollBtn.style.display='block';
   hioRollBtn.style.visibility='visible';
@@ -56,6 +57,7 @@ function resolveHio(r1, r2){
   setHioBallGraphic();
   resultEl.style.display='block';
   resultEl.style.visibility='visible';
+  document.getElementById('hioOverlay').classList.add('hio-rolled');
   if(isDoubles){
     resultEl.textContent='HOLE IN ONE!';
     resultEl.className='hio-result success';
@@ -149,4 +151,3 @@ function showToast(msg){
   el.textContent=msg;el.style.opacity='1';
   clearTimeout(el._t);el._t=setTimeout(()=>el.style.opacity='0',2000);
 }
-
