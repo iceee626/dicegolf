@@ -163,9 +163,9 @@ const T_PAC_TEE_OPEN_EASY   = ()=>T_TEE_OPEN_E();
 const T_PAC_TEE_BFWY_MED   = ()=>T_TEE_BFWY_M();
 
 // Pacific first fairway — only the first grid after a tee-shot fairway landing
-const T_PAC_FIRST_H2_E      = ()=>cells(['fwy',24],['rgh',6],['sand',2],['grn',2],['chip',2]);
-const T_PAC_FIRST_H2_M      = ()=>cells(['fwy',21],['rgh',8],['sand',3],['grn',2],['chip',2]);
-const T_PAC_FIRST_H2_H      = ()=>cells(['fwy',18],['rgh',10],['sand',4],['grn',2],['chip',2]);
+const T_PAC_FIRST_H2_E      = ()=>cells(['grn',24],['rgh',6],['sand',2],['chip',4]);
+const T_PAC_FIRST_H2_M      = ()=>cells(['grn',21],['rgh',8],['sand',3],['chip',4]);
+const T_PAC_FIRST_H2_H      = ()=>cells(['grn',18],['rgh',10],['sand',4],['chip',4]);
 const T_PAC_FIRST_NOFWY_E   = ()=>cells(['grn',24],['chip',5],['sand',3],['rgh',4]);
 const T_PAC_FIRST_NOFWY_M   = ()=>cells(['grn',21],['chip',5],['sand',5],['rgh',5]);
 const T_PAC_FIRST_NOFWY_H   = ()=>cells(['grn',18],['chip',6],['sand',6],['rgh',6]);
@@ -262,15 +262,15 @@ const COURSES={
       {name:'HOLE 7', yards:107,par:3,baseDiff:2,diff:1,layout:'open'},
       {name:'HOLE 8', yards:416,par:4,baseDiff:3,diff:3,layout:'open',teeLayout:'pacHole8',firstFwyLayout:'pacHole8'},
       {name:'HOLE 9', yards:483,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
-      {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'pacHole4'},
+      {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'pacHole4',appLayout:'bunkerGreen'},
       {name:'HOLE 11',yards:370,par:4,baseDiff:1,diff:1,layout:'open',teeLayout:'pacOpenEasy',appLayout:'bunkerGreen'},
       {name:'HOLE 12',yards:202,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
-      {name:'HOLE 13',yards:401,par:4,baseDiff:3,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy'},
-      {name:'HOLE 14',yards:559,par:5,baseDiff:2,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
+      {name:'HOLE 13',yards:401,par:4,baseDiff:3,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',appLayout:'bunkerGreen'},
+      {name:'HOLE 14',yards:559,par:5,baseDiff:2,diff:1,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
       {name:'HOLE 15',yards:393,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',teeLayout:'pacBfwyMed'},
       {name:'HOLE 16',yards:400,par:4,baseDiff:2,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',appLayout:'doglegs'},
       {name:'HOLE 17',yards:182,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
-      {name:'HOLE 18',yards:541,par:5,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'coastalPacific',appLayout:'coastalPacific'},
+      {name:'HOLE 18',yards:541,par:5,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'coastalPacific',appLayout:'bunkerGreen'},
     ]
   },
   'desert-golf-links':{
