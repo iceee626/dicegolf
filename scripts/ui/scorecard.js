@@ -113,6 +113,8 @@ function loadHole(){
   if(nr){nr.style.fontSize='';nr.style.fontFamily='';nr.style.letterSpacing='';nr.style.color='';}
 
   const nextBtn = document.getElementById('nextShotBtn');
+  const rollBtn = document.getElementById('rollBtn');
+  if(rollBtn) rollBtn.textContent='ROLL';
   if(nextBtn){
      nextBtn.textContent='NEXT SHOT';
      nextBtn.style.background='var(--c-tee)';
@@ -127,7 +129,7 @@ function loadHole(){
   applyCourseVisualTheme(S.courseId || ACTIVE_COURSE_ID);
   S.zone='tee';S.strokes=0;S.shotNum=1;S._tvShotNum=1;S.shotCount=0;
   S._wcsUsedThisHole=[];S._wcNextShotNote=null;
-  S._skipCelebration=false;S._preserveGrid=false;S._forceGrid=false;
+  S._skipCelebration=false;S._preserveGrid=false;S._forceGrid=false;S._forceP1PuttGrid=false;S._finishGridFrozenHTML=null;
   S._mulliganJustFired=false;S._puttWcUsed=false;S._pendingPuttResult=null;S._pendingHoleFinish=null;
   S._eyesClosedArmed=false;S._landscaperRoughFixes=0;S._rocketApproachPending=false;
   S._ferrettArmedShot=false;S._highlightReelArmedShot=false;
@@ -255,5 +257,3 @@ function updateTVBanner(){
   syncWcToastStackPosition();
 }
 
-
-// ═══════════════════════════════════════
