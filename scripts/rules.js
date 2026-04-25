@@ -1,7 +1,7 @@
 // Hole-in-One Confirmation Flow and Remaining Rule Helpers
 // HOLE IN ONE CONFIRMATION ROLL
 // ═══════════════════════════════════════
-let _hioRow,_hioCol,_hioSnap;
+let _hioRow,_hioCol,_hioSnap,_hioTrueAce;
 
 function setHioBallGraphic(){
   const hioBall=document.getElementById('hioBall');
@@ -10,6 +10,8 @@ function setHioBallGraphic(){
 
 function showHoleInConfirmation(row, col, snapGrid){
   _hioRow=row; _hioCol=col; _hioSnap=snapGrid;
+  const h=HOLES[S.holeIdx];
+  _hioTrueAce=!!(h&&h.par===3&&S.zone==='tee'&&S.strokes===0&&S.shotNum===1);
   setHioBallGraphic();
   document.getElementById('hioDie1').textContent='?';
   document.getElementById('hioDie2').textContent='?';
@@ -59,13 +61,14 @@ function resolveHio(r1, r2){
   resultEl.style.visibility='visible';
   document.getElementById('hioOverlay').classList.add('hio-rolled');
   if(isDoubles){
-    resultEl.textContent='HOLE IN ONE!';
+    const hioLabel=_hioTrueAce?'HOLE IN ONE!':'HOLE IN!';
+    resultEl.textContent=hioLabel;
     resultEl.className='hio-result success';
-    document.getElementById('hioSub').textContent='🎉 UNBELIEVABLE!';
+    document.getElementById('hioSub').textContent=_hioTrueAce?'🎉 UNBELIEVABLE!':'🎉 NICE SHOT!';
     playSound('putt', 1.0);
     vibHoleInOne();
     setTimeout(()=>playSound('cheer', 0.9), 400);
-    if (!TUT.active) {
+    if (!TUT.active && _hioTrueAce) {
       const profiles=loadProfiles();
       const idx=Math.min(getActiveProfileIdx(),profiles.length-1);
       if(profiles[idx])profiles[idx].holeInOnes=(profiles[idx].holeInOnes||0)+1;
@@ -79,8 +82,8 @@ function resolveHio(r1, r2){
       S.strokes+=1; S.yrdRemain=0;
       let wcNote = S._wcNextShotNote ? S._wcNextShotNote : '';
       S._wcNextShotNote = null;
-      addLog(S.shotNum,`⛳ HOLE IN ONE!${wcNote}`,'hole','+1',false,_hioRow,_hioCol,snapGrid, prevZone, prevYrdRemain);
-      showResult(Z.hole,'HOLE IN ONE!','good','');
+      addLog(S.shotNum,`⛳ ${hioLabel}${wcNote}`,'hole','+1',false,_hioRow,_hioCol,snapGrid, prevZone, prevYrdRemain);
+      showResult(Z.hole,hioLabel,'good','');
       S.shotNum++;S.holeDone=true;
       hideNextShotBtn();hidePostShotWcBtn();
       updateYrd();
