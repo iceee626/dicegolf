@@ -106,6 +106,7 @@ function saveGameState(){
     _waitingForNextShot:isShotBtnShown('nextShotBtn'),
     _pendingPuttResult:S._pendingPuttResult||null,
     _pendingHoleFinish:S._pendingHoleFinish||null,
+    _forceP1PuttGrid:!!S._forceP1PuttGrid,
     currentGrid:S.currentGrid,
     wcsEquipped:WCS.equipped, wcsActive:WCS.active,
     wcsLuckyBounce:WCS.luckyBounceActive, wcsIronWill:WCS.ironWillActive, 
@@ -208,6 +209,7 @@ function continueGame(){
     S._roundEndMeta=save._roundEndMeta||null;
     S._pendingPuttResult=save._pendingPuttResult||null;
     S._pendingHoleFinish=save._pendingHoleFinish||null;
+    S._forceP1PuttGrid=!!save._forceP1PuttGrid;
     const waitingForNextShot=save._waitingForNextShot||false;
     
     WCS.equipped=(save.wcsEquipped||[]).filter(wc=>wc && WILDCARDS.some(def=>def.id===wc.id)); WCS.active=save.wcsActive||null;
