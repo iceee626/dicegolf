@@ -632,7 +632,7 @@ function applyWildcardEffect(wc){
   if(toastMsg) showWcToast(toastMsg);
   if(typeof afterApply === 'function') afterApply();
   renderWcFab();
-  if(TUT.active && typeof tutAfterWcUse === 'function') tutAfterWcUse();
+  if(applied && TUT.active && typeof tutAfterWcUse === 'function') tutAfterWcUse();
   return applied;
 }
 
