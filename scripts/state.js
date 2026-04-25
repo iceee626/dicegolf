@@ -11,7 +11,7 @@ let S={
   currentGrid:null, holeDone:false, rolling:false,
   yrdRemain:0, yrdTotal:0, fwyVisits:0, prevZone:null, shotCount:0,
   _gameUnderParStreak:0,
-  _wcUsedThisRound:0, _skipCelebration:false, _preserveGrid:false, _forceGrid:false,
+  _wcUsedThisRound:0, _skipCelebration:false, _preserveGrid:false, _forceGrid:false, _forceP1PuttGrid:false,
   _mulliganJustFired:false, _puttWcUsed:false, _pendingPuttResult:null, _pendingHoleFinish:null,
   _eyesClosedArmed:false, _landscaperRoughFixes:0, _rocketApproachPending:false,
   _ferrettArmedShot:false, _highlightReelArmedShot:false,
@@ -203,7 +203,7 @@ function resetGameState(){
   S._gameUnderParStreak=0;
   S._wcUsedThisRound=0;
   S._wcDiscardedThisRound=0;
-  S._pendingPuttResult=null; S._pendingHoleFinish=null;
+  S._pendingPuttResult=null; S._pendingHoleFinish=null; S._forceP1PuttGrid=false;
   S._eyesClosedArmed=false; S._landscaperRoughFixes=0; S._rocketApproachPending=false;
   S._ferrettArmedShot=false; S._highlightReelArmedShot=false;
   S._roundWaterHits=0; S._roundSandHits=0; S._roundRoughHits=0;
@@ -432,6 +432,8 @@ function _setShotBtnState(showNext, immediate=false){
   };
 
   if(!showNext && _holdFinishBtn){
+    roll.textContent='FINISH HOLE';
+    next.textContent='FINISH HOLE';
     setVisible(roll, false, true);
     setVisible(next, true, true);
     return;
@@ -440,6 +442,7 @@ function _setShotBtnState(showNext, immediate=false){
   const target = showNext ? next : roll;
   const other = showNext ? roll : next;
   const targetDisabled = showNext ? false : !!S.rolling;
+  if(!showNext) roll.textContent='ROLL';
 
   // Fire morph pulse on the wrapping slot when a real swap happens (not an immediate init)
   const isRealSwap = !immediate && other.classList.contains('shot-btn-visible') && !target.classList.contains('shot-btn-visible');
@@ -459,4 +462,3 @@ function _setShotBtnState(showNext, immediate=false){
 function showNextShotBtn(immediate=false){ _setShotBtnState(true, immediate); }
 function hideNextShotBtn(immediate=false){ _setShotBtnState(false, immediate); }
 
-// ═══════════════════════════════════════
