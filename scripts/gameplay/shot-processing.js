@@ -117,9 +117,13 @@ function freezeCurrentGridForFinish(){
     rollBtn.textContent='FINISH HOLE';
     rollBtn.disabled=true;
     rollBtn.classList.remove('rolling-state');
+    rollBtn.classList.add('finish-hole-state');
     rollBtn.style.pointerEvents='none';
   }
-  if(nextBtn) nextBtn.textContent='FINISH HOLE';
+  if(nextBtn){
+    nextBtn.textContent='FINISH HOLE';
+    nextBtn.classList.add('finish-hole-state');
+  }
 }
 
 function processShot(row,col){
