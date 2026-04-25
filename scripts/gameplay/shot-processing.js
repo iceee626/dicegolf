@@ -106,6 +106,12 @@ function cupMagnetCanPull(row,col){
   }
   return false;
 }
+
+function freezeCurrentGridForFinish(){
+  const ax = document.getElementById('gridAxes');
+  S._finishGridFrozenHTML = ax ? ax.innerHTML : null;
+}
+
 function processShot(row,col){
   S._preserveGrid=false;
   let outcome=S.currentGrid[row][col];
@@ -172,6 +178,7 @@ function processShot(row,col){
         const tutorialFinish = TUT.active;
         const b=document.getElementById('puttWcBtn');if(b)b.remove();
         S._pendingHoleFinish=null;
+        freezeCurrentGridForFinish();
         _holdFinishBtn=true;
         S.holeDone=true;
         nextBtn.disabled=true;
@@ -294,6 +301,7 @@ function processShot(row,col){
           const tutorialFinish = TUT.active;
           const b=document.getElementById('puttWcBtn');if(b)b.remove();
           S._pendingHoleFinish=null;
+          freezeCurrentGridForFinish();
           _holdFinishBtn=true;
           S.holeDone=true;
           nextBtn.disabled=true;
