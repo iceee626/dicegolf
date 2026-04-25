@@ -67,6 +67,9 @@ function clearTutorialUiState(){
 
   const tutBackdrop = document.getElementById('tutBackdrop');
   if(tutBackdrop) tutBackdrop.classList.remove('show');
+  document.getElementById('wcDrawer')?.classList.remove('open','tut-force-use');
+  document.getElementById('wcBackdrop')?.classList.remove('show');
+  document.body.style.overflow = '';
 
   document.querySelectorAll('.tut-pulse').forEach(el=>{
     el.classList.remove('tut-pulse','tut-elevate','tut-relative');
@@ -92,6 +95,8 @@ function clearTutorialUiState(){
 
 function startTutorial(){
   document.getElementById('tutPrompt').classList.remove('show');
+  try{ clearSavedGameForProfileId(getActiveProfileId()); }catch{}
+  try{ localStorage.removeItem('gg_save'); }catch{}
   TUT.active = true;
   TUT.blocked = true;
   _tutStep = -1;
@@ -113,6 +118,10 @@ function startTutorial(){
   SETUP.course = DEFAULT_COURSE_ID; SETUP.courseSelected = true;
   GAME_DIFF = 1;
   resetGameState();
+  if(typeof wcReset === 'function') wcReset();
+  document.getElementById('wcDrawer')?.classList.remove('open','tut-force-use');
+  document.getElementById('wcBackdrop')?.classList.remove('show');
+  document.body.style.overflow = '';
   S.courseId = DEFAULT_COURSE_ID;
   S.startIdx = 0; S.endIdx = 2; S.holeIdx = 0;
   for(let i=0;i<3;i++) HOLES[i] = {...TUT_HOLES_DATA[i]};
@@ -681,5 +690,3 @@ function tutMenuIntercept(){
     tutComplete(true); // Pass true because we abandoned it!
   });
 }
-
-// ═══════════════════════════════════════════════════════
