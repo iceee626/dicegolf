@@ -169,7 +169,9 @@ function renderWcFab(){
 
 function openWcDrawer(){
   renderWcDrawer();
-  document.getElementById('wcDrawer').classList.add('open');
+  const drawer=document.getElementById('wcDrawer');
+  drawer.classList.toggle('tut-force-use', !!(TUT.active && _tutWaitEvent === 'wc_used'));
+  drawer.classList.add('open');
   document.getElementById('wcBackdrop').classList.add('show');
   document.body.style.overflow = 'hidden'; // Lock background scroll
   if (TUT.active && _tutWaitEvent === 'wc_used') {
@@ -177,7 +179,9 @@ function openWcDrawer(){
   }
 }
 function closeWcDrawer(){
+  if (TUT.active && _tutWaitEvent === 'wc_used') return;
   document.getElementById('wcDrawer').classList.remove('open');
+  document.getElementById('wcDrawer').classList.remove('tut-force-use');
   document.getElementById('wcBackdrop').classList.remove('show');
   document.body.style.overflow = ''; // Restore scroll
   _expandedActiveWcId = null;
@@ -286,6 +290,7 @@ function closeWcInfo(){
 function renderWcDrawer(){
   const el=document.getElementById('wcDrawerSlots');
   if(!el)return;
+  document.getElementById('wcDrawer')?.classList.toggle('tut-force-use', !!(TUT.active && _tutWaitEvent === 'wc_used'));
   el.innerHTML='';
   
   // 1. Render Equipped Slots
@@ -318,7 +323,7 @@ function renderWcDrawer(){
         </div>
         <div class="wc-slot-actions">
           <button class="wc-use-btn" onclick="activateWildcard(${i})" ${canUse?'':'disabled'}>USE</button>
-          <button class="wc-discard-btn" onclick="discardEquipped(${i})">✕</button>
+          <button class="wc-discard-btn" onclick="discardEquipped(${i})" ${TUT.active && _tutWaitEvent === 'wc_used' ? 'disabled' : ''}>✕</button>
         </div>
       `;
     }
@@ -388,6 +393,9 @@ function activateWildcard(slotIdx){
       saveProfiles(profiles);
       setTimeout(() => checkAndAwardAchievements(), 300);
     }
+  }
+  if(TUT.active && _tutWaitEvent === 'wc_used'){
+    document.getElementById('wcDrawer')?.classList.remove('tut-force-use');
   }
 
   const rerollWcs=['mulligan','tailwind','precision_grip'];
@@ -471,6 +479,7 @@ function activateWildcard(slotIdx){
     }
 
 function discardEquipped(i){
+  if(TUT.active && _tutWaitEvent === 'wc_used') return;
   WCS.equipped.splice(i,1);
   renderWcDrawer();
   renderWcFab();
