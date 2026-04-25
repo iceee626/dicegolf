@@ -275,10 +275,9 @@ function continueGame(){
             nextBtn.onclick=()=>{
                 if(_rerollChoiceActive) return;
                 const b=document.getElementById('puttWcBtn');if(b)b.remove();
-                S._pendingPuttResult=null;
                 S._pendingHoleFinish=null;
-                S.holeDone=true;
                 _holdFinishBtn=true;
+                S.holeDone=true;
                 nextBtn.disabled=true;
                 nextBtn.style.pointerEvents='none';
                 updateTVBanner();
@@ -436,3 +435,4 @@ function updateMenuContinueBtn(){
     btn.style.display='none';
   }
 }
+
