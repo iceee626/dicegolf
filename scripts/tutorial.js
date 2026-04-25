@@ -95,8 +95,6 @@ function clearTutorialUiState(){
 
 function startTutorial(){
   document.getElementById('tutPrompt').classList.remove('show');
-  try{ clearSavedGameForProfileId(getActiveProfileId()); }catch{}
-  try{ localStorage.removeItem('gg_save'); }catch{}
   TUT.active = true;
   TUT.blocked = true;
   _tutStep = -1;
