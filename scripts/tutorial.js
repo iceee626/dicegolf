@@ -540,10 +540,11 @@ let _tutWaitCallback = null;
 let _tutWaitEvent = null;
 let _tutPendingEvents = Object.create(null);
 const _TUT_PENDING_EVENT_MAX_AGE_MS = 1500;
+const _TUT_REPLAYABLE_EVENTS = new Set(['wc_revealed','wc_equipped']);
 
 function _tutWaitFor(event, cb){
   const queuedAt = _tutPendingEvents[event];
-  if(queuedAt && (Date.now() - queuedAt) <= _TUT_PENDING_EVENT_MAX_AGE_MS){
+  if(_TUT_REPLAYABLE_EVENTS.has(event) && queuedAt && (Date.now() - queuedAt) <= _TUT_PENDING_EVENT_MAX_AGE_MS){
     delete _tutPendingEvents[event];
     _tutWaitEvent = null;
     _tutWaitCallback = null;
@@ -564,7 +565,7 @@ function _tutFire(event){
     cb();
     return;
   }
-  _tutPendingEvents[event] = Date.now();
+  if(_TUT_REPLAYABLE_EVENTS.has(event)) _tutPendingEvents[event] = Date.now();
 }
 
 function tutAfterShot(outcome){
