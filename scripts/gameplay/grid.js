@@ -85,6 +85,9 @@ function _farTmpl(h){
     default:             return d===1?T_FAR_OPEN_E():d===2?T_FAR_OPEN_M():T_FAR_OPEN_H();
   }
 }
+function _isPacificHole18Approach(h){
+  return h && h.name === 'HOLE 18' && h.farLayout === 'coastalPacific' && h.appLayout === 'bunkerGreen';
+}
 function _puttTmpl(h){
   const bd=h.baseDiff||2, gd=GAME_DIFF||1;
   const tbl=[[T_PUTT_1E,T_PUTT_1N,T_PUTT_1H],[T_PUTT_2E,T_PUTT_2N,T_PUTT_2H],[T_PUTT_3E,T_PUTT_3N,T_PUTT_3H]];
@@ -155,6 +158,12 @@ function buildGrid(){
   };
 
   // PUTTING
+  if(S.zone==='grn' && S._forceP1PuttGrid){
+    S.currentGrid=Array(6).fill(null).map(()=>Array(6).fill('p1'));
+    document.getElementById('gridTitle').textContent='Putting Grid';
+    renderGrid();
+    return;
+  }
   if(S.zone==='grn'||gate==='green'){
     return _emit('Putting Grid',_puttTmpl(h));
   }
@@ -181,6 +190,9 @@ function buildGrid(){
 
   // FAIRWAY
   if(S.zone==='fwy'){
+    if(_isPacificHole18Approach(h) && S.yrdRemain <= 200 && S.yrdRemain > 80){
+      return _emit('Fairway Shot Grid',_appTmpl(h),{keepFarChips:true});
+    }
     if(S.prevZone==='tee'){
       const firstFwy=_firstFwyTmpl(h);
       if(firstFwy) return _emit('Fairway Shot Grid',firstFwy,{keepFarChips:true});
@@ -279,6 +291,51 @@ function litCell(r,c){
   if(el)el.classList.add('lit');
 }
 
+function updateVisibleGridCell(r,c,zk){
+  const cell=document.getElementById(`cell-${r}-${c}`);
+  if(!cell) return;
+  const zd=Z[zk]||Z.fwy;
+  Object.values(Z).forEach(z=>{ if(z&&z.cls) cell.classList.remove(z.cls); });
+  cell.classList.add(zd.cls);
+  const abbr={ob:'OB',h2o:'H₂O',hole:'⛳',p1:'1P',p2:'2P',p3:'3P'};
+  const alwaysName={h2o:'WATER',ob:'OB',grn:'GREEN',fwy:'FAIRWAY',rgh:'ROUGH',chip:'CHIP',sand:'SAND',tee:'TEE',hole:'HOLE',p1:'1P',p2:'2P',p3:'3P'};
+  if(getCellLabelMode()==='always'){
+    cell.textContent=(alwaysName[zk]||zd.name).toUpperCase();
+  } else {
+    cell.textContent=abbr[zk]||'';
+  }
+}
+
+function mutateCurrentPuttGridCells(matchZone, nextZone){
+  if(!Array.isArray(S.currentGrid)) return 0;
+  let changed=0;
+  for(let r=0;r<6;r++){
+    if(!Array.isArray(S.currentGrid[r])) continue;
+    for(let c=0;c<6;c++){
+      if(S.currentGrid[r][c] !== matchZone) continue;
+      S.currentGrid[r][c]=nextZone;
+      updateVisibleGridCell(r,c,nextZone);
+      changed++;
+    }
+  }
+  return changed;
+}
+
+function mutateAllCurrentPuttGridCells(nextZone){
+  if(!Array.isArray(S.currentGrid)) return 0;
+  let changed=0;
+  for(let r=0;r<6;r++){
+    if(!Array.isArray(S.currentGrid[r])) continue;
+    for(let c=0;c<6;c++){
+      if(S.currentGrid[r][c] === nextZone) continue;
+      S.currentGrid[r][c]=nextZone;
+      updateVisibleGridCell(r,c,nextZone);
+      changed++;
+    }
+  }
+  return changed;
+}
+
 // ═══════════════════════════════════════
 // YARDAGE
 // ═══════════════════════════════════════
@@ -327,11 +384,14 @@ function appendWcNoteToLastLog(noteStr){
 function activateGreenReadOnGrid(grid){
   if(!Array.isArray(grid)) return grid;
   if(!(WCS.greenReadQueued || WCS.greenReadActive)) return grid;
+  const hasP3 = grid.some(row => Array.isArray(row) && row.includes('p3'));
   WCS.greenReadQueued = false;
   WCS.greenReadActive = false;
   const nextGrid = grid.map(row => row.map(cell => (cell === 'p3' ? 'p2' : cell)));
-  showWcToast('🌱 Green Read activated!');
-  appendWcNote('🌱 Green Read');
+  if(hasP3){
+    showWcToast('🌱 Green Read activated!');
+    appendWcNote('🌱 Green Read');
+  }
   return nextGrid;
 }
 
