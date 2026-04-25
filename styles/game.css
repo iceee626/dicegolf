@@ -113,8 +113,8 @@ html, body, .sc-wrap, .sum-tabs, .sc-table-wrapper { -ms-overflow-style: none; s
 .sc-head div,.sc-body div:not(.sc-lbl){color:#fff;}
 .sc-body{border-top:1px solid var(--border);}
 .sc-body div{border-right:1px solid var(--border);}
-.sc-lbl{font-size:9px;color:var(--text);display:flex;align-items:center;justify-content:center;position:sticky;left:0;background:var(--card);z-index:2;opacity:1;}
-.sc-head .sc-lbl{background:var(--c-fwy);color:#fff;}
+.sc-lbl{font-size:9px;color:#fff!important;display:flex;align-items:center;justify-content:center;position:sticky;left:0;background:var(--card);z-index:2;opacity:1!important;filter:none!important;}
+.sc-head .sc-lbl{background:var(--c-fwy);color:#fff!important;opacity:1!important;filter:none!important;}
 .sc-active{background:rgba(58,122,48,.2);color:var(--c-fwyl)!important;}
 .sc-eagle{color:var(--gold)!important;font-weight:700;}
 .sc-birdie{color:#ff6b9d!important;font-weight:700;}
