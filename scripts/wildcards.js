@@ -578,11 +578,17 @@ function applyWildcardEffect(wc){
       toastMsg = `🌱 ${wc.name} applied!`;
       if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone){
         if(Array.isArray(S.currentGrid) && S.currentGrid.length){
-          WCS.greenReadActive = true;
+          toastMsg = null;
+          WCS.greenReadActive = false;
           WCS.greenReadQueued = false;
           afterApply = () => {
-            S.currentGrid = activateGreenReadOnGrid(S.currentGrid);
-            renderGrid();
+            const changed = typeof mutateCurrentPuttGridCells === 'function'
+              ? mutateCurrentPuttGridCells('p3','p2')
+              : 0;
+            if(changed > 0){
+              showWcToast('🌱 Green Read activated!');
+              appendWcNote('🌱 Green Read');
+            }
           };
         } else {
           WCS.greenReadActive = false;
@@ -620,7 +626,20 @@ function applyWildcardEffect(wc){
       }
       break;
     case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
-    case 'golden_putter': WCS.goldenPutterActive = true; toastMsg = `🥇 ${wc.name} applied!`; break;
+    case 'golden_putter':
+      if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone && Array.isArray(S.currentGrid) && S.currentGrid.length){
+        WCS.goldenPutterActive = false;
+        afterApply = () => {
+          if(typeof mutateAllCurrentPuttGridCells === 'function') mutateAllCurrentPuttGridCells('p1');
+          showWcToast('🥇 Golden Putter activated!');
+          appendWcNote('🥇 Golden Putter');
+        };
+        toastMsg = null;
+      } else {
+        WCS.goldenPutterActive = true;
+        toastMsg = `🥇 ${wc.name} applied!`;
+      }
+      break;
     case 'mulligan':
     case 'tailwind':
     case 'precision_grip':
