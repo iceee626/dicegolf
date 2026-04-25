@@ -210,6 +210,10 @@ function flipCell(cell, zd){
 
 function renderGrid(){
   const ax=document.getElementById('gridAxes');ax.innerHTML='';
+  if(S.holeDone && _holdFinishBtn && S._finishGridFrozenHTML){
+    ax.innerHTML = S._finishGridFrozenHTML;
+    return;
+  }
   const corner=document.createElement('div');ax.appendChild(corner);
   const alwaysLabels=getCellLabelMode()==='always';
   for(let c=1;c<=6;c++){const l=document.createElement('div');l.className='ax';l.textContent=c;ax.appendChild(l);}
@@ -374,7 +378,3 @@ function advanceYrd(zk){
     S.yrdRemain = Math.round(5 + Math.random() * 10);
   }
 }
-
-// ═══════════════════════════════════════
-// ROLL
-// ═══════════════════════════════════════
