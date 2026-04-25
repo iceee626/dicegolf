@@ -88,7 +88,7 @@
 .hio-ball{order:1;font-size:56px;animation:hio-spin 1s linear infinite;}
 @keyframes hio-spin{from{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.3)}to{transform:rotate(360deg) scale(1)}}
 .hio-title{order:2;font-family:'Bebas Neue',cursive;font-size:clamp(28px,8vw,38px);letter-spacing:4px;color:#f0c040;text-align:center;text-shadow:0 0 30px rgba(240,192,64,.8);line-height:1.1;}
-.hio-sub{order:3;font-family:'Sen', sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.6);text-align:center;}
+.hio-sub{order:3;font-family:'Sen', sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.6);text-align:center;min-height:34px;line-height:17px;display:flex;align-items:center;justify-content:center;max-width:320px;}
 .hio-dice-row{order:4;display:flex;gap:20px;justify-content:center;}
 .hio-die{
   width:64px;height:64px;
@@ -107,7 +107,7 @@
   width:100%;max-width:300px;
 }
 @keyframes hio-pulse{from{transform:scale(1);box-shadow:0 0 10px rgba(240,192,64,.3)}to{transform:scale(1.04);box-shadow:0 0 24px rgba(240,192,64,.7)}}
-.hio-result{order:5;min-height:62px;font-family:'Bebas Neue',cursive;font-size:clamp(36px,10vw,52px);letter-spacing:4px;text-align:center;animation:popin .5s cubic-bezier(.34,1.56,.64,1);width:100%;max-width:340px;margin-top:0;}
+.hio-result{order:5;min-height:62px;font-family:'Bebas Neue',cursive;font-size:clamp(36px,10vw,52px);letter-spacing:4px;text-align:center;animation:popin .5s cubic-bezier(.34,1.56,.64,1);width:100%;max-width:340px;margin-top:0;display:flex;align-items:center;justify-content:center;line-height:1;}
 .hio-result.success{color:#f0c040;text-shadow:0 0 40px rgba(240,192,64,1);}
 .hio-result.fail{color:var(--muted);}
 .hio-overlay.hio-rolled .hio-result{margin-top:-86px;}
