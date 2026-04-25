@@ -374,12 +374,14 @@ function completeHole(){
     setMainAppConcealed(true);
     hideMainAppImmediate();
     S._finishGridFrozenHTML=null;
+    document.getElementById('gridAxes')?.classList.remove('finish-grid-frozen');
     document.getElementById('hcScreen').classList.add('show');
   } else {
     showCelebration(isHoleInOne?-99:d, ()=>{
       setMainAppConcealed(true);
       hideMainAppImmediate();
       S._finishGridFrozenHTML=null;
+      document.getElementById('gridAxes')?.classList.remove('finish-grid-frozen');
       document.getElementById('hcScreen').classList.add('show');
     });
   }
