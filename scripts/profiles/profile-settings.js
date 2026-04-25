@@ -409,9 +409,14 @@ function updateSettingsUI(){
   if (tutRow) {
       tutRow.style.display = isGameActive ? 'none' : 'flex';
   }
+  const tutHdr = document.getElementById('settingsTutorialHdr');
+  if (tutHdr) {
+      tutHdr.style.display = isGameActive ? 'none' : '';
+  }
 }
 
 function openSettings(fromGame){
+  const openedFromGame = fromGame === true;
   updateSettingsUI();
   const theme=getThemeSetting();
   ['dark','light','system'].forEach(t=>{
@@ -422,9 +427,11 @@ function openSettings(fromGame){
       b.style.color=theme===t?'#fff':'var(--muted)';
     }
   });
-  // Hide the TUTORIAL header only when opened from the gamescreen gear icon
+  // Hide Tutorial controls when opened from the gamescreen gear icon.
   const tutHdr=document.getElementById('settingsTutorialHdr');
-  if(tutHdr) tutHdr.style.display = fromGame ? 'none' : '';
+  const tutRow=document.getElementById('settingsTutorialRow');
+  if(tutHdr) tutHdr.style.display = openedFromGame ? 'none' : '';
+  if(tutRow) tutRow.style.display = openedFromGame ? 'none' : 'flex';
   document.getElementById('settingsModal').classList.add('show');
 }
 function _closeProfileLikeModal(id, afterClose){
