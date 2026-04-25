@@ -143,6 +143,41 @@ const T_APP_CATH_E  = ()=>cells(['grn',28],['chip',2],['rgh',4],['sand',2]);
 const T_APP_CATH_M  = ()=>cells(['grn',23],['chip',3],['rgh',6],['sand',4]);
 const T_APP_CATH_H  = ()=>cells(['grn',18],['chip',4],['rgh',8],['sand',6]);
 
+// Pacific tee — course-specific hard-mode tuning without changing shared templates
+const T_PAC_TEE_OPEN_SOFT_E = ()=>cells(['fwy',30],['rgh',6]);
+const T_PAC_TEE_OPEN_SOFT_M = ()=>cells(['fwy',28],['rgh',7],['sand',1]);
+const T_PAC_TEE_OPEN_SOFT_H = ()=>cells(['fwy',26],['rgh',8],['sand',2]);
+const T_PAC_TEE_H2_E        = ()=>cells(['fwy',28],['rgh',6],['sand',2]);
+const T_PAC_TEE_H2_M        = ()=>cells(['fwy',25],['rgh',8],['sand',3]);
+const T_PAC_TEE_H2_H        = ()=>cells(['fwy',22],['rgh',10],['sand',4]);
+const T_PAC_TEE_H4_E        = ()=>cells(['fwy',30],['rgh',4],['sand',2]);
+const T_PAC_TEE_H4_M        = ()=>cells(['fwy',28],['rgh',5],['sand',3]);
+const T_PAC_TEE_H4_H        = ()=>cells(['fwy',26],['rgh',6],['sand',4]);
+const T_PAC_TEE_H6_E        = ()=>cells(['fwy',34],['rgh',2]);
+const T_PAC_TEE_H6_M        = ()=>cells(['fwy',32],['rgh',3],['sand',1]);
+const T_PAC_TEE_H6_H        = ()=>cells(['fwy',30],['rgh',4],['sand',2]);
+const T_PAC_TEE_H8_E        = ()=>cells(['fwy',34],['rgh',2]);
+const T_PAC_TEE_H8_M        = ()=>cells(['fwy',32],['rgh',4]);
+const T_PAC_TEE_H8_H        = ()=>cells(['fwy',30],['rgh',6]);
+const T_PAC_TEE_OPEN_EASY   = ()=>T_TEE_OPEN_E();
+const T_PAC_TEE_BFWY_MED   = ()=>T_TEE_BFWY_M();
+
+// Pacific first fairway — only the first grid after a tee-shot fairway landing
+const T_PAC_FIRST_H2_E      = ()=>cells(['fwy',24],['rgh',6],['sand',2],['grn',2],['chip',2]);
+const T_PAC_FIRST_H2_M      = ()=>cells(['fwy',21],['rgh',8],['sand',2],['grn',2],['chip',3]);
+const T_PAC_FIRST_H2_H      = ()=>cells(['fwy',18],['rgh',10],['sand',2],['grn',2],['chip',4]);
+const T_PAC_FIRST_NOFWY_E   = ()=>cells(['grn',24],['chip',5],['sand',3],['rgh',4]);
+const T_PAC_FIRST_NOFWY_M   = ()=>cells(['grn',21],['chip',5],['sand',5],['rgh',5]);
+const T_PAC_FIRST_NOFWY_H   = ()=>cells(['grn',18],['chip',6],['sand',6],['rgh',6]);
+const T_PAC_FIRST_H8_E      = ()=>cells(['fwy',26],['rgh',4],['chip',2],['h2o',1],['sand',1],['grn',2]);
+const T_PAC_FIRST_H8_M      = ()=>cells(['fwy',23],['rgh',5],['chip',3],['h2o',1],['sand',2],['grn',2]);
+const T_PAC_FIRST_H8_H      = ()=>cells(['fwy',20],['rgh',7],['chip',3],['h2o',1],['sand',3],['grn',2]);
+
+// Pacific coastal fairway — ocean pressure without OB for the closing hole
+const T_PAC_FAR_COAST_E     = ()=>cells(['fwy',24],['rgh',6],['h2o',2],['sand',4]);
+const T_PAC_FAR_COAST_M     = ()=>cells(['fwy',20],['rgh',7],['h2o',4],['sand',5]);
+const T_PAC_FAR_COAST_H     = ()=>cells(['fwy',16],['rgh',8],['h2o',6],['sand',6]);
+
 // ── ROUGH ──────────────────────────────────────────────────
 const T_RGH_FAR_E   = ()=>cells(['fwy',28],['rgh',8]);
 const T_RGH_FAR_M   = ()=>cells(['fwy',24],['rgh',12]);
@@ -218,24 +253,24 @@ const COURSES={
   'pacific-beach':{
     id:'pacific-beach', name:'PACIFIC BEACH', shortName:'PACIFIC BEACH',
     holes:[
-      {name:'HOLE 1', yards:378,par:4,baseDiff:1,diff:1,layout:'open'},
-      {name:'HOLE 2', yards:509,par:5,baseDiff:3,diff:3,layout:'waterApproach',appLayout:'coastal'},
-      {name:'HOLE 3', yards:397,par:4,baseDiff:2,diff:2,layout:'doglegs'},
-      {name:'HOLE 4', yards:333,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',appLayout:'coastal'},
-      {name:'HOLE 5', yards:189,par:3,baseDiff:3,diff:3,layout:'waterCross'},
-      {name:'HOLE 6', yards:498,par:5,baseDiff:3,diff:3,layout:'doglegs'},
-      {name:'HOLE 7', yards:107,par:3,baseDiff:2,diff:2,layout:'open'},
-      {name:'HOLE 8', yards:416,par:4,baseDiff:3,diff:3,layout:'coastal'},
-      {name:'HOLE 9', yards:483,par:4,baseDiff:3,diff:3,layout:'coastal'},
-      {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'coastal'},
-      {name:'HOLE 11',yards:370,par:4,baseDiff:2,diff:2,layout:'cathedral'},
-      {name:'HOLE 12',yards:202,par:3,baseDiff:3,diff:3,layout:'waterCross'},
-      {name:'HOLE 13',yards:401,par:4,baseDiff:2,diff:2,layout:'doglegs'},
-      {name:'HOLE 14',yards:559,par:5,baseDiff:2,diff:2,layout:'bunkerFwy'},
-      {name:'HOLE 15',yards:393,par:4,baseDiff:2,diff:2,layout:'bunkerGreen'},
-      {name:'HOLE 16',yards:400,par:4,baseDiff:2,diff:2,layout:'waterApproach',appLayout:'coastal'},
-      {name:'HOLE 17',yards:182,par:3,baseDiff:3,diff:3,layout:'waterCross',par3Layout:'waterTee'},
-      {name:'HOLE 18',yards:541,par:5,baseDiff:3,diff:3,layout:'coastal'},
+      {name:'HOLE 1', yards:378,par:4,baseDiff:1,diff:1,layout:'open',teeLayout:'pacOpenSoft'},
+      {name:'HOLE 2', yards:509,par:5,baseDiff:2,diff:2,layout:'open',teeLayout:'pacHole2',firstFwyLayout:'pacHole2'},
+      {name:'HOLE 3', yards:397,par:4,baseDiff:2,diff:2,layout:'bunkerFwy',firstFwyLayout:'pacNoFairway'},
+      {name:'HOLE 4', yards:333,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',teeLayout:'pacHole4',appLayout:'bunkerGreen'},
+      {name:'HOLE 5', yards:189,par:3,baseDiff:3,diff:3,layout:'open',par3Layout:'open'},
+      {name:'HOLE 6', yards:498,par:5,baseDiff:2,diff:1,layout:'open',teeLayout:'pacHole6',farLayout:'bunkerFwy',appLayout:'bunkerFwy'},
+      {name:'HOLE 7', yards:107,par:3,baseDiff:2,diff:1,layout:'open'},
+      {name:'HOLE 8', yards:416,par:4,baseDiff:3,diff:3,layout:'open',teeLayout:'pacHole8',firstFwyLayout:'pacHole8'},
+      {name:'HOLE 9', yards:483,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
+      {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
+      {name:'HOLE 11',yards:370,par:4,baseDiff:1,diff:1,layout:'open',teeLayout:'pacOpenEasy',appLayout:'bunkerGreen'},
+      {name:'HOLE 12',yards:202,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
+      {name:'HOLE 13',yards:401,par:4,baseDiff:3,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',appLayout:'bunkerFwy'},
+      {name:'HOLE 14',yards:559,par:5,baseDiff:2,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
+      {name:'HOLE 15',yards:393,par:4,baseDiff:2,diff:2,layout:'bunkerGreen',teeLayout:'pacBfwyMed',appLayout:'bunkerGreen'},
+      {name:'HOLE 16',yards:400,par:4,baseDiff:2,diff:2,layout:'bunkerFwy',teeLayout:'bunkerFwy',appLayout:'doglegs'},
+      {name:'HOLE 17',yards:182,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
+      {name:'HOLE 18',yards:541,par:5,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'coastalPacific',appLayout:'coastalPacific'},
     ]
   },
   'desert-golf-links':{
@@ -375,5 +410,3 @@ function restoreBaseHoles(){
   HOLES.length=BASE_HOLES.length;
   BASE_HOLES.forEach((h,i)=>{ HOLES[i]={...h}; });
 }
-
-// ═══════════════════════════════════════
