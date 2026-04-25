@@ -373,11 +373,13 @@ function completeHole(){
     S._skipCelebration=false;
     setMainAppConcealed(true);
     hideMainAppImmediate();
+    S._finishGridFrozenHTML=null;
     document.getElementById('hcScreen').classList.add('show');
   } else {
     showCelebration(isHoleInOne?-99:d, ()=>{
       setMainAppConcealed(true);
       hideMainAppImmediate();
+      S._finishGridFrozenHTML=null;
       document.getElementById('hcScreen').classList.add('show');
     });
   }
@@ -663,7 +665,3 @@ function showRoundEnd(){
     hcScreen.classList.add('show');
   }
 }
-
-// ═══════════════════════════════════════
-// ROUND SUMMARY MODAL
-// ═══════════════════════════════════════
