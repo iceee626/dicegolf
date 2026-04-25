@@ -106,10 +106,7 @@ function resolveHio(r1, r2){
       addLog(S.shotNum,`${Z[prevZone].name} → Green · ${fmtYds(1)}${wcNote}`,'grn','+1',false,_hioRow,_hioCol,snapGrid, prevZone, prevYrdRemain);
       showResult(Z.grn,`${Z[prevZone].name} → ${Z.grn.name}`,'ok',`${fmtYds(1)} to hole`);
       S.shotNum++;updateFloat();updateYrd();updateZonePill();updateTVBanner();
-      S.currentGrid=Array(6).fill(null).map(()=>Array(6).fill('p1'));
-      S._forceGrid=true;
       S._forceP1PuttGrid=true;
-      renderGrid();
       S.rolling=false;showNextShotBtn();
     },2000);
   }
