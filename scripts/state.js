@@ -461,4 +461,3 @@ function _setShotBtnState(showNext, immediate=false){
 
 function showNextShotBtn(immediate=false){ _setShotBtnState(true, immediate); }
 function hideNextShotBtn(immediate=false){ _setShotBtnState(false, immediate); }
-
