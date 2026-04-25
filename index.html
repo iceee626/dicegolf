@@ -767,15 +767,19 @@
 </div>
 
 <div class="hio-overlay" id="hioOverlay">
-  <div class="hio-ball" id="hioBall"><img src="assets/golf_ball.png" style="width:56px;height:56px;object-fit:contain;"></div>
-  <div class="hio-title">THE BALL IS IN THE AIR!</div>
-  <div class="hio-sub" id="hioSub">ROLL DOUBLES TO HOLE IT</div>
-  <div class="hio-dice-row">
-    <div class="hio-die" id="hioDie1">?</div>
-    <div class="hio-die" id="hioDie2">?</div>
+  <div class="hio-stack">
+    <div class="hio-ball" id="hioBall"><img src="assets/golf_ball.png" style="width:56px;height:56px;object-fit:contain;"></div>
+    <div class="hio-title">THE BALL IS IN THE AIR!</div>
+    <div class="hio-sub" id="hioSub">ROLL DOUBLES TO HOLE IT</div>
+    <div class="hio-dice-row">
+      <div class="hio-die" id="hioDie1">?</div>
+      <div class="hio-die" id="hioDie2">?</div>
+    </div>
+    <div class="hio-action-slot">
+      <button class="hio-roll-btn" id="hioRollBtn">🎲 ROLL FOR IT</button>
+      <div class="hio-result" id="hioResult" style="display:none;"></div>
+    </div>
   </div>
-  <button class="hio-roll-btn" id="hioRollBtn">🎲 ROLL FOR IT</button>
-  <div class="hio-result" id="hioResult" style="display:none;"></div>
 </div>
 
 <div class="profile-modal" id="confirmModal" style="z-index:700;">
