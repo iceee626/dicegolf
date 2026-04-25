@@ -4,10 +4,21 @@ function _layoutForStage(h, stage){
   const key = stage === 'par3' ? 'par3Layout' : `${stage}Layout`;
   return h[key] || h.layout;
 }
+function _byDiff(d, e, m, h){
+  return d===1?e():d===2?m():h();
+}
 function _teeTmpl(h){
   const d=h.diff;
+  const gd=GAME_DIFF||d;
   const layout=_layoutForStage(h,'tee');
   switch(layout){
+    case 'pacOpenSoft':  return _byDiff(gd,T_PAC_TEE_OPEN_SOFT_E,T_PAC_TEE_OPEN_SOFT_M,T_PAC_TEE_OPEN_SOFT_H);
+    case 'pacHole2':     return _byDiff(gd,T_PAC_TEE_H2_E,T_PAC_TEE_H2_M,T_PAC_TEE_H2_H);
+    case 'pacHole4':     return _byDiff(gd,T_PAC_TEE_H4_E,T_PAC_TEE_H4_M,T_PAC_TEE_H4_H);
+    case 'pacHole6':     return _byDiff(gd,T_PAC_TEE_H6_E,T_PAC_TEE_H6_M,T_PAC_TEE_H6_H);
+    case 'pacHole8':     return _byDiff(gd,T_PAC_TEE_H8_E,T_PAC_TEE_H8_M,T_PAC_TEE_H8_H);
+    case 'pacOpenEasy':  return T_PAC_TEE_OPEN_EASY();
+    case 'pacBfwyMed':   return T_PAC_TEE_BFWY_MED();
     case 'doglegs':      return d===1?T_TEE_DOG_E(): d===2?T_TEE_DOG_M(): T_TEE_DOG_H();
     case 'bunkerFwy':    return d===1?T_TEE_BFWY_E():d===2?T_TEE_BFWY_M():T_TEE_BFWY_H();
     case 'waterCross':   return d===1?T_TEE_WCRS_E():d===2?T_TEE_WCRS_M():T_TEE_WCRS_H();
@@ -29,8 +40,22 @@ function _par3Tmpl(h){
     default:             return d===1?T_P3_OPEN_E():d===2?T_P3_OPEN_M():T_P3_OPEN_H();
   }
 }
+function _firstFwyTmpl(h){
+  const d=h.diff;
+  const gd=GAME_DIFF||d;
+  const layout=_layoutForStage(h,'firstFwy');
+  switch(layout){
+    case 'pacHole2':     return _byDiff(gd,T_PAC_FIRST_H2_E,T_PAC_FIRST_H2_M,T_PAC_FIRST_H2_H);
+    case 'pacNoFairway': return _byDiff(gd,T_PAC_FIRST_NOFWY_E,T_PAC_FIRST_NOFWY_M,T_PAC_FIRST_NOFWY_H);
+    case 'pacHole8':     return _byDiff(gd,T_PAC_FIRST_H8_E,T_PAC_FIRST_H8_M,T_PAC_FIRST_H8_H);
+    case 'bunkerFwy':    return d===1?T_FAR_BFWY_E():d===2?T_FAR_BFWY_M():T_FAR_BFWY_H();
+    case 'coastalPacific': return _byDiff(gd,T_PAC_FAR_COAST_E,T_PAC_FAR_COAST_M,T_PAC_FAR_COAST_H);
+    default:             return null;
+  }
+}
 function _appTmpl(h){
   const d=h.diff;
+  const gd=GAME_DIFF||d;
   const layout=_layoutForStage(h,'app');
   switch(layout){
     case 'doglegs':      return d===1?T_APP_DOG_E(): d===2?T_APP_DOG_M(): T_APP_DOG_H();
@@ -39,6 +64,7 @@ function _appTmpl(h){
     case 'waterCross':   return d===1?T_APP_WCRS_E():d===2?T_APP_WCRS_M():T_APP_WCRS_H();
     case 'waterApproach':return d===1?T_APP_WAPR_E():d===2?T_APP_WAPR_M():T_APP_WAPR_H();
     case 'coastal':      return d===1?T_APP_COAST_E():d===2?T_APP_COAST_M():T_APP_COAST_H();
+    case 'coastalPacific': return _byDiff(gd,T_PAC_FAR_COAST_E,T_PAC_FAR_COAST_M,T_PAC_FAR_COAST_H);
     case 'desertWash':   return d===1?T_APP_DSRT_E():d===2?T_APP_DSRT_M():T_APP_DSRT_H();
     case 'cathedral':    return d===1?T_APP_CATH_E():d===2?T_APP_CATH_M():T_APP_CATH_H();
     default:             return d===1?T_APP_OPEN_E():d===2?T_APP_OPEN_M():T_APP_OPEN_H();
@@ -46,6 +72,7 @@ function _appTmpl(h){
 }
 function _farTmpl(h){
   const d=h.diff;
+  const gd=GAME_DIFF||d;
   const layout=_layoutForStage(h,'far');
   switch(layout){
     case 'doglegs':
@@ -53,6 +80,7 @@ function _farTmpl(h){
     case 'bunkerFwy':    return d===1?T_FAR_BFWY_E():d===2?T_FAR_BFWY_M():T_FAR_BFWY_H();
     case 'waterCross':   return d===1?T_FAR_WCRS_E():d===2?T_FAR_WCRS_M():T_FAR_WCRS_H();
     case 'coastal':      return d===1?T_FAR_COAST_E():d===2?T_FAR_COAST_M():T_FAR_COAST_H();
+    case 'coastalPacific': return _byDiff(gd,T_PAC_FAR_COAST_E,T_PAC_FAR_COAST_M,T_PAC_FAR_COAST_H);
     case 'desertWash':   return d===1?T_FAR_DSRT_E():d===2?T_FAR_DSRT_M():T_FAR_DSRT_H();
     default:             return d===1?T_FAR_OPEN_E():d===2?T_FAR_OPEN_M():T_FAR_OPEN_H();
   }
@@ -113,12 +141,12 @@ function buildGrid(){
   const gate=getGate(S.yrdRemain,isPar3);
   let tmpl;
 
-  const _emit=(title,t)=>{
+  const _emit=(title,t,opts={})=>{
     document.getElementById('gridTitle').textContent=title;
     // Replace chip cells with fwy when yardage is too high for chip zone after advance
     // (chip advance min 30yds; if pre-advance >117yds chip will always be overridden visually)
     // Don't replace chip→fwy on par 3 tee: chip is always valid there and hole cell must stay
-    if(S.yrdRemain>117 && S.zone!=='chip' && S.zone!=='sand' && !(isPar3&&S.zone==='tee')){
+    if(!opts.keepFarChips && S.yrdRemain>117 && S.zone!=='chip' && S.zone!=='sand' && !(isPar3&&S.zone==='tee')){
       t=t.map(row=>row.map(c=>c==='chip'?'fwy':c));
     }
     if(VS.active)vsCacheGrid(t);
@@ -153,6 +181,10 @@ function buildGrid(){
 
   // FAIRWAY
   if(S.zone==='fwy'){
+    if(S.prevZone==='tee'){
+      const firstFwy=_firstFwyTmpl(h);
+      if(firstFwy) return _emit('Fairway Shot Grid',firstFwy,{keepFarChips:true});
+    }
     if(gate==='short'||gate==='nearpin'){
       tmpl=_appTmpl(h); // approach templates have no raw fwy cells
     } else if(gate==='mid'){
