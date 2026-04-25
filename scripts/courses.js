@@ -164,8 +164,8 @@ const T_PAC_TEE_BFWY_MED   = ()=>T_TEE_BFWY_M();
 
 // Pacific first fairway — only the first grid after a tee-shot fairway landing
 const T_PAC_FIRST_H2_E      = ()=>cells(['fwy',24],['rgh',6],['sand',2],['grn',2],['chip',2]);
-const T_PAC_FIRST_H2_M      = ()=>cells(['fwy',21],['rgh',8],['sand',2],['grn',2],['chip',3]);
-const T_PAC_FIRST_H2_H      = ()=>cells(['fwy',18],['rgh',10],['sand',2],['grn',2],['chip',4]);
+const T_PAC_FIRST_H2_M      = ()=>cells(['fwy',21],['rgh',8],['sand',3],['grn',2],['chip',2]);
+const T_PAC_FIRST_H2_H      = ()=>cells(['fwy',18],['rgh',10],['sand',4],['grn',2],['chip',2]);
 const T_PAC_FIRST_NOFWY_E   = ()=>cells(['grn',24],['chip',5],['sand',3],['rgh',4]);
 const T_PAC_FIRST_NOFWY_M   = ()=>cells(['grn',21],['chip',5],['sand',5],['rgh',5]);
 const T_PAC_FIRST_NOFWY_H   = ()=>cells(['grn',18],['chip',6],['sand',6],['rgh',6]);
