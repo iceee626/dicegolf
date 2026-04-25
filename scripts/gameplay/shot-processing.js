@@ -109,6 +109,7 @@ function cupMagnetCanPull(row,col){
 
 function freezeCurrentGridForFinish(){
   const ax = document.getElementById('gridAxes');
+  if(ax) ax.classList.add('finish-grid-frozen');
   S._finishGridFrozenHTML = ax ? ax.innerHTML : null;
 }
 
