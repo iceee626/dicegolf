@@ -551,8 +551,6 @@ function applyWildcardEffect(wc){
         S.yrdRemain=Math.min(S.yrdRemain, Math.round(15+Math.random()*30));
         addLog('🃏', `Skipped to Chip (${wc.icon} ${wc.name})`, 'chip', 'WC', false, null, null, null, prevZone, prevYrdRemain);
         updateZonePill();updateYrd();updateFloat();updateTVBanner();
-        buildGrid();
-        S._preserveGrid=true;
         toastMsg = `⚡ ${wc.name} activated!`;
         if(h.par === 5){
           unlockAchievement('express_route');
@@ -578,6 +576,18 @@ function applyWildcardEffect(wc){
       toastMsg = `🌱 ${wc.name} applied!`;
       if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone){
         if(Array.isArray(S.currentGrid) && S.currentGrid.length){
+          const hasPuttCells = S.currentGrid.some(row => Array.isArray(row) && row.some(cell => ['p1','p2','p3'].includes(cell)));
+          const hasP3 = S.currentGrid.some(row => Array.isArray(row) && row.includes('p3'));
+          if(!hasPuttCells){
+            WCS.greenReadActive = false;
+            WCS.greenReadQueued = true;
+            break;
+          }
+          if(!hasP3){
+            toastMsg = `${wc.icon} ${wc.name}: no 3P cells to read.`;
+            applied = false;
+            break;
+          }
           toastMsg = null;
           WCS.greenReadActive = false;
           WCS.greenReadQueued = false;
@@ -614,7 +624,7 @@ function applyWildcardEffect(wc){
     case 'sand_wedge_pro': WCS.sandWedgeProActive = true; toastMsg = `🏖️ ${wc.name} applied!`; break;
     case 'lucky_bounce': WCS.luckyBounceActive = true; toastMsg = `🍀 ${wc.name} applied!`; break;
     case 'iron_will': WCS.ironWillActive = true; toastMsg = `🔩 ${wc.name} applied!`; break;
-    case 'birdie_boost': WCS.birdieBoostActive = true; toastMsg = `🚀 ${wc.name} applied!`; break;
+    case 'birdie_boost': WCS.birdieBoostActive = true; toastMsg = `🚀 ${wc.name} armed for your next approach!`; break;
     case 'hole_wall': WCS.holeWallActive = true; toastMsg = `🕳️ ${wc.name} applied!`; break;
     case 'the_ferrett': 
       if (S.zone === 'sand' && S.yrdRemain > 87) {
@@ -628,6 +638,12 @@ function applyWildcardEffect(wc){
     case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
     case 'golden_putter':
       if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone && Array.isArray(S.currentGrid) && S.currentGrid.length){
+        const hasPuttCells = S.currentGrid.some(row => Array.isArray(row) && row.some(cell => ['p1','p2','p3'].includes(cell)));
+        if(!hasPuttCells){
+          WCS.goldenPutterActive = true;
+          toastMsg = `${wc.icon} ${wc.name} armed for the next putting grid!`;
+          break;
+        }
         WCS.goldenPutterActive = false;
         afterApply = () => {
           if(typeof mutateAllCurrentPuttGridCells === 'function') mutateAllCurrentPuttGridCells('p1');
@@ -758,6 +774,8 @@ function applyWcGridMods(grid){
     grid = grid.map(r=>r.map(()=>Math.random()<.80?'hole':'grn'));
   }
   if (WCS.birdieBoostActive && ['fwy','rgh','sand','chip'].includes(S.zone)) {
+    const isApproach = S.yrdRemain <= 200 && S.yrdRemain > 35 && !(S.zone === 'sand' && S.yrdRemain > 87);
+    if(!isApproach) return grid;
     WCS.birdieBoostActive = false; 
     S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
     showWcToast('🚀 Birdie Boost activated!'); appendWcNote('🚀 Birdie Boost');
