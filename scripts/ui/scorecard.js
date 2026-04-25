@@ -114,8 +114,9 @@ function loadHole(){
 
   const nextBtn = document.getElementById('nextShotBtn');
   const rollBtn = document.getElementById('rollBtn');
-  if(rollBtn) rollBtn.textContent='ROLL';
+  if(rollBtn){ rollBtn.textContent='ROLL'; rollBtn.classList.remove('finish-hole-state'); }
   if(nextBtn){
+     nextBtn.classList.remove('finish-hole-state');
      nextBtn.textContent='NEXT SHOT';
      nextBtn.style.background='var(--c-tee)';
      nextBtn.style.pointerEvents = '';
@@ -256,3 +257,4 @@ function updateTVBanner(){
   }
   syncWcToastStackPosition();
 }
+
