@@ -88,7 +88,7 @@
 @keyframes hio-spin{from{transform:rotate(0deg) scale(1)}50%{transform:rotate(180deg) scale(1.3)}to{transform:rotate(360deg) scale(1)}}
 .hio-title{position:absolute;top:calc(50% - 185px);left:50%;transform:translateX(-50%);width:min(520px,calc(100vw - 48px));font-family:'Bebas Neue',cursive;font-size:clamp(28px,8vw,38px);letter-spacing:4px;color:#f0c040;text-align:center;text-shadow:0 0 30px rgba(240,192,64,.8);line-height:1.1;}
 .hio-sub{position:absolute;top:calc(50% - 126px);left:50%;transform:translateX(-50%);width:min(360px,calc(100vw - 48px));font-family:'Sen', sans-serif;font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.6);text-align:center;min-height:34px;line-height:17px;display:flex;align-items:center;justify-content:center;max-width:320px;}
-.hio-dice-row{position:absolute;top:calc(50% - 24px);left:50%;transform:translateX(-50%);display:flex;gap:32px;justify-content:center;}
+.hio-dice-row{position:absolute;top:calc(50% - 86px);left:50%;transform:translateX(-50%);display:flex;gap:32px;justify-content:center;}
 .hio-die{
   width:64px;height:64px;
   background:linear-gradient(145deg,#fefefe,#e2e2e2);
