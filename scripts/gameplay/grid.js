@@ -269,6 +269,7 @@ function renderGrid(){
       const zk=S.currentGrid[r][c];const zd=Z[zk]||Z.fwy;
       const cell=document.createElement('div');
       cell.className=`cell ${zd.cls}`;cell.id=`cell-${r}-${c}`;
+      cell.dataset.zone=zk;
       const abbr={ob:'OB',h2o:'H₂O',hole:'⛳',p1:'1P',p2:'2P',p3:'3P'};
       const alwaysName={h2o:'WATER',ob:'OB',grn:'GREEN',fwy:'FAIRWAY',rgh:'ROUGH',chip:'CHIP',sand:'SAND',tee:'TEE',hole:'HOLE',p1:'1P',p2:'2P',p3:'3P'};
       if(alwaysLabels){
@@ -304,6 +305,7 @@ function updateVisibleGridCell(r,c,zk){
   } else {
     cell.textContent=abbr[zk]||'';
   }
+  cell.dataset.zone=zk;
 }
 
 function mutateCurrentPuttGridCells(matchZone, nextZone){
