@@ -15,7 +15,7 @@ function bindStaticUiEvents(){
   bindClick('menuContinueBtn', continueGame);
   bindClick('menuPlayBtn', navToPlayMode);
   bindClick('menuVersusBtn', navToVersusSetup);
-  bindClick('menuSettingsBtn', openSettings);
+  bindClick('menuSettingsBtn', () => openSettings(false));
 
   bindClick('versusSetupBackBtn', () => navBack('menuScreen'));
   bindClick('versusModeInfoBtn', () => openModeInfo('versus'));
