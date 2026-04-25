@@ -140,7 +140,14 @@ function processShot(row,col){
     }
 
     playShotSound('grn', outcome);
+    const h_putt=HOLES[S.holeIdx];
     S.strokes+=finalPutts;S.yrdRemain=0;
+    if (WCS.bogeyShieldActive && (S.strokes - h_putt.par) >= 1) {
+        WCS.bogeyShieldActive = false;
+        S.strokes = h_putt.par;
+        wcPuttNote += ' (🛡️ Bogey Shield)';
+        showWcToast('🛡️ Bogey Shield activated!');
+    }
     S._pendingPuttResult={putts:finalPutts, row, col, snapGrid, prevZone};
     addLog(S.shotNum,`Green → ${finalPutts} putt${finalPutts>1?'s':''}${wcPuttNote}`,outcome,`+${finalPutts}`,false,row,col,snapGrid, prevZone, prevYrdRemain);
     S._tvShotNum = S.shotNum;
@@ -149,9 +156,7 @@ function processShot(row,col){
     S.holeDone=false;
 
     {
-      const h_putt=HOLES[S.holeIdx];
-      const previewScore = (WCS.bogeyShieldActive && (S.strokes - h_putt.par) >= 1) ? h_putt.par : S.strokes;
-      const d_putt=previewScore-h_putt.par;
+      const d_putt=S.strokes-h_putt.par;
       const isHio_putt=(h_putt.par===3&&S.strokes===1);
       showCelebration(isHio_putt?-99:d_putt, ()=>{});
       S._skipCelebration=true;
@@ -166,10 +171,9 @@ function processShot(row,col){
         document.querySelectorAll('.celebration-overlay').forEach(e=>e.remove());
         const tutorialFinish = TUT.active;
         const b=document.getElementById('puttWcBtn');if(b)b.remove();
-        S._pendingPuttResult=null;
         S._pendingHoleFinish=null;
-        S.holeDone=true;
         _holdFinishBtn=true;
+        S.holeDone=true;
         nextBtn.disabled=true;
         nextBtn.style.pointerEvents='none';
         updateTVBanner();
@@ -220,7 +224,7 @@ function processShot(row,col){
       showWcToast('🍀 Lucky Bounce activated!');
   }
   if (!bounceBackApplied && WCS.mowersRevengeActive && rawOutcome === 'rgh') {
-      resolvedOutcome = 'fwy';
+      resolvedOutcome = S.yrdRemain <= 87 ? 'grn' : 'fwy';
       addAppliedNote(' (🚜 Mower\'s Revenge)');
       showWcToast('🚜 Mower\'s Revenge activated!');
       S._landscaperRoughFixes = (S._landscaperRoughFixes || 0) + 1;
@@ -289,10 +293,9 @@ function processShot(row,col){
           document.querySelectorAll('.celebration-overlay').forEach(e=>e.remove());
           const tutorialFinish = TUT.active;
           const b=document.getElementById('puttWcBtn');if(b)b.remove();
-          S._pendingPuttResult=null;
           S._pendingHoleFinish=null;
-          S.holeDone=true;
           _holdFinishBtn=true;
+          S.holeDone=true;
           nextBtn.disabled=true;
           nextBtn.style.pointerEvents='none';
           updateTVBanner();
