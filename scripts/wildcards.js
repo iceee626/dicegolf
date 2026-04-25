@@ -568,7 +568,7 @@ function applyWildcardEffect(wc){
     case 'green_read':
       toastMsg = `🌱 ${wc.name} applied!`;
       if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone){
-        if(isShotBtnShown('rollBtn') && Array.isArray(S.currentGrid) && S.currentGrid.length){
+        if(Array.isArray(S.currentGrid) && S.currentGrid.length){
           WCS.greenReadActive = true;
           WCS.greenReadQueued = false;
           afterApply = () => {
@@ -949,6 +949,3 @@ function closeWcReveal(){
     setTimeout(()=>processShot(r,c),280);
   }
 }
-
-
-// ═══════════════════════════════════════
