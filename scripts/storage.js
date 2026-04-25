@@ -276,6 +276,7 @@ function continueGame(){
                 if(_rerollChoiceActive) return;
                 const b=document.getElementById('puttWcBtn');if(b)b.remove();
                 S._pendingHoleFinish=null;
+                if(typeof freezeCurrentGridForFinish === 'function') freezeCurrentGridForFinish();
                 _holdFinishBtn=true;
                 S.holeDone=true;
                 nextBtn.disabled=true;
@@ -435,4 +436,3 @@ function updateMenuContinueBtn(){
     btn.style.display='none';
   }
 }
-
