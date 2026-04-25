@@ -90,6 +90,11 @@
 .wc-drawer-close{background:rgba(224,82,82,.24);border:1px solid rgba(255,82,82,.55);color:#ffd7d7;width:28px;height:28px;border-radius:7px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
 .wc-drawer-close:hover{background:rgba(224,82,82,.36);border-color:rgba(255,82,82,.8);}
 .wc-drawer-close:active{transform:translateY(1px) scale(.95);}
+.wc-drawer.tut-force-use .wc-drawer-close,
+.wc-drawer.tut-force-use .mode-info-btn,
+.wc-drawer.tut-force-use .wc-discard-btn{opacity:.25;pointer-events:none;}
+.wc-drawer.tut-force-use .wc-slot{pointer-events:none;}
+.wc-drawer.tut-force-use .wc-use-btn{pointer-events:auto;}
 .wc-drawer-sub{font-family:'Sen', sans-serif;font-size:10px;color:rgba(255,255,255,.5);letter-spacing:1px;padding:10px 16px 0;}
 .wc-drawer-slots{display:flex;flex-direction:column;gap:8px;padding:8px 16px 16px;}
 .wc-slot{
