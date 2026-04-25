@@ -111,6 +111,15 @@ function freezeCurrentGridForFinish(){
   const ax = document.getElementById('gridAxes');
   if(ax) ax.classList.add('finish-grid-frozen');
   S._finishGridFrozenHTML = ax ? ax.innerHTML : null;
+  const rollBtn=document.getElementById('rollBtn');
+  const nextBtn=document.getElementById('nextShotBtn');
+  if(rollBtn){
+    rollBtn.textContent='FINISH HOLE';
+    rollBtn.disabled=true;
+    rollBtn.classList.remove('rolling-state');
+    rollBtn.style.pointerEvents='none';
+  }
+  if(nextBtn) nextBtn.textContent='FINISH HOLE';
 }
 
 function processShot(row,col){
