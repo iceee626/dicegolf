@@ -108,6 +108,7 @@ function resolveHio(r1, r2){
       S.shotNum++;updateFloat();updateYrd();updateZonePill();updateTVBanner();
       S.currentGrid=Array(6).fill(null).map(()=>Array(6).fill('p1'));
       S._forceGrid=true;
+      S._forceP1PuttGrid=true;
       renderGrid();
       S.rolling=false;showNextShotBtn();
     },2000);
