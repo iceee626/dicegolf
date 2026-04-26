@@ -340,6 +340,57 @@ function restoreReplaySetupFromCurrentState(versusReplay){
   SETUP.courseSelected = true;
 }
 
+function captureReplayProfileProgress(){
+  try{
+    const profiles = loadProfiles();
+    const idx = Math.min(getActiveProfileIdx(), profiles.length - 1);
+    const p = profiles[idx];
+    if(!p) return null;
+    return { idx, id:p.id || '', profile:JSON.parse(JSON.stringify(p)) };
+  }catch{return null;}
+}
+
+function restoreReplayProfileProgress(snapshot){
+  if(!snapshot || !snapshot.profile) return;
+  try{
+    const profiles = loadProfiles();
+    const idx = snapshot.id
+      ? profiles.findIndex(p => p && p.id === snapshot.id)
+      : snapshot.idx;
+    if(idx < 0 || !profiles[idx]) return;
+    const before = snapshot.profile;
+    const current = profiles[idx];
+    ensureProfileDefaults(before);
+    ensureProfileDefaults(current);
+
+    const achievements = new Set([...(before.achievements || []), ...(current.achievements || [])]);
+    current.achievements = [...achievements];
+
+    Object.keys(before).forEach(key => {
+      if(typeof before[key] === 'number'){
+        if(key === 'bestDiff'){
+          if(current[key] === undefined || before[key] < current[key]) current[key] = before[key];
+        } else {
+          current[key] = Math.max(current[key] || 0, before[key] || 0);
+        }
+      }
+    });
+
+    if(before.bestDiff !== undefined && (current.bestDiff === undefined || before.bestDiff < current.bestDiff)){
+      current.bestDiff = before.bestDiff;
+    }
+    if(before.scoreBuckets && typeof before.scoreBuckets === 'object'){
+      current.scoreBuckets = current.scoreBuckets || {};
+      Object.keys(before.scoreBuckets).forEach(key => {
+        current.scoreBuckets[key] = Math.max(current.scoreBuckets[key] || 0, before.scoreBuckets[key] || 0);
+      });
+    }
+
+    profiles[idx] = current;
+    saveProfiles(profiles);
+  }catch{}
+}
+
 function summaryPlayAgain(){
   closeSummaryHoleModal();
   setMainAppConcealed(true);
@@ -351,9 +402,11 @@ function summaryPlayAgain(){
   if(hc) hc.classList.remove('show');
   clearRoundStartSplash();
   const versusReplay = !!(_summaryContext && _summaryContext.mode === 'versus');
+  const profileProgress = captureReplayProfileProgress();
   restoreReplaySetupFromCurrentState(versusReplay);
   setSummaryContext(null);
   startGame();
+  restoreReplayProfileProgress(profileProgress);
   if(summaryModal) summaryModal.classList.remove('show');
   if(overlay) overlay.classList.remove('show');
   document.querySelector('.tv-bar')?.classList.add('show');
