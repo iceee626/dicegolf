@@ -266,7 +266,10 @@ function continueGame(){
     document.getElementById('holePar').textContent=h.par;
     
     if (S.currentGrid) renderGrid(); else buildGrid();
-    
+    if (WCS && wcEnabled() && typeof applyQueuedWildcardsToCurrentGrid === 'function'){
+      applyQueuedWildcardsToCurrentGrid();
+    }
+
     updateZonePill();updateYrd();renderLog();updateFloat();updateTVBanner();
     
     if (S._pendingPuttResult || S._pendingHoleFinish) {
