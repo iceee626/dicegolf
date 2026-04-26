@@ -528,9 +528,55 @@ function replaceGridCells(grid, predicate, nextZoneOrFactory, onChange){
   return changed;
 }
 
+function readVisibleGridCells(){
+  const nextGrid = [];
+  for(let r = 0; r < 6; r++){
+    const row = [];
+    for(let c = 0; c < 6; c++){
+      const cell = document.getElementById(`cell-${r}-${c}`);
+      const zone = cell?.dataset?.zone;
+      if(!zone) return null;
+      row.push(zone);
+    }
+    nextGrid.push(row);
+  }
+  return nextGrid;
+}
+
+function syncCurrentGridFromVisibleCells(){
+  const visibleGrid = readVisibleGridCells();
+  if(visibleGrid){
+    S.currentGrid = visibleGrid;
+  }
+  return visibleGrid;
+}
+
+function writeVisibleGridCell(r, c, zk){
+  if(typeof updateVisibleGridCell === 'function'){
+    updateVisibleGridCell(r, c, zk);
+    return;
+  }
+  const cell = document.getElementById(`cell-${r}-${c}`);
+  if(!cell) return;
+  const zd = Z[zk] || Z.fwy;
+  Object.values(Z).forEach(z => { if(z && z.cls) cell.classList.remove(z.cls); });
+  cell.classList.add(zd.cls);
+  const abbr = {ob:'OB',h2o:'H₂O',hole:'⛳',p1:'1P',p2:'2P',p3:'3P'};
+  const alwaysName = {h2o:'WATER',ob:'OB',grn:'GREEN',fwy:'FAIRWAY',rgh:'ROUGH',chip:'CHIP',sand:'SAND',tee:'TEE',hole:'HOLE',p1:'1P',p2:'2P',p3:'3P'};
+  if(typeof getCellLabelMode === 'function' && getCellLabelMode() === 'always'){
+    cell.textContent = (alwaysName[zk] || zd.name).toUpperCase();
+  } else {
+    cell.textContent = abbr[zk] || '';
+  }
+  cell.dataset.zone = zk;
+}
+
 function replaceCurrentGridCells(predicate, nextZoneOrFactory){
-  const changed = replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory);
-  if(changed > 0 && typeof renderGrid === 'function'){
+  const visibleGrid = syncCurrentGridFromVisibleCells();
+  const changed = replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory, (r, c, nextZone) => {
+    writeVisibleGridCell(r, c, nextZone);
+  });
+  if(changed > 0 && !visibleGrid && typeof renderGrid === 'function'){
     renderGrid();
   }
   return changed;
@@ -582,6 +628,7 @@ function applyBirdieBoostToGridCells(grid, maxCells = 8){
 }
 
 function applyBirdieBoostToCurrentGrid(maxCells = 8){
+  syncCurrentGridFromVisibleCells();
   if(!Array.isArray(S.currentGrid)) return 0;
   const eligible = collectBirdieBoostEligibleCells(S.currentGrid);
   if(eligible.length === 0) return 0;
@@ -612,9 +659,7 @@ function applyFerrettToGrid(grid, onChange){
 }
 
 function applyFerrettToCurrentGrid(){
-  const changed = applyFerrettToGrid(S.currentGrid);
-  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
-  return changed;
+  return replaceCurrentGridCells(() => true, () => Math.random() < .75 ? 'hole' : 'grn');
 }
 
 function applyHighlightReelToGrid(grid, onChange){
@@ -622,9 +667,7 @@ function applyHighlightReelToGrid(grid, onChange){
 }
 
 function applyHighlightReelToCurrentGrid(){
-  const changed = applyHighlightReelToGrid(S.currentGrid);
-  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
-  return changed;
+  return replaceCurrentGridCells(cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null);
 }
 
 function applySandWedgeProToGrid(grid){
@@ -632,7 +675,9 @@ function applySandWedgeProToGrid(grid){
 }
 
 function applyPendingGridWildcardsToCurrentGrid(){
-  if(!isCurrentGridReady() || S._pendingPuttResult) return false;
+  if(S._pendingPuttResult) return false;
+  syncCurrentGridFromVisibleCells();
+  if(!isCurrentGridReady()) return false;
   let appliedAny = false;
 
   if(isPuttingGrid(S.currentGrid) && (WCS.greenReadQueued || WCS.greenReadActive)){
@@ -671,6 +716,7 @@ function applyPendingGridWildcardsToCurrentGrid(){
 }
 
 function applyWildcardEffect(wc){
+  syncCurrentGridFromVisibleCells();
   const h=HOLES[S.holeIdx];
   let applied = true;
   let toastMsg = `${wc.icon} ${wc.name} applied!`;
