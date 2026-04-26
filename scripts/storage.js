@@ -113,7 +113,7 @@ function saveGameState(){
     wcsGreenReadActive:WCS.greenReadActive, wcsGreenReadQueued:WCS.greenReadQueued,
     wcsBounceBackPending:WCS.bounceBackPending, wcsBounceBackReady:WCS.bounceBackReady,
     wcsBogeyShield:WCS.bogeyShieldActive,
-    wcsMowersRevenge:WCS.mowersRevengeActive,
+    wcsMowersRevenge:WCS.mowersRevengeActive, wcsMowersRevengeQueued:WCS.mowersRevengeQueued,
     wcsBirdieBoost:WCS.birdieBoostActive, wcsHoleWall:WCS.holeWallActive,
     wcsSandWedgePro:WCS.sandWedgeProActive, wcsCupMagnet:WCS.cupMagnetActive,
     wcsGoldenPutter:WCS.goldenPutterActive, wcsFerrett:WCS.ferrettActive,
@@ -218,7 +218,7 @@ function continueGame(){
     WCS.greenReadActive=save.wcsGreenReadActive||false; WCS.greenReadQueued=save.wcsGreenReadQueued||false;
     WCS.bounceBackPending=save.wcsBounceBackPending||false; WCS.bounceBackReady=save.wcsBounceBackReady||false;
     WCS.bogeyShieldActive=save.wcsBogeyShield||false;
-    WCS.mowersRevengeActive=save.wcsMowersRevenge||false;
+    WCS.mowersRevengeActive=save.wcsMowersRevenge||false; WCS.mowersRevengeQueued=save.wcsMowersRevengeQueued||false;
     WCS.birdieBoostActive=save.wcsBirdieBoost||false; WCS.holeWallActive=save.wcsHoleWall||false;
     WCS.sandWedgeProActive=save.wcsSandWedgePro||false; WCS.cupMagnetActive=save.wcsCupMagnet||false;
     WCS.goldenPutterActive=save.wcsGoldenPutter||false; WCS.ferrettActive=save.wcsFerrett||false;
@@ -266,10 +266,7 @@ function continueGame(){
     document.getElementById('holePar').textContent=h.par;
     
     if (S.currentGrid) renderGrid(); else buildGrid();
-    if (WCS && wcEnabled() && typeof applyQueuedWildcardsToCurrentGrid === 'function'){
-      applyQueuedWildcardsToCurrentGrid();
-    }
-
+    
     updateZonePill();updateYrd();renderLog();updateFloat();updateTVBanner();
     
     if (S._pendingPuttResult || S._pendingHoleFinish) {
