@@ -128,7 +128,8 @@ function freezeCurrentGridForFinish(){
 
 function processShot(row,col){
   S._preserveGrid=false;
-  if(Array.isArray(S.currentGrid) && (WCS.greenReadActive || WCS.greenReadQueued)){
+  // Green Read must mutate the grid before selection; never convert putt results here.
+  if(false && Array.isArray(S.currentGrid) && (WCS.greenReadActive || WCS.greenReadQueued)){
     const hasPuttCells = S.currentGrid.some(r => Array.isArray(r) && r.some(c => ['p1','p2','p3'].includes(c)));
     if(hasPuttCells){
       let changed = 0;
