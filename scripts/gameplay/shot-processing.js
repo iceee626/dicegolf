@@ -432,6 +432,7 @@ function doNextShot(){
   // Allow Safari to fully paint the button press state before building the heavy grid
   requestAnimationFrame(() => {
       setTimeout(() => {
+          const pendingPuttGridWildcard = !!(WCS && (WCS.greenReadQueued || WCS.greenReadActive || WCS.goldenPutterActive));
           if(S._forceP1PuttGrid && S.zone === 'grn'){
             S.currentGrid=Array(6).fill(null).map(()=>Array(6).fill('p1'));
             document.getElementById('gridTitle').textContent='Putting Grid';
@@ -439,8 +440,9 @@ function doNextShot(){
             S._forceGrid=false;
           }
           else if(S._forceGrid){S._forceGrid=false;}
-          else if(S._preserveGrid){S._preserveGrid=false;}
+          else if(S._preserveGrid && !(S.zone === 'grn' && pendingPuttGridWildcard)){S._preserveGrid=false;}
           else{buildGrid();}
+          if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
 
           updateZonePill();
           updateTVBanner();
