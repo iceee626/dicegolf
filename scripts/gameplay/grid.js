@@ -134,10 +134,9 @@ function buildGrid(){
     const cached=vsGetCachedGrid();
     if(cached){
       let tmpl=cached.map(r=>[...r]);
+      if(WCS&&wcEnabled())tmpl=applyWcGridMods(tmpl);
       S.currentGrid=tmpl;renderGrid();
-      if(WCS && wcEnabled() && typeof applyQueuedWildcardsToCurrentGrid === 'function'){
-        applyQueuedWildcardsToCurrentGrid();
-      }
+      if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
       return;
     }
   }
@@ -156,13 +155,9 @@ function buildGrid(){
       t=t.map(row=>row.map(c=>c==='chip'?'fwy':c));
     }
     if(VS.active)vsCacheGrid(t);
+    if(WCS&&wcEnabled())t=applyWcGridMods(t);
     S.currentGrid=t;renderGrid();
-    // Apply queued wildcards directly on the live grid using surgical visual updates.
-    // (Single source of truth — same helpers as immediate-apply path, so green_read,
-    // golden_putter, ferrett, etc. all visibly mutate the rendered grid.)
-    if(WCS && wcEnabled() && typeof applyQueuedWildcardsToCurrentGrid === 'function'){
-      applyQueuedWildcardsToCurrentGrid();
-    }
+    if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
   };
 
   // PUTTING
@@ -232,9 +227,7 @@ function buildGrid(){
   tmpl=T_FAR_OPEN_M();
   if(VS.active)vsCacheGrid(tmpl);
   S.currentGrid=tmpl;renderGrid();
-  if(WCS && wcEnabled() && typeof applyQueuedWildcardsToCurrentGrid === 'function'){
-    applyQueuedWildcardsToCurrentGrid();
-  }
+  if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
 }
 
 function flipCell(cell, zd){
@@ -394,8 +387,26 @@ function appendWcNoteToLastLog(noteStr){
   }
 }
 
-// activateGreenReadOnGrid was the old template-mutating path. Replaced by
-// applyQueuedWildcardsToCurrentGrid in wildcards.js — see _emit below.
+function activateGreenReadOnGrid(grid){
+  if(!Array.isArray(grid)) return grid;
+  if(!(WCS.greenReadQueued || WCS.greenReadActive)) return grid;
+  const hasP3 = grid.some(row => Array.isArray(row) && row.includes('p3'));
+  WCS.greenReadQueued = false;
+  WCS.greenReadActive = false;
+  const nextGrid = grid.map(row => [...row]);
+  if(typeof applyGreenReadToGrid === 'function'){
+    applyGreenReadToGrid(nextGrid);
+  } else {
+    nextGrid.forEach(row => row.forEach((cell, idx) => {
+      if(cell === 'p3') row[idx] = 'p2';
+    }));
+  }
+  if(hasP3){
+    showWcToast('🌱 Green Read activated!');
+    appendWcNote('🌱 Green Read');
+  }
+  return nextGrid;
+}
 
 function maybeArmBounceBackFromHoleResult(diff){
   if(!WCS.bounceBackPending) return;
