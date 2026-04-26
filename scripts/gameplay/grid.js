@@ -389,7 +389,14 @@ function activateGreenReadOnGrid(grid){
   const hasP3 = grid.some(row => Array.isArray(row) && row.includes('p3'));
   WCS.greenReadQueued = false;
   WCS.greenReadActive = false;
-  const nextGrid = grid.map(row => row.map(cell => (cell === 'p3' ? 'p2' : cell)));
+  const nextGrid = grid.map(row => [...row]);
+  if(typeof applyGreenReadToGrid === 'function'){
+    applyGreenReadToGrid(nextGrid);
+  } else {
+    nextGrid.forEach(row => row.forEach((cell, idx) => {
+      if(cell === 'p3') row[idx] = 'p2';
+    }));
+  }
   if(hasP3){
     showWcToast('🌱 Green Read activated!');
     appendWcNote('🌱 Green Read');
