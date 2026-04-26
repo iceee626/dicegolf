@@ -128,6 +128,31 @@ function freezeCurrentGridForFinish(){
 
 function processShot(row,col){
   S._preserveGrid=false;
+  if(false){
+    const hasPuttCells = S.currentGrid.some(r => Array.isArray(r) && r.some(c => ['p1','p2','p3'].includes(c)));
+    if(hasPuttCells){
+      let changed = 0;
+      if(typeof applyGreenReadToCurrentGrid === 'function'){
+        changed = applyGreenReadToCurrentGrid();
+      } else {
+        for(let r = 0; r < S.currentGrid.length; r++){
+          if(!Array.isArray(S.currentGrid[r])) continue;
+          for(let c = 0; c < S.currentGrid[r].length; c++){
+            if(S.currentGrid[r][c] !== 'p3') continue;
+            S.currentGrid[r][c] = 'p2';
+            changed++;
+            if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, 'p2');
+          }
+        }
+      }
+      WCS.greenReadActive = false;
+      WCS.greenReadQueued = false;
+      if(changed > 0){
+        showWcToast('🌱 Green Read activated!');
+        appendWcNote('🌱 Green Read');
+      }
+    }
+  }
   let outcome=S.currentGrid[row][col];
   litCell(row,col);
   const prevZone=S.zone;
