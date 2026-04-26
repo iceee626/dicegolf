@@ -507,6 +507,46 @@ function trackWcDiscard() {
 }
 
 // ── APPLY EFFECTS ─────────────────────────────────────
+function isBirdieBoostApproachContext(zone = S.zone, yrdRemain = S.yrdRemain){
+  return ['fwy','rgh','sand','chip'].includes(zone)
+    && yrdRemain <= 200
+    && yrdRemain > 35
+    && !(zone === 'sand' && yrdRemain > 87);
+}
+
+function collectBirdieBoostEligibleCells(grid){
+  if(!Array.isArray(grid)) return [];
+  const eligible = [];
+  const convertibleZones = new Set(['sand','rgh','fwy','h2o','ob','chip']);
+  for(let r=0; r<6; r++){
+    if(!Array.isArray(grid[r])) continue;
+    for(let c=0; c<6; c++){
+      if(convertibleZones.has(grid[r][c])) eligible.push({r,c});
+    }
+  }
+  return eligible;
+}
+
+function applyBirdieBoostToGridCells(grid, maxCells = 8){
+  const eligible = collectBirdieBoostEligibleCells(grid);
+  if(eligible.length === 0) return [];
+  const chosen = shuffle(eligible).slice(0, maxCells);
+  chosen.forEach(({r,c}) => { grid[r][c] = 'grn'; });
+  return chosen;
+}
+
+function applyBirdieBoostToCurrentGrid(maxCells = 8){
+  if(!Array.isArray(S.currentGrid)) return 0;
+  const chosen = applyBirdieBoostToGridCells(S.currentGrid, maxCells);
+  if(chosen.length === 0) return 0;
+  chosen.forEach(({r,c}) => {
+    if(typeof updateVisibleGridCell === 'function'){
+      updateVisibleGridCell(r, c, 'grn');
+    }
+  });
+  return chosen.length;
+}
+
 function applyWildcardEffect(wc){
   const h=HOLES[S.holeIdx];
   let applied = true;
@@ -592,9 +632,22 @@ function applyWildcardEffect(wc){
           WCS.greenReadActive = false;
           WCS.greenReadQueued = false;
           afterApply = () => {
-            const changed = typeof mutateCurrentPuttGridCells === 'function'
+            let changed = typeof mutateCurrentPuttGridCells === 'function'
               ? mutateCurrentPuttGridCells('p3','p2')
               : 0;
+            if(changed === 0 && Array.isArray(S.currentGrid)){
+              for(let r=0; r<6; r++){
+                if(!Array.isArray(S.currentGrid[r])) continue;
+                for(let c=0; c<6; c++){
+                  if(S.currentGrid[r][c] !== 'p3') continue;
+                  S.currentGrid[r][c] = 'p2';
+                  changed++;
+                  if(typeof updateVisibleGridCell === 'function'){
+                    updateVisibleGridCell(r, c, 'p2');
+                  }
+                }
+              }
+            }
             if(changed > 0){
               showWcToast('🌱 Green Read activated!');
               appendWcNote('🌱 Green Read');
@@ -624,7 +677,28 @@ function applyWildcardEffect(wc){
     case 'sand_wedge_pro': WCS.sandWedgeProActive = true; toastMsg = `🏖️ ${wc.name} applied!`; break;
     case 'lucky_bounce': WCS.luckyBounceActive = true; toastMsg = `🍀 ${wc.name} applied!`; break;
     case 'iron_will': WCS.ironWillActive = true; toastMsg = `🔩 ${wc.name} applied!`; break;
-    case 'birdie_boost': WCS.birdieBoostActive = true; toastMsg = `🚀 ${wc.name} armed for your next approach!`; break;
+    case 'birdie_boost': {
+      WCS.birdieBoostActive = true;
+      toastMsg = `🚀 ${wc.name} applied!`;
+      const canApplyNow = !S.holeDone
+        && !S._pendingPuttResult
+        && Array.isArray(S.currentGrid)
+        && S.currentGrid.length
+        && isBirdieBoostApproachContext();
+      if(canApplyNow){
+        const changed = applyBirdieBoostToCurrentGrid();
+        if(changed > 0){
+          WCS.birdieBoostActive = false;
+          S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
+          toastMsg = null;
+          afterApply = () => {
+            showWcToast(`🚀 ${wc.name} applied!`);
+            appendWcNote(`🚀 ${wc.name}`);
+          };
+        }
+      }
+      break;
+    }
     case 'hole_wall': WCS.holeWallActive = true; toastMsg = `🕳️ ${wc.name} applied!`; break;
     case 'the_ferrett': 
       if (S.zone === 'sand' && S.yrdRemain > 87) {
@@ -774,16 +848,13 @@ function applyWcGridMods(grid){
     grid = grid.map(r=>r.map(()=>Math.random()<.80?'hole':'grn'));
   }
   if (WCS.birdieBoostActive && ['fwy','rgh','sand','chip'].includes(S.zone)) {
-    const isApproach = S.yrdRemain <= 200 && S.yrdRemain > 35 && !(S.zone === 'sand' && S.yrdRemain > 87);
-    if(!isApproach) return grid;
-    WCS.birdieBoostActive = false; 
-    S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
-    showWcToast('🚀 Birdie Boost activated!'); appendWcNote('🚀 Birdie Boost');
-    let eligible = [];
-    const worseZones = new Set(['sand','rgh','fwy','h2o','ob','chip']);
-    for(let r=0; r<6; r++) for(let c=0; c<6; c++) if(worseZones.has(grid[r][c])) eligible.push({r,c});
-    eligible = shuffle(eligible).slice(0, 8);
-    eligible.forEach(cell => { grid[cell.r][cell.c] = 'grn'; });
+    if(!isBirdieBoostApproachContext()) return grid;
+    const changedCells = applyBirdieBoostToGridCells(grid, 8);
+    if(changedCells.length > 0){
+      WCS.birdieBoostActive = false; 
+      S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
+      showWcToast('🚀 Birdie Boost applied!'); appendWcNote('🚀 Birdie Boost');
+    }
   }
   if (WCS.sandWedgeProActive && S.zone === 'sand') {
       WCS.sandWedgeProActive = false; 
