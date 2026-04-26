@@ -158,7 +158,7 @@ function vsStartGame(){
   VS.histories = [makeRounds(), makeRounds()];
   VS.matchScore = [0, 0];
   VS.sharedGrids = {};
-  const baseWc = () => ({ equipped:[], active:null, luckyBounceActive:false, ironWillActive:false, greenReadActive:false, greenReadQueued:false, bounceBackPending:false, bounceBackReady:false, bogeyShieldActive:false, mowersRevengeActive:false, birdieBoostActive:false, holeWallActive:false, sandWedgeProActive:false, cupMagnetActive:false, goldenPutterActive:false, ferrettActive:false, hioActive:false, highlightReelActive:false, shortcutActive:false });
+  const baseWc = () => ({ equipped:[], active:null, luckyBounceActive:false, ironWillActive:false, greenReadActive:false, greenReadQueued:false, bounceBackPending:false, bounceBackReady:false, bogeyShieldActive:false, mowersRevengeActive:false, mowersRevengeQueued:false, birdieBoostActive:false, holeWallActive:false, sandWedgeProActive:false, cupMagnetActive:false, goldenPutterActive:false, ferrettActive:false, hioActive:false, highlightReelActive:false, shortcutActive:false });
   VS.wcs = [baseWc(), baseWc()];
   vsShowTurnScreen();
 }
@@ -321,7 +321,7 @@ function vsCompleteHole(){
   });
   
   if (!VS.wcs) {
-  const baseWc = () => ({ equipped:[], active:null, luckyBounceActive:false, ironWillActive:false, greenReadActive:false, greenReadQueued:false, bounceBackPending:false, bounceBackReady:false, bogeyShieldActive:false, mowersRevengeActive:false, birdieBoostActive:false, holeWallActive:false, sandWedgeProActive:false, cupMagnetActive:false, goldenPutterActive:false, ferrettActive:false, hioActive:false, highlightReelActive:false, shortcutActive:false });
+  const baseWc = () => ({ equipped:[], active:null, luckyBounceActive:false, ironWillActive:false, greenReadActive:false, greenReadQueued:false, bounceBackPending:false, bounceBackReady:false, bogeyShieldActive:false, mowersRevengeActive:false, mowersRevengeQueued:false, birdieBoostActive:false, holeWallActive:false, sandWedgeProActive:false, cupMagnetActive:false, goldenPutterActive:false, ferrettActive:false, hioActive:false, highlightReelActive:false, shortcutActive:false });
    VS.wcs = [baseWc(), baseWc()];
   }
   VS.wcs[VS.currentPlayer] = { ...WCS, equipped: [...WCS.equipped] }; // Save FULL wildcard state for this player
