@@ -307,6 +307,39 @@ function summarySaveAndMenu(){
   setTimeout(()=>clearCourseVisualTheme(), 220);
 }
 
+function restoreReplaySetupFromCurrentState(versusReplay){
+  const restoredCourseId = normalizeCourseId(
+    S.courseId || (versusReplay ? VS.setup?.course : SETUP.course) || DEFAULT_COURSE_ID
+  );
+
+  if(versusReplay){
+    VS.active = true;
+    if(!VS.setup){
+      VS.setup = { rounds:1, holesConfig:'18', diff:1, course:null, courseSelected:false };
+    }
+    VS.setup.course = restoredCourseId;
+    VS.setup.courseSelected = true;
+    VS.setup.rounds = Math.max(1, S.totalRounds || VS.setup.rounds || 1);
+    VS.setup.holesConfig = S.holesConfig || VS.setup.holesConfig || '18';
+    VS.setup.diff = Math.max(1, Math.min(3, GAME_DIFF || VS.setup.diff || 1));
+
+    SETUP.mode = 'custom';
+    SETUP.rounds = VS.setup.rounds;
+    SETUP.holesConfig = VS.setup.holesConfig;
+    SETUP.course = restoredCourseId;
+    SETUP.courseSelected = true;
+    GAME_DIFF = VS.setup.diff;
+    return;
+  }
+
+  VS.active = false;
+  SETUP.mode = S.mode || SETUP.mode || 'single';
+  SETUP.rounds = Math.max(1, S.totalRounds || SETUP.rounds || 1);
+  SETUP.holesConfig = S.holesConfig || SETUP.holesConfig || '18';
+  SETUP.course = restoredCourseId;
+  SETUP.courseSelected = true;
+}
+
 function summaryPlayAgain(){
   closeSummaryHoleModal();
   setMainAppConcealed(true);
@@ -318,15 +351,8 @@ function summaryPlayAgain(){
   if(hc) hc.classList.remove('show');
   clearRoundStartSplash();
   const versusReplay = !!(_summaryContext && _summaryContext.mode === 'versus');
+  restoreReplaySetupFromCurrentState(versusReplay);
   setSummaryContext(null);
-  if(versusReplay){
-    VS.active = true;
-    startGame();
-    if(summaryModal) summaryModal.classList.remove('show');
-    if(overlay) overlay.classList.remove('show');
-    document.querySelector('.tv-bar')?.classList.add('show');
-    return;
-  }
   startGame();
   if(summaryModal) summaryModal.classList.remove('show');
   if(overlay) overlay.classList.remove('show');
