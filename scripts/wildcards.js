@@ -507,6 +507,48 @@ function trackWcDiscard() {
 }
 
 // ── APPLY EFFECTS ─────────────────────────────────────
+function replaceGridCells(grid, predicate, nextZoneOrFactory, onChange){
+  if(!Array.isArray(grid)) return 0;
+  let changed = 0;
+  for(let r = 0; r < 6; r++){
+    if(!Array.isArray(grid[r])) continue;
+    for(let c = 0; c < grid[r].length; c++){
+      const currentZone = grid[r][c];
+      if(!predicate(currentZone, r, c, grid)) continue;
+      const nextZone = typeof nextZoneOrFactory === 'function'
+        ? nextZoneOrFactory(currentZone, r, c, grid)
+        : nextZoneOrFactory;
+      if(!nextZone || nextZone === currentZone) continue;
+      grid[r][c] = nextZone;
+      changed++;
+      if(typeof onChange === 'function') onChange(r, c, nextZone, currentZone);
+    }
+  }
+  return changed;
+}
+
+function replaceCurrentGridCells(predicate, nextZoneOrFactory){
+  return replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory, (r, c, nextZone) => {
+    if(typeof updateVisibleGridCell === 'function'){
+      updateVisibleGridCell(r, c, nextZone);
+    }
+  });
+}
+
+function gridHasAnyCell(grid, zones){
+  if(!Array.isArray(grid)) return false;
+  const zoneSet = zones instanceof Set ? zones : new Set(zones);
+  return grid.some(row => Array.isArray(row) && row.some(cell => zoneSet.has(cell)));
+}
+
+function isPuttingGrid(grid = S.currentGrid){
+  return gridHasAnyCell(grid, ['p1','p2','p3']);
+}
+
+function isCurrentGridReady(){
+  return Array.isArray(S.currentGrid) && S.currentGrid.length > 0;
+}
+
 function isBirdieBoostApproachContext(zone = S.zone, yrdRemain = S.yrdRemain){
   return ['fwy','rgh','sand','chip'].includes(zone)
     && yrdRemain <= 200
@@ -520,7 +562,7 @@ function collectBirdieBoostEligibleCells(grid){
   const convertibleZones = new Set(['sand','rgh','fwy','h2o','ob','chip']);
   for(let r=0; r<6; r++){
     if(!Array.isArray(grid[r])) continue;
-    for(let c=0; c<6; c++){
+    for(let c=0; c<grid[r].length; c++){
       if(convertibleZones.has(grid[r][c])) eligible.push({r,c});
     }
   }
@@ -531,20 +573,59 @@ function applyBirdieBoostToGridCells(grid, maxCells = 8){
   const eligible = collectBirdieBoostEligibleCells(grid);
   if(eligible.length === 0) return [];
   const chosen = shuffle(eligible).slice(0, maxCells);
-  chosen.forEach(({r,c}) => { grid[r][c] = 'grn'; });
+  const chosenKeys = new Set(chosen.map(({r,c}) => `${r}:${c}`));
+  replaceGridCells(grid, (_cell, r, c) => chosenKeys.has(`${r}:${c}`), 'grn');
   return chosen;
 }
 
 function applyBirdieBoostToCurrentGrid(maxCells = 8){
   if(!Array.isArray(S.currentGrid)) return 0;
-  const chosen = applyBirdieBoostToGridCells(S.currentGrid, maxCells);
-  if(chosen.length === 0) return 0;
-  chosen.forEach(({r,c}) => {
-    if(typeof updateVisibleGridCell === 'function'){
-      updateVisibleGridCell(r, c, 'grn');
-    }
-  });
+  const eligible = collectBirdieBoostEligibleCells(S.currentGrid);
+  if(eligible.length === 0) return 0;
+  const chosen = shuffle(eligible).slice(0, maxCells);
+  const chosenKeys = new Set(chosen.map(({r,c}) => `${r}:${c}`));
+  replaceCurrentGridCells((_cell, r, c) => chosenKeys.has(`${r}:${c}`), 'grn');
   return chosen.length;
+}
+
+function applyGreenReadToGrid(grid){
+  return replaceGridCells(grid, cell => cell === 'p3', 'p2');
+}
+
+function applyGreenReadToCurrentGrid(){
+  return replaceCurrentGridCells(cell => cell === 'p3', 'p2');
+}
+
+function applyGoldenPutterToGrid(grid){
+  return replaceGridCells(grid, cell => ['p1','p2','p3'].includes(cell), 'p1');
+}
+
+function applyGoldenPutterToCurrentGrid(){
+  return replaceCurrentGridCells(cell => ['p1','p2','p3'].includes(cell), 'p1');
+}
+
+function applyFerrettToGrid(grid, onChange){
+  return replaceGridCells(grid, () => true, () => Math.random() < .75 ? 'hole' : 'grn', onChange);
+}
+
+function applyFerrettToCurrentGrid(){
+  return applyFerrettToGrid(S.currentGrid, (r, c, nextZone) => {
+    if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, nextZone);
+  });
+}
+
+function applyHighlightReelToGrid(grid, onChange){
+  return replaceGridCells(grid, cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null, onChange);
+}
+
+function applyHighlightReelToCurrentGrid(){
+  return applyHighlightReelToGrid(S.currentGrid, (r, c, nextZone) => {
+    if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, nextZone);
+  });
+}
+
+function applySandWedgeProToGrid(grid){
+  return replaceGridCells(grid, () => Math.random() < .8, 'grn');
 }
 
 function applyWildcardEffect(wc){
@@ -614,49 +695,22 @@ function applyWildcardEffect(wc){
       break;
     case 'green_read':
       toastMsg = `🌱 ${wc.name} applied!`;
-      if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone){
-        if(Array.isArray(S.currentGrid) && S.currentGrid.length){
-          const hasPuttCells = S.currentGrid.some(row => Array.isArray(row) && row.some(cell => ['p1','p2','p3'].includes(cell)));
-          const hasP3 = S.currentGrid.some(row => Array.isArray(row) && row.includes('p3'));
-          if(!hasPuttCells){
-            WCS.greenReadActive = false;
-            WCS.greenReadQueued = true;
-            break;
-          }
-          if(!hasP3){
-            toastMsg = `${wc.icon} ${wc.name}: no 3P cells to read.`;
-            applied = false;
-            break;
-          }
-          toastMsg = null;
-          WCS.greenReadActive = false;
-          WCS.greenReadQueued = false;
-          afterApply = () => {
-            let changed = typeof mutateCurrentPuttGridCells === 'function'
-              ? mutateCurrentPuttGridCells('p3','p2')
-              : 0;
-            if(changed === 0 && Array.isArray(S.currentGrid)){
-              for(let r=0; r<6; r++){
-                if(!Array.isArray(S.currentGrid[r])) continue;
-                for(let c=0; c<6; c++){
-                  if(S.currentGrid[r][c] !== 'p3') continue;
-                  S.currentGrid[r][c] = 'p2';
-                  changed++;
-                  if(typeof updateVisibleGridCell === 'function'){
-                    updateVisibleGridCell(r, c, 'p2');
-                  }
-                }
-              }
-            }
-            if(changed > 0){
-              showWcToast('🌱 Green Read activated!');
-              appendWcNote('🌱 Green Read');
-            }
-          };
-        } else {
-          WCS.greenReadActive = false;
-          WCS.greenReadQueued = true;
+      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
+        if(!gridHasAnyCell(S.currentGrid, ['p3'])){
+          toastMsg = `${wc.icon} ${wc.name}: no 3P cells to read.`;
+          applied = false;
+          break;
         }
+        toastMsg = null;
+        WCS.greenReadActive = false;
+        WCS.greenReadQueued = false;
+        afterApply = () => {
+          const changed = applyGreenReadToCurrentGrid();
+          if(changed > 0){
+            showWcToast('🌱 Green Read activated!');
+            appendWcNote('🌱 Green Read');
+          }
+        };
       } else {
         WCS.greenReadActive = false;
         WCS.greenReadQueued = true;
@@ -673,18 +727,30 @@ function applyWildcardEffect(wc){
       break;
     case 'mowers_revenge': WCS.mowersRevengeActive = true; toastMsg = `🚜 ${wc.name} applied!`; break;
     case 'cup_magnet': WCS.cupMagnetActive = true; toastMsg = `🧲 ${wc.name} applied!`; break;
-    case 'commercial': WCS.highlightReelActive = true; toastMsg = `🎥 ${wc.name} applied!`; break;
+    case 'commercial':
+      if(S.zone === 'chip' && isCurrentGridReady()){
+        WCS.highlightReelActive = false;
+        S._highlightReelArmedShot = true;
+        toastMsg = null;
+        afterApply = () => {
+          const changed = applyHighlightReelToCurrentGrid();
+          if(changed > 0){
+            showWcToast(`🎥 ${wc.name} applied!`);
+            appendWcNote(`🎥 ${wc.name}`);
+          }
+        };
+      } else {
+        WCS.highlightReelActive = true;
+        toastMsg = `🎥 ${wc.name} applied!`;
+      }
+      break;
     case 'sand_wedge_pro': WCS.sandWedgeProActive = true; toastMsg = `🏖️ ${wc.name} applied!`; break;
     case 'lucky_bounce': WCS.luckyBounceActive = true; toastMsg = `🍀 ${wc.name} applied!`; break;
     case 'iron_will': WCS.ironWillActive = true; toastMsg = `🔩 ${wc.name} applied!`; break;
     case 'birdie_boost': {
       WCS.birdieBoostActive = true;
       toastMsg = `🚀 ${wc.name} applied!`;
-      const canApplyNow = !S.holeDone
-        && !S._pendingPuttResult
-        && Array.isArray(S.currentGrid)
-        && S.currentGrid.length
-        && isBirdieBoostApproachContext();
+      const canApplyNow = !S.holeDone && isCurrentGridReady() && isBirdieBoostApproachContext();
       if(canApplyNow){
         const changed = applyBirdieBoostToCurrentGrid();
         if(changed > 0){
@@ -704,6 +770,17 @@ function applyWildcardEffect(wc){
       if (S.zone === 'sand' && S.yrdRemain > 87) {
           toastMsg = `🦡 The Ferrett only works on greenside bunkers!`;
           applied = false;
+      } else if(S.zone === 'sand' && isCurrentGridReady()) {
+          WCS.ferrettActive = false;
+          S._ferrettArmedShot = true;
+          toastMsg = null;
+          afterApply = () => {
+            const changed = applyFerrettToCurrentGrid();
+            if(changed > 0){
+              showWcToast(`🦡 ${wc.name} applied!`);
+              appendWcNote(`🦡 ${wc.name}`);
+            }
+          };
       } else {
           WCS.ferrettActive = true;
           toastMsg = `🦡 ${wc.name} applied!`; 
@@ -711,16 +788,10 @@ function applyWildcardEffect(wc){
       break;
     case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
     case 'golden_putter':
-      if(S.zone === 'grn' && !S._pendingPuttResult && !S.holeDone && Array.isArray(S.currentGrid) && S.currentGrid.length){
-        const hasPuttCells = S.currentGrid.some(row => Array.isArray(row) && row.some(cell => ['p1','p2','p3'].includes(cell)));
-        if(!hasPuttCells){
-          WCS.goldenPutterActive = true;
-          toastMsg = `${wc.icon} ${wc.name} armed for the next putting grid!`;
-          break;
-        }
+      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
         WCS.goldenPutterActive = false;
         afterApply = () => {
-          if(typeof mutateAllCurrentPuttGridCells === 'function') mutateAllCurrentPuttGridCells('p1');
+          applyGoldenPutterToCurrentGrid();
           showWcToast('🥇 Golden Putter activated!');
           appendWcNote('🥇 Golden Putter');
         };
@@ -822,7 +893,7 @@ function appendWcNote(noteStr) {
 function applyWcGridMods(grid){
   const h=HOLES[S.holeIdx];
 
-  if (S.zone === 'grn' && !S._pendingPuttResult && (WCS.greenReadQueued || WCS.greenReadActive)) {
+  if (isPuttingGrid(grid) && !S._pendingPuttResult && (WCS.greenReadQueued || WCS.greenReadActive)) {
     grid = activateGreenReadOnGrid(grid);
   }
 
@@ -830,12 +901,12 @@ function applyWcGridMods(grid){
     WCS.ferrettActive = false; 
     S._ferrettArmedShot = true;
     showWcToast('🦡 The Ferrett activated!'); appendWcNote('🦡 The Ferrett');
-    grid = grid.map(r=>r.map(()=>Math.random()<.75?'hole':'grn'));
+    applyFerrettToGrid(grid);
   }
   if (WCS.goldenPutterActive && S.zone === 'grn') {
     WCS.goldenPutterActive = false; 
     showWcToast('🥇 Golden Putter activated!'); appendWcNote('🥇 Golden Putter');
-    grid = grid.map(r=>r.map(()=>'p1'));
+    applyGoldenPutterToGrid(grid);
   }
   if (WCS.holeWallActive && h.par === 3 && S.zone === 'tee') {
     WCS.holeWallActive = false; 
@@ -859,13 +930,13 @@ function applyWcGridMods(grid){
   if (WCS.sandWedgeProActive && S.zone === 'sand') {
       WCS.sandWedgeProActive = false; 
       showWcToast('🏖️ Sand Wedge Pro activated!'); appendWcNote('🏖️ Sand Wedge Pro');
-      grid = grid.map(r=>r.map(c=>Math.random() < 0.8 ? 'grn' : c));
+      applySandWedgeProToGrid(grid);
   }
   if (WCS.highlightReelActive && S.zone === 'chip') {
       WCS.highlightReelActive = false; 
       S._highlightReelArmedShot = true;
       showWcToast('🎥 Highlight Reel activated!'); appendWcNote('🎥 Highlight Reel');
-      grid = grid.map(r=>r.map(c=> (c !== 'hole' && Math.random() < 0.75) ? 'hole' : c));
+      applyHighlightReelToGrid(grid);
   }
 
   return grid;
