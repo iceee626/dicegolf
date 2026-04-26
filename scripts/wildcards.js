@@ -29,7 +29,7 @@ const WILDCARDS=[
   {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone (only par 4/5 after tee shot).'},
   {id:'bogey_shield',    weight: 15, icon:'🛡️', name:'Bogey Shield',      desc:'Next Bogey+ result converted into a Par.'},
   {id:'sand_wedge_pro',  weight: 15, icon:'🏖️', name:'Sand Wedge Pro',    desc:'Next Sand shot: 80% of grid converted into Green.'},
-  {id:'mulligan',        weight: 15, icon:'↩️',  name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
+  {id:'mulligan',        weight: 15, icon:'↩️', name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
   {id:'cup_magnet',      weight: 15, icon:'🧲', name:'Cup Magnet',        desc:'Next Green roll: If you miss the 1-putt by 1 cell, it \'sucks\' into the hole anyway.'},
   
   // LEGENDARY (Weight 5) - Game breakers
@@ -528,11 +528,13 @@ function replaceGridCells(grid, predicate, nextZoneOrFactory, onChange){
 }
 
 function replaceCurrentGridCells(predicate, nextZoneOrFactory){
-  const changed = replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory);
-  if(changed > 0 && typeof renderGrid === 'function'){
-    renderGrid();
-  }
-  return changed;
+  // Surgical visual update: only touch cells that actually changed, leave the rest of
+  // the rendered grid (and any shot markers / lit state) untouched. This is what makes
+  // wildcard activations "no reshuffle" — same grid, only the affected cells flip.
+  const onChange = (r, c, nextZone) => {
+    if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, nextZone);
+  };
+  return replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory, onChange);
 }
 
 function gridHasAnyCell(grid, zones){
@@ -611,9 +613,7 @@ function applyFerrettToGrid(grid, onChange){
 }
 
 function applyFerrettToCurrentGrid(){
-  const changed = applyFerrettToGrid(S.currentGrid);
-  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
-  return changed;
+  return replaceCurrentGridCells(() => true, () => Math.random() < .75 ? 'hole' : 'grn');
 }
 
 function applyHighlightReelToGrid(grid, onChange){
@@ -621,13 +621,26 @@ function applyHighlightReelToGrid(grid, onChange){
 }
 
 function applyHighlightReelToCurrentGrid(){
-  const changed = applyHighlightReelToGrid(S.currentGrid);
-  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
-  return changed;
+  return replaceCurrentGridCells(cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null);
 }
 
 function applySandWedgeProToGrid(grid){
   return replaceGridCells(grid, () => Math.random() < .8, 'grn');
+}
+
+function applySandWedgeProToCurrentGrid(){
+  return replaceCurrentGridCells(() => Math.random() < .8, 'grn');
+}
+
+function applyHoleWallToCurrentGrid(){
+  return replaceCurrentGridCells(
+    () => true,
+    cell => (cell === 'rgh' || cell === 'sand' || cell === 'fwy' || cell === 'ob') ? 'chip' : 'grn'
+  );
+}
+
+function applyHioToCurrentGrid(){
+  return replaceCurrentGridCells(() => true, () => Math.random() < .80 ? 'hole' : 'grn');
 }
 
 function applyWildcardEffect(wc){
@@ -696,26 +709,20 @@ function applyWildcardEffect(wc){
       }
       break;
     case 'green_read':
-      toastMsg = `🌱 ${wc.name} applied!`;
-      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
-        if(!gridHasAnyCell(S.currentGrid, ['p3'])){
-          toastMsg = `${wc.icon} ${wc.name}: no 3P cells to read.`;
-          applied = false;
-          break;
-        }
-        toastMsg = null;
+      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid) && gridHasAnyCell(S.currentGrid, ['p3'])){
         WCS.greenReadActive = false;
         WCS.greenReadQueued = false;
+        toastMsg = null;
         afterApply = () => {
-          const changed = applyGreenReadToCurrentGrid();
-          if(changed > 0){
-            showWcToast('🌱 Green Read activated!');
-            appendWcNote('🌱 Green Read');
-          }
+          applyGreenReadToCurrentGrid();
+          showWcToast('🌱 Green Read activated!');
+          appendWcNote('🌱 Green Read');
         };
       } else {
+        // Not on a putting grid, or grid has no p3 cells yet — queue for the next putting attempt.
         WCS.greenReadActive = false;
         WCS.greenReadQueued = true;
+        toastMsg = `🌱 ${wc.name} applied!`;
       }
       break;
     case 'bounce_back':
@@ -735,23 +742,32 @@ function applyWildcardEffect(wc){
         S._highlightReelArmedShot = true;
         toastMsg = null;
         afterApply = () => {
-          const changed = applyHighlightReelToCurrentGrid();
-          if(changed > 0){
-            showWcToast(`🎥 ${wc.name} applied!`);
-            appendWcNote(`🎥 ${wc.name}`);
-          }
+          applyHighlightReelToCurrentGrid();
+          showWcToast('🎥 Highlight Reel activated!');
+          appendWcNote('🎥 Highlight Reel');
         };
       } else {
         WCS.highlightReelActive = true;
         toastMsg = `🎥 ${wc.name} applied!`;
       }
       break;
-    case 'sand_wedge_pro': WCS.sandWedgeProActive = true; toastMsg = `🏖️ ${wc.name} applied!`; break;
+    case 'sand_wedge_pro':
+      if(S.zone === 'sand' && isCurrentGridReady()){
+        WCS.sandWedgeProActive = false;
+        toastMsg = null;
+        afterApply = () => {
+          applySandWedgeProToCurrentGrid();
+          showWcToast('🏖️ Sand Wedge Pro activated!');
+          appendWcNote('🏖️ Sand Wedge Pro');
+        };
+      } else {
+        WCS.sandWedgeProActive = true;
+        toastMsg = `🏖️ ${wc.name} applied!`;
+      }
+      break;
     case 'lucky_bounce': WCS.luckyBounceActive = true; toastMsg = `🍀 ${wc.name} applied!`; break;
     case 'iron_will': WCS.ironWillActive = true; toastMsg = `🔩 ${wc.name} applied!`; break;
     case 'birdie_boost': {
-      WCS.birdieBoostActive = true;
-      toastMsg = `🚀 ${wc.name} applied!`;
       const canApplyNow = !S.holeDone && isCurrentGridReady() && isBirdieBoostApproachContext();
       if(canApplyNow){
         const changed = applyBirdieBoostToCurrentGrid();
@@ -760,15 +776,35 @@ function applyWildcardEffect(wc){
           S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
           toastMsg = null;
           afterApply = () => {
-            showWcToast(`🚀 ${wc.name} applied!`);
-            appendWcNote(`🚀 ${wc.name}`);
+            showWcToast('🚀 Birdie Boost activated!');
+            appendWcNote('🚀 Birdie Boost');
           };
+        } else {
+          // Grid had no eligible cells (already all green) — arm for the next approach.
+          WCS.birdieBoostActive = true;
+          toastMsg = `🚀 ${wc.name} applied!`;
         }
+      } else {
+        WCS.birdieBoostActive = true;
+        toastMsg = `🚀 ${wc.name} applied!`;
       }
       break;
     }
-    case 'hole_wall': WCS.holeWallActive = true; toastMsg = `🕳️ ${wc.name} applied!`; break;
-    case 'the_ferrett': 
+    case 'hole_wall':
+      if(isCurrentGridReady() && h.par === 3 && S.zone === 'tee'){
+        WCS.holeWallActive = false;
+        toastMsg = null;
+        afterApply = () => {
+          applyHoleWallToCurrentGrid();
+          showWcToast('🕳️ Hole In The Wall activated!');
+          appendWcNote('🕳️ Hole In The Wall');
+        };
+      } else {
+        WCS.holeWallActive = true;
+        toastMsg = `🕳️ ${wc.name} applied!`;
+      }
+      break;
+    case 'the_ferrett':
       if (S.zone === 'sand' && S.yrdRemain > 87) {
           toastMsg = `🦡 The Ferrett only works on greenside bunkers!`;
           applied = false;
@@ -777,27 +813,38 @@ function applyWildcardEffect(wc){
           S._ferrettArmedShot = true;
           toastMsg = null;
           afterApply = () => {
-            const changed = applyFerrettToCurrentGrid();
-            if(changed > 0){
-              showWcToast(`🦡 ${wc.name} applied!`);
-              appendWcNote(`🦡 ${wc.name}`);
-            }
+            applyFerrettToCurrentGrid();
+            showWcToast('🦡 The Ferrett activated!');
+            appendWcNote('🦡 The Ferrett');
           };
       } else {
           WCS.ferrettActive = true;
-          toastMsg = `🦡 ${wc.name} applied!`; 
+          toastMsg = `🦡 ${wc.name} applied!`;
       }
       break;
-    case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
+    case 'hole_in_one':
+      if(isCurrentGridReady() && h.par === 3 && S.zone === 'tee'){
+        WCS.hioActive = false;
+        toastMsg = null;
+        afterApply = () => {
+          applyHioToCurrentGrid();
+          showWcToast('🌟 Hole In One activated!');
+          appendWcNote('🌟 Hole In One');
+        };
+      } else {
+        WCS.hioActive = true;
+        toastMsg = `🌟 ${wc.name} applied!`;
+      }
+      break;
     case 'golden_putter':
       if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
         WCS.goldenPutterActive = false;
+        toastMsg = null;
         afterApply = () => {
           applyGoldenPutterToCurrentGrid();
           showWcToast('🥇 Golden Putter activated!');
           appendWcNote('🥇 Golden Putter');
         };
-        toastMsg = null;
       } else {
         WCS.goldenPutterActive = true;
         toastMsg = `🥇 ${wc.name} applied!`;
@@ -920,13 +967,12 @@ function applyWcGridMods(grid){
     showWcToast('🌟 Hole In One activated!'); appendWcNote('🌟 Hole In One');
     grid = grid.map(r=>r.map(()=>Math.random()<.80?'hole':'grn'));
   }
-  if (WCS.birdieBoostActive && ['fwy','rgh','sand','chip'].includes(S.zone)) {
-    if(!isBirdieBoostApproachContext()) return grid;
+  if (WCS.birdieBoostActive && isBirdieBoostApproachContext()) {
     const changedCells = applyBirdieBoostToGridCells(grid, 8);
     if(changedCells.length > 0){
-      WCS.birdieBoostActive = false; 
+      WCS.birdieBoostActive = false;
       S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
-      showWcToast('🚀 Birdie Boost applied!'); appendWcNote('🚀 Birdie Boost');
+      showWcToast('🚀 Birdie Boost activated!'); appendWcNote('🚀 Birdie Boost');
     }
   }
   if (WCS.sandWedgeProActive && S.zone === 'sand') {
