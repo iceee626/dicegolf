@@ -261,7 +261,7 @@ const COURSES={
       {name:'HOLE 6', yards:498,par:5,baseDiff:2,diff:1,layout:'open',teeLayout:'pacHole6',farLayout:'bunkerFwy',appLayout:'bunkerFwy'},
       {name:'HOLE 7', yards:107,par:3,baseDiff:2,diff:1,layout:'open'},
       {name:'HOLE 8', yards:416,par:4,baseDiff:3,diff:3,layout:'open',teeLayout:'pacHole8',firstFwyLayout:'pacHole8'},
-      {name:'HOLE 9', yards:483,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
+      {name:'HOLE 9', yards:483,par:4,baseDiff:2,diff:2,layout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'bunkerFwy'},
       {name:'HOLE 10',yards:444,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'pacHole4',appLayout:'bunkerGreen'},
       {name:'HOLE 11',yards:370,par:4,baseDiff:1,diff:1,layout:'open',teeLayout:'pacOpenEasy',appLayout:'bunkerGreen'},
       {name:'HOLE 12',yards:202,par:3,baseDiff:3,diff:3,layout:'bunkerGreen',par3Layout:'bunkerGreen'},
