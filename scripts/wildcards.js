@@ -528,11 +528,11 @@ function replaceGridCells(grid, predicate, nextZoneOrFactory, onChange){
 }
 
 function replaceCurrentGridCells(predicate, nextZoneOrFactory){
-  return replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory, (r, c, nextZone) => {
-    if(typeof updateVisibleGridCell === 'function'){
-      updateVisibleGridCell(r, c, nextZone);
-    }
-  });
+  const changed = replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory);
+  if(changed > 0 && typeof renderGrid === 'function'){
+    renderGrid();
+  }
+  return changed;
 }
 
 function gridHasAnyCell(grid, zones){
@@ -549,11 +549,13 @@ function isCurrentGridReady(){
   return Array.isArray(S.currentGrid) && S.currentGrid.length > 0;
 }
 
+function currentGridMatchesTitle(expectedText){
+  const title = document.getElementById('gridTitle');
+  return !!title && (title.textContent || '').toLowerCase().includes(expectedText);
+}
+
 function isBirdieBoostApproachContext(zone = S.zone, yrdRemain = S.yrdRemain){
-  return ['fwy','rgh','sand','chip'].includes(zone)
-    && yrdRemain <= 200
-    && yrdRemain > 35
-    && !(zone === 'sand' && yrdRemain > 87);
+  return ['fwy','rgh','sand','chip'].includes(zone);
 }
 
 function collectBirdieBoostEligibleCells(grid){
@@ -609,9 +611,9 @@ function applyFerrettToGrid(grid, onChange){
 }
 
 function applyFerrettToCurrentGrid(){
-  return applyFerrettToGrid(S.currentGrid, (r, c, nextZone) => {
-    if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, nextZone);
-  });
+  const changed = applyFerrettToGrid(S.currentGrid);
+  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
+  return changed;
 }
 
 function applyHighlightReelToGrid(grid, onChange){
@@ -619,9 +621,9 @@ function applyHighlightReelToGrid(grid, onChange){
 }
 
 function applyHighlightReelToCurrentGrid(){
-  return applyHighlightReelToGrid(S.currentGrid, (r, c, nextZone) => {
-    if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, nextZone);
-  });
+  const changed = applyHighlightReelToGrid(S.currentGrid);
+  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
+  return changed;
 }
 
 function applySandWedgeProToGrid(grid){
@@ -903,7 +905,7 @@ function applyWcGridMods(grid){
     showWcToast('🦡 The Ferrett activated!'); appendWcNote('🦡 The Ferrett');
     applyFerrettToGrid(grid);
   }
-  if (WCS.goldenPutterActive && S.zone === 'grn') {
+  if (WCS.goldenPutterActive && isPuttingGrid(grid)) {
     WCS.goldenPutterActive = false; 
     showWcToast('🥇 Golden Putter activated!'); appendWcNote('🥇 Golden Putter');
     applyGoldenPutterToGrid(grid);
