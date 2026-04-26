@@ -298,9 +298,14 @@ function completeHole(){
   scHead.innerHTML = '<div class="sc-lbl">H</div>';
   scPar.innerHTML = '<div class="sc-lbl">PAR</div>';
   scYou.innerHTML = '<div class="sc-lbl">YOU</div>';
-  [scHead, scPar, scYou].forEach(row=>{
+  [scHead, scPar, scYou].forEach((row, idx)=>{
     const lbl=row?.querySelector('.sc-lbl');
-    if(lbl){ lbl.style.opacity='1'; lbl.style.filter='none'; lbl.style.color='#fff'; }
+    if(lbl){
+      lbl.style.opacity='1';
+      lbl.style.filter='none';
+      lbl.style.color='#fff';
+      lbl.style.background = idx === 0 ? 'var(--c-fwy)' : 'var(--dark)';
+    }
   });
 
   const activeHoles = HOLES.slice(S.startIdx, S.endIdx + 1);
