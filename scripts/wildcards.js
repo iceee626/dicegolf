@@ -29,7 +29,7 @@ const WILDCARDS=[
   {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone (only par 4/5 after tee shot).'},
   {id:'bogey_shield',    weight: 15, icon:'🛡️', name:'Bogey Shield',      desc:'Next Bogey+ result converted into a Par.'},
   {id:'sand_wedge_pro',  weight: 15, icon:'🏖️', name:'Sand Wedge Pro',    desc:'Next Sand shot: 80% of grid converted into Green.'},
-  {id:'mulligan',        weight: 15, icon:'↩️', name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
+  {id:'mulligan',        weight: 15, icon:'↩️',  name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
   {id:'cup_magnet',      weight: 15, icon:'🧲', name:'Cup Magnet',        desc:'Next Green roll: If you miss the 1-putt by 1 cell, it \'sucks\' into the hole anyway.'},
   
   // LEGENDARY (Weight 5) - Game breakers
@@ -528,13 +528,22 @@ function replaceGridCells(grid, predicate, nextZoneOrFactory, onChange){
 }
 
 function replaceCurrentGridCells(predicate, nextZoneOrFactory){
-  // Surgical visual update: only touch cells that actually changed, leave the rest of
-  // the rendered grid (and any shot markers / lit state) untouched. This is what makes
-  // wildcard activations "no reshuffle" — same grid, only the affected cells flip.
+  // Surgical visual update: only touch cells that actually changed (no reshuffle of
+  // anything else in the displayed grid). After mutating S.currentGrid, also do a full
+  // renderGrid() pass so the DOM is guaranteed to reflect state — belt and suspenders.
   const onChange = (r, c, nextZone) => {
     if(typeof updateVisibleGridCell === 'function') updateVisibleGridCell(r, c, nextZone);
   };
-  return replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory, onChange);
+  const changed = replaceGridCells(S.currentGrid, predicate, nextZoneOrFactory, onChange);
+  if(changed > 0 && typeof renderGrid === 'function') renderGrid();
+  return changed;
+}
+
+// True when the currently rendered grid is the one the player will roll on next —
+// i.e. NOT a leftover grid from a shot that just resolved and is awaiting NEXT SHOT.
+function isCurrentGridForUpcomingShot(){
+  if(typeof isShotBtnShown !== 'function') return true;
+  return !isShotBtnShown('nextShotBtn');
 }
 
 function gridHasAnyCell(grid, zones){
@@ -709,7 +718,11 @@ function applyWildcardEffect(wc){
       }
       break;
     case 'green_read':
-      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid) && gridHasAnyCell(S.currentGrid, ['p3'])){
+      if(isCurrentGridReady()
+         && isPuttingGrid(S.currentGrid)
+         && gridHasAnyCell(S.currentGrid, ['p3'])
+         && !S._pendingPuttResult
+         && isCurrentGridForUpcomingShot()){
         WCS.greenReadActive = false;
         WCS.greenReadQueued = false;
         toastMsg = null;
@@ -719,7 +732,8 @@ function applyWildcardEffect(wc){
           appendWcNote('🌱 Green Read');
         };
       } else {
-        // Not on a putting grid, or grid has no p3 cells yet — queue for the next putting attempt.
+        // Either not on a putting grid yet, or putt already rolled, or current grid is
+        // a leftover from the previous shot — queue for the next putting attempt.
         WCS.greenReadActive = false;
         WCS.greenReadQueued = true;
         toastMsg = `🌱 ${wc.name} applied!`;
@@ -737,7 +751,7 @@ function applyWildcardEffect(wc){
     case 'mowers_revenge': WCS.mowersRevengeActive = true; toastMsg = `🚜 ${wc.name} applied!`; break;
     case 'cup_magnet': WCS.cupMagnetActive = true; toastMsg = `🧲 ${wc.name} applied!`; break;
     case 'commercial':
-      if(S.zone === 'chip' && isCurrentGridReady()){
+      if(S.zone === 'chip' && isCurrentGridReady() && isCurrentGridForUpcomingShot()){
         WCS.highlightReelActive = false;
         S._highlightReelArmedShot = true;
         toastMsg = null;
@@ -752,7 +766,7 @@ function applyWildcardEffect(wc){
       }
       break;
     case 'sand_wedge_pro':
-      if(S.zone === 'sand' && isCurrentGridReady()){
+      if(S.zone === 'sand' && isCurrentGridReady() && isCurrentGridForUpcomingShot()){
         WCS.sandWedgeProActive = false;
         toastMsg = null;
         afterApply = () => {
@@ -768,7 +782,10 @@ function applyWildcardEffect(wc){
     case 'lucky_bounce': WCS.luckyBounceActive = true; toastMsg = `🍀 ${wc.name} applied!`; break;
     case 'iron_will': WCS.ironWillActive = true; toastMsg = `🔩 ${wc.name} applied!`; break;
     case 'birdie_boost': {
-      const canApplyNow = !S.holeDone && isCurrentGridReady() && isBirdieBoostApproachContext();
+      const canApplyNow = !S.holeDone
+        && isCurrentGridReady()
+        && isBirdieBoostApproachContext()
+        && isCurrentGridForUpcomingShot();
       if(canApplyNow){
         const changed = applyBirdieBoostToCurrentGrid();
         if(changed > 0){
@@ -785,13 +802,15 @@ function applyWildcardEffect(wc){
           toastMsg = `🚀 ${wc.name} applied!`;
         }
       } else {
+        // Either wrong zone, or current grid is the previous shot's leftover —
+        // queue so the next approach grid gets the boost.
         WCS.birdieBoostActive = true;
         toastMsg = `🚀 ${wc.name} applied!`;
       }
       break;
     }
     case 'hole_wall':
-      if(isCurrentGridReady() && h.par === 3 && S.zone === 'tee'){
+      if(isCurrentGridReady() && h.par === 3 && S.zone === 'tee' && isCurrentGridForUpcomingShot()){
         WCS.holeWallActive = false;
         toastMsg = null;
         afterApply = () => {
@@ -808,7 +827,7 @@ function applyWildcardEffect(wc){
       if (S.zone === 'sand' && S.yrdRemain > 87) {
           toastMsg = `🦡 The Ferrett only works on greenside bunkers!`;
           applied = false;
-      } else if(S.zone === 'sand' && isCurrentGridReady()) {
+      } else if(S.zone === 'sand' && isCurrentGridReady() && isCurrentGridForUpcomingShot()) {
           WCS.ferrettActive = false;
           S._ferrettArmedShot = true;
           toastMsg = null;
@@ -823,7 +842,7 @@ function applyWildcardEffect(wc){
       }
       break;
     case 'hole_in_one':
-      if(isCurrentGridReady() && h.par === 3 && S.zone === 'tee'){
+      if(isCurrentGridReady() && h.par === 3 && S.zone === 'tee' && isCurrentGridForUpcomingShot()){
         WCS.hioActive = false;
         toastMsg = null;
         afterApply = () => {
@@ -837,7 +856,10 @@ function applyWildcardEffect(wc){
       }
       break;
     case 'golden_putter':
-      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
+      if(isCurrentGridReady()
+         && isPuttingGrid(S.currentGrid)
+         && !S._pendingPuttResult
+         && isCurrentGridForUpcomingShot()){
         WCS.goldenPutterActive = false;
         toastMsg = null;
         afterApply = () => {
