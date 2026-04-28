@@ -266,6 +266,7 @@ function continueGame(){
     document.getElementById('holePar').textContent=h.par;
     
     if (S.currentGrid) renderGrid(); else buildGrid();
+    if(WCS&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
     
     updateZonePill();updateYrd();renderLog();updateFloat();updateTVBanner();
     
