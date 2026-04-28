@@ -419,6 +419,8 @@ function scrollToGrid() {
 
 function doNextShot(){
   if(S.holeDone||_rerollChoiceActive)return;
+  if(S._nextShotTransitioning)return;
+  S._nextShotTransitioning=true;
   S._mulliganJustFired=false;
   S._tvShotNum = S.shotNum;
   _holdFinishBtn=false;
@@ -432,6 +434,7 @@ function doNextShot(){
   // Allow Safari to fully paint the button press state before building the heavy grid
   requestAnimationFrame(() => {
       setTimeout(() => {
+        try{
           const pendingGridWildcard = !!(WCS && (
             (typeof hasPendingGridWildcardForCurrentContext === 'function' && hasPendingGridWildcardForCurrentContext()) ||
             (S.zone === 'grn' && (WCS.greenReadQueued || WCS.greenReadActive || WCS.goldenPutterActive)) ||
@@ -461,6 +464,9 @@ function doNextShot(){
 
           if(!TUT.active && gridFocusEnabled()) scrollToGrid();
           if(TUT.active) _tutFire('next_shot_clicked');
+        } finally {
+          S._nextShotTransitioning=false;
+        }
       }, 20); // Small 20ms buffer guarantees UI responsiveness
   });
 }
