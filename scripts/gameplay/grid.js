@@ -388,6 +388,7 @@ function appendWcNoteToLastLog(noteStr){
 }
 
 function activateGreenReadOnGrid(grid){
+  if(typeof consumeGreenReadOnGrid === 'function') return consumeGreenReadOnGrid(grid);
   if(!Array.isArray(grid)) return grid;
   if(!(WCS.greenReadQueued || WCS.greenReadActive)) return grid;
   const hasP3 = grid.some(row => Array.isArray(row) && row.includes('p3'));
