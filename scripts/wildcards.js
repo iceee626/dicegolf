@@ -613,11 +613,41 @@ function visibleGridMatchesCurrentGrid(visibleGrid = readVisibleGridCells()){
   return true;
 }
 
-function isCurrentVisibleGridPlayable(){
-  if(S.rolling || S.holeDone || S._pendingPuttResult) return false;
+function isCurrentVisibleGridPlayable(opts = {}){
+  if(S.rolling || S.holeDone) return false;
+  if(S._pendingPuttResult && !opts.allowPendingPutt) return false;
   if(!_shotButtonShown('rollBtn') || _shotButtonShown('nextShotBtn')) return false;
   const visibleGrid = readVisibleGridCells();
   return visibleGridMatchesCurrentGrid(visibleGrid);
+}
+
+function isCurrentVisiblePuttingGridAvailable(){
+  if(S.rolling || S.holeDone) return false;
+  const visibleGrid = readVisibleGridCells();
+  return visibleGridMatchesCurrentGrid(visibleGrid) && isPuttingGrid(S.currentGrid);
+}
+
+function updatePendingPuttResult(nextPutts, noteStr){
+  if(!S._pendingPuttResult || !Number.isFinite(nextPutts)) return;
+  const oldPutts = S._pendingPuttResult.putts || nextPutts;
+  if(nextPutts >= oldPutts) return;
+  const diff = oldPutts - nextPutts;
+  S._pendingPuttResult.putts = nextPutts;
+  S.strokes = Math.max(0, (S.strokes || 0) - diff);
+  S.shotNum = Math.max(1, (S.shotNum || 1) - diff);
+  if(Array.isArray(S.log) && S.log.length){
+    const last = S.log[S.log.length - 1];
+    if(last && typeof last.desc === 'string'){
+      const suffix = noteStr ? ` (${noteStr})` : '';
+      last.desc = last.desc.replace(/Green\s+.*?\s+\d+\s+putts?/i, `Green → ${nextPutts} putt${nextPutts>1?'s':''}`);
+      if(noteStr && !last.desc.includes(noteStr)) last.desc += suffix;
+    }
+    if(last) last.note = `+${nextPutts}`;
+  }
+  if(typeof updateYrd === 'function') updateYrd();
+  if(typeof updateFloat === 'function') updateFloat();
+  if(typeof updateTVBanner === 'function') updateTVBanner();
+  if(typeof renderLog === 'function') renderLog();
 }
 
 function currentGridMatchesTitle(expectedText){
@@ -807,7 +837,7 @@ function applyWildcardEffect(wc){
       break;
     case 'green_read':
       toastMsg = `🌱 ${wc.name} applied!`;
-      if(isCurrentVisibleGridPlayable() && isPuttingGrid(S.currentGrid)){
+      if(isCurrentVisiblePuttingGridAvailable()){
         if(!gridHasAnyCell(S.currentGrid, ['p3'])){
           toastMsg = `${wc.icon} ${wc.name}: no 3P cells to read.`;
           applied = false;
@@ -819,6 +849,9 @@ function applyWildcardEffect(wc){
         afterApply = () => {
           const changed = applyGreenReadToCurrentGrid();
           if(changed > 0){
+            if(S._pendingPuttResult && S._pendingPuttResult.putts === 3){
+              updatePendingPuttResult(2, '🌱 Green Read');
+            }
             showWcToast('🌱 Green Read activated!');
             appendWcNote('🌱 Green Read');
           }
@@ -909,10 +942,13 @@ function applyWildcardEffect(wc){
       break;
     case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
     case 'golden_putter':
-      if(isCurrentVisibleGridPlayable() && isPuttingGrid(S.currentGrid)){
+      if(isCurrentVisiblePuttingGridAvailable()){
         WCS.goldenPutterActive = false;
         afterApply = () => {
           applyGoldenPutterToCurrentGrid();
+          if(S._pendingPuttResult){
+            updatePendingPuttResult(1, '🥇 Golden Putter');
+          }
           showWcToast('🥇 Golden Putter activated!');
           appendWcNote('🥇 Golden Putter');
         };
