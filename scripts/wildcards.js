@@ -803,6 +803,109 @@ function applySandWedgeProToGrid(grid){
   return replaceGridCells(grid, () => Math.random() < .8, 'grn');
 }
 
+function countGridZones(grid){
+  const counts = {};
+  if(!Array.isArray(grid)) return counts;
+  grid.forEach(row => {
+    if(!Array.isArray(row)) return;
+    row.forEach(zone => {
+      if(zone) counts[zone] = (counts[zone] || 0) + 1;
+    });
+  });
+  return counts;
+}
+
+function applyGridWildcardToGrid(grid, source = 'build'){
+  const beforeCounts = countGridZones(grid);
+  const applied = [];
+  let changed = 0;
+  const h = HOLES[S.holeIdx];
+
+  if(isPuttingGrid(grid) && !S._pendingPuttResult && (WCS.greenReadQueued || WCS.greenReadActive)){
+    const before = countGridZones(grid).p3 || 0;
+    consumeGreenReadOnGrid(grid);
+    const after = countGridZones(grid).p3 || 0;
+    if(before !== after){
+      applied.push('green_read');
+      changed += before - after;
+    }
+  }
+
+  if(WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87){
+    WCS.ferrettActive = false;
+    S._ferrettArmedShot = true;
+    showWcToast('🦡 The Ferrett activated!');
+    appendWcNote('🦡 The Ferrett');
+    changed += applyFerrettToGrid(grid);
+    applied.push('the_ferrett');
+  }
+
+  if(WCS.goldenPutterActive && isPuttingGrid(grid)){
+    WCS.goldenPutterActive = false;
+    showWcToast('🥇 Golden Putter activated!');
+    appendWcNote('🥇 Golden Putter');
+    changed += applyGoldenPutterToGrid(grid);
+    applied.push('golden_putter');
+  }
+
+  if(WCS.holeWallActive && h.par === 3 && S.zone === 'tee'){
+    WCS.holeWallActive = false;
+    showWcToast('🕳️ Hole In The Wall activated!');
+    appendWcNote('🕳️ Hole In The Wall');
+    const changedCells = replaceGridCells(grid, c => c === 'rgh' || c === 'sand' || c === 'fwy' || c === 'ob', 'chip');
+    changed += changedCells + replaceGridCells(grid, c => c !== 'chip' && c !== 'grn', 'grn');
+    applied.push('hole_wall');
+  }
+
+  if(WCS.hioActive && h.par === 3 && S.zone === 'tee'){
+    WCS.hioActive = false;
+    showWcToast('🌟 Hole In One activated!');
+    appendWcNote('🌟 Hole In One');
+    changed += replaceGridCells(grid, () => true, () => Math.random() < .80 ? 'hole' : 'grn');
+    applied.push('hole_in_one');
+  }
+
+  if(WCS.birdieBoostActive && ['fwy','rgh','sand','chip'].includes(S.zone)){
+    if(isBirdieBoostApproachContext()){
+      const changedCells = applyBirdieBoostToGridCells(grid, 8);
+      if(changedCells.length > 0){
+        WCS.birdieBoostActive = false;
+        S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
+        showWcToast('🚀 Birdie Boost activated!');
+        appendWcNote('🚀 Birdie Boost');
+        changed += changedCells.length;
+        applied.push('birdie_boost');
+      }
+    }
+  }
+
+  if(WCS.sandWedgeProActive && S.zone === 'sand'){
+    WCS.sandWedgeProActive = false;
+    showWcToast('🏖️ Sand Wedge Pro activated!');
+    appendWcNote('🏖️ Sand Wedge Pro');
+    changed += applySandWedgeProToGrid(grid);
+    applied.push('sand_wedge_pro');
+  }
+
+  if(WCS.highlightReelActive && S.zone === 'chip'){
+    WCS.highlightReelActive = false;
+    S._highlightReelArmedShot = true;
+    showWcToast('🎥 Highlight Reel activated!');
+    appendWcNote('🎥 Highlight Reel');
+    changed += applyHighlightReelToGrid(grid);
+    applied.push('commercial');
+  }
+
+  return {
+    grid,
+    source,
+    applied,
+    changed,
+    beforeCounts,
+    afterCounts: countGridZones(grid)
+  };
+}
+
 function applyPendingGridWildcardsToCurrentGrid(){
   return applyQueuedGridWildcardsAfterRender();
 }
@@ -1086,55 +1189,7 @@ function appendWcNote(noteStr) {
 }
   
 function applyWcGridMods(grid){
-  const h=HOLES[S.holeIdx];
-
-  if (isPuttingGrid(grid) && !S._pendingPuttResult && (WCS.greenReadQueued || WCS.greenReadActive)) {
-    grid = consumeGreenReadOnGrid(grid);
-  }
-
-  if (WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87) {
-    WCS.ferrettActive = false; 
-    S._ferrettArmedShot = true;
-    showWcToast('🦡 The Ferrett activated!'); appendWcNote('🦡 The Ferrett');
-    applyFerrettToGrid(grid);
-  }
-  if (WCS.goldenPutterActive && isPuttingGrid(grid)) {
-    WCS.goldenPutterActive = false; 
-    showWcToast('🥇 Golden Putter activated!'); appendWcNote('🥇 Golden Putter');
-    applyGoldenPutterToGrid(grid);
-  }
-  if (WCS.holeWallActive && h.par === 3 && S.zone === 'tee') {
-    WCS.holeWallActive = false; 
-    showWcToast('🕳️ Hole In The Wall activated!'); appendWcNote('🕳️ Hole In The Wall');
-    grid = grid.map(r=>r.map(c=>(c==='rgh'||c==='sand'||c==='fwy'||c==='ob')?'chip':'grn'));
-  }
-  if (WCS.hioActive && h.par === 3 && S.zone === 'tee') {
-    WCS.hioActive = false; 
-    showWcToast('🌟 Hole In One activated!'); appendWcNote('🌟 Hole In One');
-    grid = grid.map(r=>r.map(()=>Math.random()<.80?'hole':'grn'));
-  }
-  if (WCS.birdieBoostActive && ['fwy','rgh','sand','chip'].includes(S.zone)) {
-    if(!isBirdieBoostApproachContext()) return grid;
-    const changedCells = applyBirdieBoostToGridCells(grid, 8);
-    if(changedCells.length > 0){
-      WCS.birdieBoostActive = false; 
-      S._rocketApproachPending = (S.zone === 'rgh' || S.zone === 'sand');
-      showWcToast('🚀 Birdie Boost activated!'); appendWcNote('🚀 Birdie Boost');
-    }
-  }
-  if (WCS.sandWedgeProActive && S.zone === 'sand') {
-      WCS.sandWedgeProActive = false; 
-      showWcToast('🏖️ Sand Wedge Pro activated!'); appendWcNote('🏖️ Sand Wedge Pro');
-      applySandWedgeProToGrid(grid);
-  }
-  if (WCS.highlightReelActive && S.zone === 'chip') {
-      WCS.highlightReelActive = false; 
-      S._highlightReelArmedShot = true;
-      showWcToast('🎥 Highlight Reel activated!'); appendWcNote('🎥 Highlight Reel');
-      applyHighlightReelToGrid(grid);
-  }
-
-  return grid;
+  return applyGridWildcardToGrid(grid, 'build').grid;
 }
 
 // ── WILDCARD REVEAL FLOW ──────────────────────────────
