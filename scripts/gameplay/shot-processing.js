@@ -432,15 +432,25 @@ function doNextShot(){
   // Allow Safari to fully paint the button press state before building the heavy grid
   requestAnimationFrame(() => {
       setTimeout(() => {
-          const pendingPuttGridWildcard = !!(WCS && (WCS.greenReadQueued || WCS.greenReadActive || WCS.goldenPutterActive));
+          const pendingGridWildcard = !!(WCS && (
+            (typeof hasPendingGridWildcardForCurrentContext === 'function' && hasPendingGridWildcardForCurrentContext()) ||
+            (S.zone === 'grn' && (WCS.greenReadQueued || WCS.greenReadActive || WCS.goldenPutterActive)) ||
+            (WCS.birdieBoostActive && ['fwy','rgh','sand','chip'].includes(S.zone)) ||
+            (WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87)
+          ));
           if(S._forceP1PuttGrid && S.zone === 'grn'){
             S.currentGrid=Array(6).fill(null).map(()=>Array(6).fill('p1'));
             document.getElementById('gridTitle').textContent='Putting Grid';
             renderGrid();
             S._forceGrid=false;
           }
-          else if(S._forceGrid){S._forceGrid=false;}
-          else if(S._preserveGrid && !(S.zone === 'grn' && pendingPuttGridWildcard)){S._preserveGrid=false;}
+          else if(pendingGridWildcard){
+            S._forceGrid=false;
+            S._preserveGrid=false;
+            buildGrid();
+          }
+          else if(S._forceGrid && !pendingGridWildcard){S._forceGrid=false;}
+          else if(S._preserveGrid && !pendingGridWildcard){S._preserveGrid=false;}
           else{buildGrid();}
           if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
 
