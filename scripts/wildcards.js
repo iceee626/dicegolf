@@ -596,6 +596,30 @@ function isCurrentGridReady(){
   return Array.isArray(S.currentGrid) && S.currentGrid.length > 0;
 }
 
+function _shotButtonShown(id){
+  if(typeof isShotBtnShown === 'function') return isShotBtnShown(id);
+  const btn = document.getElementById(id);
+  return !!btn && btn.classList && btn.classList.contains('shot-btn-visible');
+}
+
+function visibleGridMatchesCurrentGrid(visibleGrid = readVisibleGridCells()){
+  if(!visibleGrid || !Array.isArray(S.currentGrid)) return false;
+  for(let r = 0; r < 6; r++){
+    if(!Array.isArray(visibleGrid[r]) || !Array.isArray(S.currentGrid[r])) return false;
+    for(let c = 0; c < 6; c++){
+      if(visibleGrid[r][c] !== S.currentGrid[r][c]) return false;
+    }
+  }
+  return true;
+}
+
+function isCurrentVisibleGridPlayable(){
+  if(S.rolling || S.holeDone || S._pendingPuttResult) return false;
+  if(!_shotButtonShown('rollBtn') || _shotButtonShown('nextShotBtn')) return false;
+  const visibleGrid = readVisibleGridCells();
+  return visibleGridMatchesCurrentGrid(visibleGrid);
+}
+
 function currentGridMatchesTitle(expectedText){
   const title = document.getElementById('gridTitle');
   return !!title && (title.textContent || '').toLowerCase().includes(expectedText);
@@ -783,7 +807,7 @@ function applyWildcardEffect(wc){
       break;
     case 'green_read':
       toastMsg = `🌱 ${wc.name} applied!`;
-      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
+      if(isCurrentVisibleGridPlayable() && isPuttingGrid(S.currentGrid)){
         if(!gridHasAnyCell(S.currentGrid, ['p3'])){
           toastMsg = `${wc.icon} ${wc.name}: no 3P cells to read.`;
           applied = false;
@@ -825,7 +849,7 @@ function applyWildcardEffect(wc){
       break;
     case 'cup_magnet': WCS.cupMagnetActive = true; toastMsg = `🧲 ${wc.name} applied!`; break;
     case 'commercial':
-      if(S.zone === 'chip' && isCurrentGridReady()){
+      if(S.zone === 'chip' && isCurrentVisibleGridPlayable()){
         WCS.highlightReelActive = false;
         S._highlightReelArmedShot = true;
         toastMsg = null;
@@ -847,7 +871,7 @@ function applyWildcardEffect(wc){
     case 'birdie_boost': {
       WCS.birdieBoostActive = true;
       toastMsg = `🚀 ${wc.name} applied!`;
-      const canApplyNow = !S.holeDone && isCurrentGridReady() && isBirdieBoostApproachContext();
+      const canApplyNow = isCurrentVisibleGridPlayable() && isBirdieBoostApproachContext();
       if(canApplyNow){
         const changed = applyBirdieBoostToCurrentGrid();
         if(changed > 0){
@@ -867,7 +891,7 @@ function applyWildcardEffect(wc){
       if (S.zone === 'sand' && S.yrdRemain > 87) {
           toastMsg = `🦡 The Ferrett only works on greenside bunkers!`;
           applied = false;
-      } else if(S.zone === 'sand' && isCurrentGridReady()) {
+      } else if(S.zone === 'sand' && isCurrentVisibleGridPlayable()) {
           WCS.ferrettActive = false;
           S._ferrettArmedShot = true;
           toastMsg = null;
@@ -885,7 +909,7 @@ function applyWildcardEffect(wc){
       break;
     case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
     case 'golden_putter':
-      if(isCurrentGridReady() && isPuttingGrid(S.currentGrid)){
+      if(isCurrentVisibleGridPlayable() && isPuttingGrid(S.currentGrid)){
         WCS.goldenPutterActive = false;
         afterApply = () => {
           applyGoldenPutterToCurrentGrid();
