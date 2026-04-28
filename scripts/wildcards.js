@@ -730,28 +730,25 @@ function applyFerrettToCurrentGrid(){
   return replaceCurrentGridCells(() => true, () => Math.random() < .75 ? 'hole' : 'grn');
 }
 
-function applyHighlightReelToGrid(grid, onChange){
-  return replaceGridCells(grid, cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null, onChange);
+function hasPendingGridWildcardForCurrentContext(){
+  if(!WCS) return false;
+  if(S.zone === 'grn' && (WCS.greenReadQueued || WCS.greenReadActive || WCS.goldenPutterActive)) return true;
+  if(WCS.birdieBoostActive && isBirdieBoostApproachContext()) return true;
+  if(WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87) return true;
+  return false;
 }
 
-function applyHighlightReelToCurrentGrid(){
-  return replaceCurrentGridCells(cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null);
-}
-
-function applySandWedgeProToGrid(grid){
-  return replaceGridCells(grid, () => Math.random() < .8, 'grn');
-}
-
-function applyPendingGridWildcardsToCurrentGrid(){
+function applyQueuedGridWildcardsAfterRender(){
   if(S._pendingPuttResult) return false;
-  syncCurrentGridFromVisibleCells();
-  if(!isCurrentGridReady()) return false;
+  if(!hasPendingGridWildcardForCurrentContext()) return false;
+  const visibleGrid = syncCurrentGridFromVisibleCells();
+  if(!visibleGrid || !isCurrentGridReady()) return false;
   let appliedAny = false;
 
   if(isPuttingGrid(S.currentGrid) && (WCS.greenReadQueued || WCS.greenReadActive)){
+    const changed = applyGreenReadToCurrentGrid();
     WCS.greenReadQueued = false;
     WCS.greenReadActive = false;
-    const changed = applyGreenReadToCurrentGrid();
     if(changed > 0){
       showWcToast('🌱 Green Read activated!');
       appendWcNote('🌱 Green Read');
@@ -760,8 +757,8 @@ function applyPendingGridWildcardsToCurrentGrid(){
   }
 
   if(isPuttingGrid(S.currentGrid) && WCS.goldenPutterActive){
-    WCS.goldenPutterActive = false;
     const changed = applyGoldenPutterToCurrentGrid();
+    WCS.goldenPutterActive = false;
     if(changed > 0){
       showWcToast('🥇 Golden Putter activated!');
       appendWcNote('🥇 Golden Putter');
@@ -780,7 +777,34 @@ function applyPendingGridWildcardsToCurrentGrid(){
     }
   }
 
+  if(WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87){
+    WCS.ferrettActive = false;
+    S._ferrettArmedShot = true;
+    const changed = applyFerrettToCurrentGrid();
+    if(changed > 0){
+      showWcToast('🦡 The Ferrett activated!');
+      appendWcNote('🦡 The Ferrett');
+      appliedAny = true;
+    }
+  }
+
   return appliedAny;
+}
+
+function applyHighlightReelToGrid(grid, onChange){
+  return replaceGridCells(grid, cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null, onChange);
+}
+
+function applyHighlightReelToCurrentGrid(){
+  return replaceCurrentGridCells(cell => cell !== 'hole', () => Math.random() < .75 ? 'hole' : null);
+}
+
+function applySandWedgeProToGrid(grid){
+  return replaceGridCells(grid, () => Math.random() < .8, 'grn');
+}
+
+function applyPendingGridWildcardsToCurrentGrid(){
+  return applyQueuedGridWildcardsAfterRender();
 }
 
 function applyWildcardEffect(wc){
