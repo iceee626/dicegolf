@@ -662,7 +662,7 @@ function isBirdieBoostApproachContext(zone = S.zone, yrdRemain = S.yrdRemain){
 function collectBirdieBoostEligibleCells(grid){
   if(!Array.isArray(grid)) return [];
   const eligible = [];
-  const convertibleZones = new Set(['sand','rgh','fwy','h2o','ob','chip']);
+  const convertibleZones = new Set(['sand','rgh','h2o','ob','chip']);
   for(let r=0; r<6; r++){
     if(!Array.isArray(grid[r])) continue;
     for(let c=0; c<grid[r].length; c++){
@@ -740,10 +740,41 @@ function hasPendingGridWildcardForCurrentContext(){
 
 function applyQueuedGridWildcardsAfterRender(){
   if(S._pendingPuttResult) return false;
-  if(!hasPendingGridWildcardForCurrentContext()) return false;
+  if(!hasPendingGridWildcardForCurrentContext() && !hasStoredGridWildcardCommit()) return false;
+  let appliedAny = false;
+
+  if(S.zone === 'grn'){
+    if(commitStoredGridWildcard('green_read')){
+      WCS.greenReadQueued = false;
+      WCS.greenReadActive = false;
+      appliedAny = true;
+    }
+    if(commitStoredGridWildcard('golden_putter')){
+      WCS.goldenPutterActive = false;
+      appliedAny = true;
+    }
+  }
+
+  if(commitStoredGridWildcard('birdie_boost')){
+    WCS.birdieBoostActive = false;
+    appliedAny = true;
+  }
+
+  if(S.zone === 'sand' && S.yrdRemain <= 87 && commitStoredGridWildcard('the_ferrett')){
+    WCS.ferrettActive = false;
+    WCS.sandWedgeProActive = false;
+    clearStoredGridWildcardCommit('sand_wedge_pro');
+    S._ferrettArmedShot = true;
+    appliedAny = true;
+  }
+
+  if(S.zone === 'sand' && !S._ferrettArmedShot && commitStoredGridWildcard('sand_wedge_pro')){
+    WCS.sandWedgeProActive = false;
+    appliedAny = true;
+  }
+
   const visibleGrid = syncCurrentGridFromVisibleCells();
   if(!visibleGrid || !isCurrentGridReady()) return false;
-  let appliedAny = false;
 
   if(isPuttingGrid(S.currentGrid) && (WCS.greenReadQueued || WCS.greenReadActive)){
     const changed = applyGreenReadToCurrentGrid();
@@ -779,11 +810,23 @@ function applyQueuedGridWildcardsAfterRender(){
 
   if(WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87){
     WCS.ferrettActive = false;
+    WCS.sandWedgeProActive = false;
+    clearStoredGridWildcardCommit('sand_wedge_pro');
     S._ferrettArmedShot = true;
     const changed = applyFerrettToCurrentGrid();
     if(changed > 0){
       showWcToast('🦡 The Ferrett activated!');
       appendWcNote('🦡 The Ferrett');
+      appliedAny = true;
+    }
+  }
+
+  if(WCS.sandWedgeProActive && S.zone === 'sand' && !S._ferrettArmedShot){
+    WCS.sandWedgeProActive = false;
+    const changed = replaceCurrentGridCells(() => Math.random() < .8, 'grn');
+    if(changed > 0){
+      showWcToast('đźŹ–ď¸Ź Sand Wedge Pro activated!');
+      appendWcNote('đźŹ–ď¸Ź Sand Wedge Pro');
       appliedAny = true;
     }
   }
@@ -815,6 +858,44 @@ function countGridZones(grid){
   return counts;
 }
 
+function cloneGridForCommit(grid){
+  return Array.isArray(grid) ? grid.map(row => Array.isArray(row) ? [...row] : row) : null;
+}
+
+function markGridWildcardCommit(id, grid){
+  if(!id) return;
+  const clone = cloneGridForCommit(grid);
+  if(!clone) return;
+  if(!S._pendingGridWildcardCommit) S._pendingGridWildcardCommit = {};
+  S._pendingGridWildcardCommit[id] = clone;
+}
+
+function hasStoredGridWildcardCommit(){
+  return !!(S._pendingGridWildcardCommit && Object.keys(S._pendingGridWildcardCommit).length);
+}
+
+function clearStoredGridWildcardCommit(id){
+  if(!S._pendingGridWildcardCommit) return;
+  delete S._pendingGridWildcardCommit[id];
+  if(Object.keys(S._pendingGridWildcardCommit).length === 0){
+    S._pendingGridWildcardCommit = null;
+  }
+}
+
+function commitStoredGridWildcard(id){
+  const stored = S._pendingGridWildcardCommit?.[id];
+  if(!stored) return false;
+  S.currentGrid = cloneGridForCommit(stored);
+  for(let r = 0; r < 6; r++){
+    if(!Array.isArray(S.currentGrid?.[r])) continue;
+    for(let c = 0; c < 6; c++){
+      writeVisibleGridCell(r, c, S.currentGrid[r][c]);
+    }
+  }
+  clearStoredGridWildcardCommit(id);
+  return true;
+}
+
 function applyGridWildcardToGrid(grid, source = 'build'){
   const beforeCounts = countGridZones(grid);
   const applied = [];
@@ -828,16 +909,19 @@ function applyGridWildcardToGrid(grid, source = 'build'){
     if(before !== after){
       applied.push('green_read');
       changed += before - after;
+      markGridWildcardCommit('green_read', grid);
     }
   }
 
   if(WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87){
     WCS.ferrettActive = false;
+    WCS.sandWedgeProActive = false;
     S._ferrettArmedShot = true;
     showWcToast('🦡 The Ferrett activated!');
     appendWcNote('🦡 The Ferrett');
     changed += applyFerrettToGrid(grid);
     applied.push('the_ferrett');
+    markGridWildcardCommit('the_ferrett', grid);
   }
 
   if(WCS.goldenPutterActive && isPuttingGrid(grid)){
@@ -846,6 +930,7 @@ function applyGridWildcardToGrid(grid, source = 'build'){
     appendWcNote('🥇 Golden Putter');
     changed += applyGoldenPutterToGrid(grid);
     applied.push('golden_putter');
+    markGridWildcardCommit('golden_putter', grid);
   }
 
   if(WCS.holeWallActive && h.par === 3 && S.zone === 'tee'){
@@ -875,16 +960,18 @@ function applyGridWildcardToGrid(grid, source = 'build'){
         appendWcNote('🚀 Birdie Boost');
         changed += changedCells.length;
         applied.push('birdie_boost');
+        markGridWildcardCommit('birdie_boost', grid);
       }
     }
   }
 
-  if(WCS.sandWedgeProActive && S.zone === 'sand'){
+  if(WCS.sandWedgeProActive && S.zone === 'sand' && !applied.includes('the_ferrett')){
     WCS.sandWedgeProActive = false;
     showWcToast('🏖️ Sand Wedge Pro activated!');
     appendWcNote('🏖️ Sand Wedge Pro');
     changed += applySandWedgeProToGrid(grid);
     applied.push('sand_wedge_pro');
+    markGridWildcardCommit('sand_wedge_pro', grid);
   }
 
   if(WCS.highlightReelActive && S.zone === 'chip'){
