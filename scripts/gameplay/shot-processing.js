@@ -452,7 +452,7 @@ function doNextShot(){
           else if(S._forceGrid && !pendingGridWildcard){S._forceGrid=false;}
           else if(S._preserveGrid && !pendingGridWildcard){S._preserveGrid=false;}
           else{buildGrid();}
-          if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
+          if(WCS&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
 
           updateZonePill();
           updateTVBanner();
