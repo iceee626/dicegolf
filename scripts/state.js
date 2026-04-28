@@ -10,6 +10,7 @@ let S={
   scorecards: [Array(18).fill(null)], histories: [Array(18).fill(null)],
   currentGrid:null, holeDone:false, rolling:false,
   yrdRemain:0, yrdTotal:0, fwyVisits:0, prevZone:null, shotCount:0,
+  _nextShotTransitioning:false,
   _gameUnderParStreak:0,
   _wcUsedThisRound:0, _skipCelebration:false, _preserveGrid:false, _forceGrid:false, _forceP1PuttGrid:false,
   _mulliganJustFired:false, _puttWcUsed:false, _pendingPuttResult:null, _pendingHoleFinish:null,
@@ -201,6 +202,7 @@ function resetGameState(){
   S.histories = [Array(18).fill(null)];
   S.currentGrid=null; S.holeDone=false; S.rolling=false;
   S.yrdRemain=0; S.yrdTotal=0; S.fwyVisits=0; S.prevZone=null; S.shotCount=0;
+  S._nextShotTransitioning=false;
   S._gameUnderParStreak=0;
   S._wcUsedThisRound=0;
   S._wcDiscardedThisRound=0;
