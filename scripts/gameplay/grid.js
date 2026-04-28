@@ -119,6 +119,12 @@ function _sandTmpl(h){
   return d===1?T_SAND_E():d===2?T_SAND_M():T_SAND_H();
 }
 
+function _shouldApplyWcGridMods(){
+  if(!WCS) return false;
+  if(wcEnabled()) return true;
+  return typeof hasPendingGridWildcardForCurrentContext === 'function' && hasPendingGridWildcardForCurrentContext();
+}
+
 function buildGrid(){
   // Tutorial override
   if(TUT.active){
@@ -134,9 +140,9 @@ function buildGrid(){
     const cached=vsGetCachedGrid();
     if(cached){
       let tmpl=cached.map(r=>[...r]);
-      if(WCS&&wcEnabled())tmpl=applyWcGridMods(tmpl);
+      if(_shouldApplyWcGridMods())tmpl=applyWcGridMods(tmpl);
       S.currentGrid=tmpl;renderGrid();
-      if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
+      if(WCS&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
       return;
     }
   }
@@ -155,9 +161,9 @@ function buildGrid(){
       t=t.map(row=>row.map(c=>c==='chip'?'fwy':c));
     }
     if(VS.active)vsCacheGrid(t);
-    if(WCS&&wcEnabled())t=applyWcGridMods(t);
+    if(_shouldApplyWcGridMods())t=applyWcGridMods(t);
     S.currentGrid=t;renderGrid();
-    if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
+    if(WCS&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
   };
 
   // PUTTING
@@ -227,7 +233,7 @@ function buildGrid(){
   tmpl=T_FAR_OPEN_M();
   if(VS.active)vsCacheGrid(tmpl);
   S.currentGrid=tmpl;renderGrid();
-  if(WCS&&wcEnabled()&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
+  if(WCS&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
 }
 
 function flipCell(cell, zd){
