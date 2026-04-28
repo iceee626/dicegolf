@@ -14,6 +14,7 @@ let S={
   _wcUsedThisRound:0, _skipCelebration:false, _preserveGrid:false, _forceGrid:false, _forceP1PuttGrid:false,
   _mulliganJustFired:false, _puttWcUsed:false, _pendingPuttResult:null, _pendingHoleFinish:null,
   _eyesClosedArmed:false, _landscaperRoughFixes:0, _rocketApproachPending:false,
+  _pendingGridWildcardCommit:null,
   _ferrettArmedShot:false, _highlightReelArmedShot:false,
   _roundWaterHits:0, _roundSandHits:0, _roundRoughHits:0,
   _roundPrevWasDoubleOrWorse:false, _roundIceTriggered:false
@@ -205,6 +206,7 @@ function resetGameState(){
   S._wcDiscardedThisRound=0;
   S._pendingPuttResult=null; S._pendingHoleFinish=null; S._forceP1PuttGrid=false;
   S._eyesClosedArmed=false; S._landscaperRoughFixes=0; S._rocketApproachPending=false;
+  S._pendingGridWildcardCommit=null;
   S._ferrettArmedShot=false; S._highlightReelArmedShot=false;
   S._roundWaterHits=0; S._roundSandHits=0; S._roundRoughHits=0;
   S._roundPrevWasDoubleOrWorse=false; S._roundIceTriggered=false;
