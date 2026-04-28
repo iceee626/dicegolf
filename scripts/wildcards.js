@@ -696,6 +696,20 @@ function applyGreenReadToGrid(grid){
   return replaceGridCells(grid, cell => cell === 'p3', 'p2');
 }
 
+function consumeGreenReadOnGrid(grid){
+  if(!Array.isArray(grid)) return grid;
+  if(!(WCS.greenReadQueued || WCS.greenReadActive)) return grid;
+  const hasP3 = grid.some(row => Array.isArray(row) && row.includes('p3'));
+  WCS.greenReadQueued = false;
+  WCS.greenReadActive = false;
+  applyGreenReadToGrid(grid);
+  if(hasP3){
+    showWcToast('🌱 Green Read activated!');
+    appendWcNote('🌱 Green Read');
+  }
+  return grid;
+}
+
 function applyGreenReadToCurrentGrid(){
   return replaceCurrentGridCells(cell => cell === 'p3', 'p2');
 }
@@ -1051,7 +1065,7 @@ function applyWcGridMods(grid){
   const h=HOLES[S.holeIdx];
 
   if (isPuttingGrid(grid) && !S._pendingPuttResult && (WCS.greenReadQueued || WCS.greenReadActive)) {
-    grid = activateGreenReadOnGrid(grid);
+    grid = consumeGreenReadOnGrid(grid);
   }
 
   if (WCS.ferrettActive && S.zone === 'sand' && S.yrdRemain <= 87) {
