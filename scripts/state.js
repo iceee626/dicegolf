@@ -17,6 +17,7 @@ let S={
   _eyesClosedArmed:false, _landscaperRoughFixes:0, _rocketApproachPending:false,
   _pendingGridWildcardCommit:null,
   _ferrettArmedShot:false, _highlightReelArmedShot:false,
+  _lastShotOriginZone:null, _lastShotResultZone:null, _lastShotHoleIdx:null,
   _roundWaterHits:0, _roundSandHits:0, _roundRoughHits:0,
   _roundPrevWasDoubleOrWorse:false, _roundIceTriggered:false
 };
@@ -210,6 +211,7 @@ function resetGameState(){
   S._eyesClosedArmed=false; S._landscaperRoughFixes=0; S._rocketApproachPending=false;
   S._pendingGridWildcardCommit=null;
   S._ferrettArmedShot=false; S._highlightReelArmedShot=false;
+  S._lastShotOriginZone=null; S._lastShotResultZone=null; S._lastShotHoleIdx=null;
   S._roundWaterHits=0; S._roundSandHits=0; S._roundRoughHits=0;
   S._roundPrevWasDoubleOrWorse=false; S._roundIceTriggered=false;
   S._roundEndProcessed=false; S._roundEndMeta=null;
