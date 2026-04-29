@@ -29,8 +29,12 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   
   document.getElementById('sumTitle').textContent='SUMMARY';
 
-  const scData = S.scorecards[viewRound - 1] || Array(18).fill(null);
-  const histData = S.histories[viewRound - 1] || Array(18).fill(null);
+  const isOverallStats = viewRound === 'overall';
+  const scorecardRound = typeof viewRound === 'number'
+    ? viewRound
+    : Math.max(1, Math.min(S.currentRound || 1, S.totalRounds || 1));
+  const scData = S.scorecards[scorecardRound - 1] || Array(18).fill(null);
+  const histData = S.histories[scorecardRound - 1] || Array(18).fill(null);
   const activeHoles = HOLES.slice(S.startIdx, S.endIdx + 1);
 
   const roundTotal = scData.reduce((a,b)=>a+(b||0),0);
@@ -41,7 +45,7 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   S.scorecards.forEach(sc => sc.forEach((s, i) => { if(s!==null){ globalTotal+=s; globalPar+=HOLES[i].par; } }));
   const globalDiff = globalTotal - globalPar;
   const gDiffStr = globalDiff===0?'E':globalDiff>0?`+${globalDiff}`:`${globalDiff}`;
-  const roundStats = getRoundStats(viewRound);
+  const roundStats = getRoundStats(isOverallStats ? 'overall' : scorecardRound);
 
   const statsHead = document.createElement('div');
   statsHead.className = 'sum-section-head';
@@ -49,10 +53,15 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   if(S.totalRounds > 1){
     const pillWrap = document.createElement('div');
     pillWrap.style.cssText = 'display:flex;gap:4px;flex-shrink:0;';
+    const allPill = document.createElement('button');
+    allPill.className = `sum-tab${isOverallStats ? ' active' : ''}`;
+    allPill.textContent = 'ALL';
+    allPill.onclick = () => openSummary('overall', backTarget);
+    pillWrap.appendChild(allPill);
     for(let r=1; r<=S.totalRounds; r++){
       if(r > S.currentRound && S.currentRound !== S.totalRounds && !S.scorecards[r-1]) continue;
       const pill = document.createElement('button');
-      pill.className = `sum-tab${r === viewRound ? ' active' : ''}`;
+      pill.className = `sum-tab${!isOverallStats && r === scorecardRound ? ' active' : ''}`;
       pill.textContent = `R${r}`;
       pill.onclick = () => openSummary(r, backTarget);
       pillWrap.appendChild(pill);
@@ -196,7 +205,7 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
     const hasWc = hist.wcsUsed && hist.wcsUsed.length > 0;
     row.style.overflow = 'hidden';
     row.innerHTML=`<div class="shp-num" style="color:${numColor};">${absoluteIdx+1}</div>${hasWc?'<div style="position:absolute;top:4px;right:4px;font-size:7px;line-height:1;pointer-events:none;opacity:.9;">🃏</div>':''}`;
-    row.onclick=()=>openHistInline(absoluteIdx, holeList, row, viewRound);
+    row.onclick=()=>openHistInline(absoluteIdx, holeList, row, scorecardRound);
     holeList.appendChild(row);
   });
   body.appendChild(holeList);
