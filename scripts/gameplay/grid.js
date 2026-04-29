@@ -25,6 +25,8 @@ function _teeTmpl(h){
     case 'waterTee':     return d===1?T_TEE_WTEE_E():d===2?T_TEE_WTEE_M():T_TEE_WTEE_H();
     case 'coastal':      return d===1?T_TEE_COAST_E():d===2?T_TEE_COAST_M():T_TEE_COAST_H();
     case 'desertWash':   return d===1?T_TEE_DSRT_E():d===2?T_TEE_DSRT_M():T_TEE_DSRT_H();
+    case 'gatorMarsh':   return _byDiff(gd,T_GATOR_TEE_MARSH_E,T_GATOR_TEE_MARSH_M,T_GATOR_TEE_MARSH_H);
+    case 'gatorFinish':  return _byDiff(gd,T_GATOR_FINISH_TEE_E,T_GATOR_FINISH_TEE_M,T_GATOR_FINISH_TEE_H);
     case 'cathedral':    return d===1?T_TEE_CATH_E():d===2?T_TEE_CATH_M():T_TEE_CATH_H();
     default:             return d===1?T_TEE_OPEN_E():d===2?T_TEE_OPEN_M():T_TEE_OPEN_H();
   }
@@ -37,6 +39,8 @@ function _par3Tmpl(h){
     case 'waterTee':     return d===1?T_P3_WTEE_E():d===2?T_P3_WTEE_M():T_P3_WTEE_H();
     case 'bunkerGreen':  return d===1?T_P3_BGRN_E():d===2?T_P3_BGRN_M():T_P3_BGRN_H();
     case 'stadium':      return d===1?T_P3_STAD_E():d===2?T_P3_STAD_M():T_P3_STAD_H();
+    case 'gatorSideWater': return d===1?T_GATOR_P3_SIDEWATER_E():d===2?T_GATOR_P3_SIDEWATER_M():T_GATOR_P3_SIDEWATER_H();
+    case 'gatorIsland':  return d===1?T_GATOR_P3_ISLAND_E():d===2?T_GATOR_P3_ISLAND_M():T_GATOR_P3_ISLAND_H();
     default:             return d===1?T_P3_OPEN_E():d===2?T_P3_OPEN_M():T_P3_OPEN_H();
   }
 }
@@ -66,6 +70,8 @@ function _appTmpl(h){
     case 'coastal':      return d===1?T_APP_COAST_E():d===2?T_APP_COAST_M():T_APP_COAST_H();
     case 'coastalPacific': return _byDiff(gd,T_PAC_FAR_COAST_E,T_PAC_FAR_COAST_M,T_PAC_FAR_COAST_H);
     case 'desertWash':   return d===1?T_APP_DSRT_E():d===2?T_APP_DSRT_M():T_APP_DSRT_H();
+    case 'gatorMarsh':   return _byDiff(gd,T_GATOR_APP_MARSH_E,T_GATOR_APP_MARSH_M,T_GATOR_APP_MARSH_H);
+    case 'gatorFinish':  return _byDiff(gd,T_GATOR_FINISH_APP_E,T_GATOR_FINISH_APP_M,T_GATOR_FINISH_APP_H);
     case 'cathedral':    return d===1?T_APP_CATH_E():d===2?T_APP_CATH_M():T_APP_CATH_H();
     default:             return d===1?T_APP_OPEN_E():d===2?T_APP_OPEN_M():T_APP_OPEN_H();
   }
@@ -82,6 +88,8 @@ function _farTmpl(h){
     case 'coastal':      return d===1?T_FAR_COAST_E():d===2?T_FAR_COAST_M():T_FAR_COAST_H();
     case 'coastalPacific': return _byDiff(gd,T_PAC_FAR_COAST_E,T_PAC_FAR_COAST_M,T_PAC_FAR_COAST_H);
     case 'desertWash':   return d===1?T_FAR_DSRT_E():d===2?T_FAR_DSRT_M():T_FAR_DSRT_H();
+    case 'gatorMarsh':   return _byDiff(gd,T_GATOR_FAR_MARSH_E,T_GATOR_FAR_MARSH_M,T_GATOR_FAR_MARSH_H);
+    case 'gatorFinish':  return _byDiff(gd,T_GATOR_FINISH_FAR_E,T_GATOR_FINISH_FAR_M,T_GATOR_FINISH_FAR_H);
     default:             return d===1?T_FAR_OPEN_E():d===2?T_FAR_OPEN_M():T_FAR_OPEN_H();
   }
 }
