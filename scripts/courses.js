@@ -328,7 +328,7 @@ const COURSES={
       {name:'HOLE 15',yards:470,par:4,baseDiff:3,diff:3,layout:'bunkerFwy',appLayout:'bunkerGreen'},
       {name:'HOLE 16',yards:525,par:5,baseDiff:2,diff:2,layout:'open',farLayout:'waterCross',appLayout:'open'},
       {name:'HOLE 17',yards:139,par:3,baseDiff:3,diff:3,layout:'gatorIsland',par3Layout:'gatorIsland'},
-      {name:'HOLE 18',yards:462,par:4,baseDiff:3,diff:3,layout:'gatorFinish',farLayout:'gatorFinish',appLayout:'gatorFinish'},
+      {name:'HOLE 18',yards:467,par:4,baseDiff:3,diff:3,layout:'gatorFinish',farLayout:'gatorFinish',appLayout:'gatorFinish'},
     ]
   },
   'septembra-national':{
