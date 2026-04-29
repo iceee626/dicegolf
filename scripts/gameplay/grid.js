@@ -484,11 +484,11 @@ function advanceYrd(zk){
     const variance = (Math.random() * 0.10) - 0.05; 
     
     if (GAME_DIFF === 1) {
-      penalty = 0.85 + variance; // ~15% distance loss on Easy
+      penalty = 0.90 + variance; // ~10% distance loss on Easy
     } else if (GAME_DIFF === 2) {
-      penalty = 0.70 + variance; // ~30% distance loss on Normal
+      penalty = 0.75 + variance; // ~25% distance loss on Normal
     } else {
-      penalty = 0.55 + variance; // ~45% distance loss on Hard
+      penalty = 0.60 + variance; // ~40% distance loss on Hard
     }
     dist = Math.round(dist * penalty);
   }
