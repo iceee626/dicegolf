@@ -15,7 +15,7 @@ const WILDCARDS=[
   {id:'lucky_bounce',    weight: 50, icon:'🍀', name:'Lucky Bounce',      desc:'Next OOB or Water result treated as Rough (or Sand on Par 3).'},
   {id:'iron_will',       weight: 50, icon:'🔩', name:'Iron Will',         desc:'Next Rough result treated as Fairway.'},
   {id:'tailwind',        weight: 50, icon:'💨', name:'Tailwind',          desc:'Re-roll one die of your choice this hole.'},
-  {id:'green_read',      weight: 50, icon:'🌱', name:'Green Read',        desc:'On your next putting attempt, convert all 3-putt cells into 2-putt.'},
+  {id:'green_read',      weight: 50, icon:'🌱', name:'Green Read',        desc:'On your next unresolved putting attempt, convert all 3-putt cells into 2-putt.'},
   {id:'bounce_back',     weight: 50, icon:'🪃', name:'Bounce Back',       desc:'After a bogey or worse, your next tee shot is guaranteed to be Fairway (or Green if on Par 3)'},
   
   // RARE (Weight 30) - Solid utility
@@ -26,14 +26,14 @@ const WILDCARDS=[
   {id:'birdie_boost',    weight: 30, icon:'🚀', name:'Birdie Boost',      desc:'Add 8 extra Green cells to next approach grid.'},
   
   // EPIC (Weight 15) - Very powerful
-  {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone (only par 4/5 after tee shot).'},
+  {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Use anytime; activates on NEXT SHOT after a playable par 4/5 tee shot.'},
   {id:'bogey_shield',    weight: 15, icon:'🛡️', name:'Bogey Shield',      desc:'Next Bogey+ result converted into a Par.'},
   {id:'sand_wedge_pro',  weight: 15, icon:'🏖️', name:'Sand Wedge Pro',    desc:'Next Sand shot: 80% of grid converted into Green.'},
   {id:'mulligan',        weight: 15, icon:'↩️',  name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
   {id:'cup_magnet',      weight: 15, icon:'🧲', name:'Cup Magnet',        desc:'Next Green roll: If you miss the 1-putt by 1 cell, it \'sucks\' into the hole anyway.'},
   
   // LEGENDARY (Weight 5) - Game breakers
-  {id:'golden_putter',   weight: 5,  icon:'🥇', name:'Golden Putter',     desc:'If on green: instant 1-putt now. Otherwise next green roll is guaranteed 1-putt.'},
+  {id:'golden_putter',   weight: 5,  icon:'🥇', name:'Golden Putter',     desc:'On your next unresolved putting attempt, every putt cell becomes 1-putt.'},
   {id:'the_ferrett',     weight: 5,  icon:'🦡', name:'The Ferrett',       desc:'Next Sand shot: 75% chance of holing out directly.'},
   {id:'hole_in_one',     weight: 5,  icon:'🌟', name:'Hole In One',       desc:'Next Par 3 tee shot: 80% chance of hole-in-one.'},
   {id:'commercial',      weight: 5,  icon:'🎥', name:'Highlight Reel',    desc:'Next Chip shot: 75% chance of holing out directly.'},
@@ -350,6 +350,7 @@ function renderWcDrawer(){
       if (wc.id === 'bounce_back') statusText = WCS.bounceBackReady ? 'Ready for next tee shot' : 'Waiting for bogey+ result';
       if (wc.id === 'bogey_shield') statusText = 'Waiting for bogey+ result';
       if (wc.id === 'cup_magnet') statusText = 'Waiting for Green...';
+      if (wc.id === 'shortcut') statusText = 'Waiting for NEXT SHOT after Par 4/5 tee shot';
 
       const item = document.createElement('div');
       item.className = `wc-active-item${_expandedActiveWcId===wc.id?' expanded':''}`;
@@ -623,6 +624,7 @@ function isCurrentVisibleGridPlayable(opts = {}){
 
 function isCurrentVisiblePuttingGridAvailable(){
   if(S.rolling || S.holeDone) return false;
+  if(S._pendingPuttResult) return false;
   const visibleGrid = readVisibleGridCells();
   return visibleGridMatchesCurrentGrid(visibleGrid) && isPuttingGrid(S.currentGrid);
 }
@@ -924,7 +926,7 @@ function applyGridWildcardToGrid(grid, source = 'build'){
     markGridWildcardCommit('the_ferrett', grid);
   }
 
-  if(WCS.goldenPutterActive && isPuttingGrid(grid)){
+  if(WCS.goldenPutterActive && isPuttingGrid(grid) && !S._pendingPuttResult){
     WCS.goldenPutterActive = false;
     showWcToast('🥇 Golden Putter activated!');
     appendWcNote('🥇 Golden Putter');
@@ -1029,24 +1031,8 @@ function applyWildcardEffect(wc){
 
   switch(wc.id){
     case 'shortcut':
-      if (h.par === 3 || S.zone === 'tee') {
-        toastMsg = `⚡ Shortcut only works on Par 4/5 after the tee shot!`;
-        applied = false;
-      } else if (S.zone === 'grn' || S._pendingPuttResult) {
-        WCS.shortcutActive = true;
-        toastMsg = `⚡ Already on the green. Shortcut activates on your next Par 4/5 hole.`;
-      } else {
-        const prevZone = S.zone;
-        const prevYrdRemain = S.yrdRemain;
-        S.zone='chip';
-        S.yrdRemain=Math.min(S.yrdRemain, Math.round(15+Math.random()*30));
-        addLog('🃏', `Skipped to Chip (${wc.icon} ${wc.name})`, 'chip', 'WC', false, null, null, null, prevZone, prevYrdRemain);
-        updateZonePill();updateYrd();updateFloat();updateTVBanner();
-        toastMsg = `⚡ ${wc.name} activated!`;
-        if(h.par === 5){
-          unlockAchievement('express_route');
-        }
-      }
+      WCS.shortcutActive = true;
+      toastMsg = `⚡ ${wc.name} applied!`;
       break;
     case 'phantom_stroke':
       const removablePenalties = getNetPenaltyCount(S.log);
