@@ -103,16 +103,16 @@ body[data-course-theme='pacific-beach']{
   --summary-head-from:#22506e;--summary-head-to:rgba(34,80,110,.75);
   --summary-chip-bg:rgba(104,169,223,.18);--summary-chip-border:rgba(104,169,223,.4);
 }
-body[data-course-theme='desert-golf-links']{
-  --course-bg-top:#3f2710;--course-bg-bottom:#1f1308;--course-bg-glow:rgba(239,166,88,.24);
-  --course-panel:rgba(52,33,18,.86);--course-panel-strong:rgba(30,19,10,.96);--course-panel-border:rgba(214,156,96,.36);
-  --course-text:#f7e6d3;--course-muted:#d0ad86;--course-accent:#e0a064;--course-accent-soft:#f2c58d;
-  --course-header-chip:rgba(31,18,10,.28);
-  --tv-bar-bg:#7d4a24;--tv-row1-bg:#7d4a24;--tv-row2-bg:#aa6630;--tv-icon-bg:#c6792f;
-  --tv-total-bg:#efc27d;--tv-total-fg:#4e2c14;--tv-active-bg:#fff2de;--tv-active-fg:#6a3c1b;
-  --tv-total-good:#3f5b20;--tv-total-bad:#7a1f1f;--tv-total-even:#4a2a14;
-  --summary-head-from:#9b5c2c;--summary-head-to:rgba(155,92,44,.8);
-  --summary-chip-bg:rgba(224,160,100,.24);--summary-chip-border:rgba(224,160,100,.48);
+body[data-course-theme='gator-creek']{
+  --course-bg-top:#2a100f;--course-bg-bottom:#100b0c;--course-bg-glow:rgba(138,42,44,.24);
+  --course-panel:rgba(35,18,18,.86);--course-panel-strong:rgba(17,10,11,.96);--course-panel-border:rgba(132,66,61,.36);
+  --course-text:#f4e4dc;--course-muted:#bd958d;--course-accent:#a64642;--course-accent-soft:#d47867;
+  --course-header-chip:rgba(28,11,12,.3);
+  --tv-bar-bg:#4a1718;--tv-row1-bg:#4a1718;--tv-row2-bg:#6b2424;--tv-icon-bg:#7e3d31;
+  --tv-total-bg:#d08370;--tv-total-fg:#2d1110;--tv-active-bg:#fff0e8;--tv-active-fg:#4a1718;
+  --tv-total-good:#24462f;--tv-total-bad:#7f2020;--tv-total-even:#321313;
+  --summary-head-from:#6f2523;--summary-head-to:rgba(111,37,35,.8);
+  --summary-chip-bg:rgba(164,70,66,.22);--summary-chip-border:rgba(212,120,103,.45);
 }
 body[data-course-theme='septembra-national']{
   --course-bg-top:#162319;--course-bg-bottom:#0f1711;--course-bg-glow:rgba(206,181,118,.18);
@@ -142,7 +142,7 @@ body[data-course-theme]{
 }
 html[data-course-theme='little-pines']{background:#102116;}
 html[data-course-theme='pacific-beach']{background:#0e1c2f;}
-html[data-course-theme='desert-golf-links']{background:#3f2710;}
+html[data-course-theme='gator-creek']{background:#2a100f;}
 html[data-course-theme='septembra-national']{background:#162319;}
 body[data-course-theme] #mainApp::before{
   background-image:
