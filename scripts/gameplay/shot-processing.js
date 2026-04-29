@@ -136,6 +136,32 @@ function clearQueuedGreenReadWithoutActivation(){
   }
 }
 
+function applyQueuedShortcutAfterTeeShot(){
+  if(!WCS || !WCS.shortcutActive) return false;
+  const h = HOLES[S.holeIdx];
+  if(!h || h.par === 3) return false;
+  if(S._lastShotHoleIdx !== S.holeIdx || S._lastShotOriginZone !== 'tee') return false;
+  if(S.holeDone || S._pendingPuttResult) return false;
+  if(!['fwy','rgh','sand','chip'].includes(S.zone)) return false;
+
+  const prevZone = S.zone;
+  const prevYrdRemain = S.yrdRemain;
+  WCS.shortcutActive = false;
+  S.zone = 'chip';
+  S.yrdRemain = Math.min(S.yrdRemain, Math.round(15 + Math.random() * 30));
+  S._lastShotOriginZone = null;
+  S._lastShotResultZone = 'chip';
+  addLog('🃏', 'Skipped to Chip (⚡ Shortcut)', 'chip', 'WC', false, null, null, null, prevZone, prevYrdRemain);
+  updateZonePill(); updateYrd(); updateFloat(); updateTVBanner();
+  showWcToast('⚡ Shortcut activated!');
+  if(h.par === 5){
+    unlockAchievement('express_route');
+  }
+  renderWcFab();
+  renderWcDrawer();
+  return true;
+}
+
 function processShot(row,col){
   S._preserveGrid=false;
   if(false){
@@ -196,6 +222,9 @@ function processShot(row,col){
         showWcToast('🛡️ Bogey Shield activated!');
     }
     S._pendingPuttResult={putts:finalPutts, row, col, snapGrid, prevZone};
+    S._lastShotOriginZone = prevZone;
+    S._lastShotResultZone = outcome;
+    S._lastShotHoleIdx = S.holeIdx;
     addLog(S.shotNum,`Green → ${finalPutts} putt${finalPutts>1?'s':''}${wcPuttNote}`,outcome,`+${finalPutts}`,false,row,col,snapGrid, prevZone, prevYrdRemain);
     S._tvShotNum = S.shotNum;
     S.shotNum += finalPutts;
@@ -256,15 +285,6 @@ function processShot(row,col){
       showWcToast('🪃 Bounce Back activated!');
   }
   
-  if (!bounceBackApplied && WCS.shortcutActive && prevZone === 'tee' && HOLES[S.holeIdx].par !== 3) {
-      WCS.shortcutActive = false;
-      resolvedOutcome = 'chip';
-      addAppliedNote(' (⚡ Shortcut)');
-      showWcToast('⚡ Shortcut activated!');
-      if(HOLES[S.holeIdx].par === 5){
-        unlockAchievement('express_route');
-      }
-  }
   if (!bounceBackApplied && WCS.luckyBounceActive && (rawOutcome === 'ob' || rawOutcome === 'h2o')) {
       resolvedOutcome = HOLES[S.holeIdx].par === 3 ? 'sand' : 'rgh';
       WCS.luckyBounceActive = false; 
@@ -297,6 +317,9 @@ function processShot(row,col){
   handleShotAchievementOutcome(resolvedOutcome, prevZone);
 
   if(resolvedOutcome==='h2o'||resolvedOutcome==='ob'){
+    S._lastShotOriginZone = prevZone;
+    S._lastShotResultZone = resolvedOutcome;
+    S._lastShotHoleIdx = S.holeIdx;
     trackImmediateRoundAchievementProgress(resolvedOutcome, true);
     playShotSound(prevZone, resolvedOutcome);
     S.strokes+=2;
@@ -324,6 +347,9 @@ function processShot(row,col){
     } else {
       playShotSound(prevZone,'hole');
       S.strokes+=1;S.yrdRemain=0;S.zone='hole';
+      S._lastShotOriginZone = prevZone;
+      S._lastShotResultZone = 'hole';
+      S._lastShotHoleIdx = S.holeIdx;
       addLog(S.shotNum,`⛳ Hole In!${wcAppliedNote}`,'hole','+1',false,row,col,snapGrid, prevZone, prevYrdRemain);
       showResult(Z.hole,'Hole In!','good',`Row ${row+1} · Col ${col+1}`);
       S._pendingHoleFinish={row,col,snapGrid,prevZone};
@@ -383,6 +409,9 @@ function processShot(row,col){
     S.yrdRemain = newDist;
   }
   S.zone=resolvedOutcome;
+  S._lastShotOriginZone = prevZone;
+  S._lastShotResultZone = resolvedOutcome;
+  S._lastShotHoleIdx = S.holeIdx;
   S._puttWcUsed=false;
   if(!S.zoneHistory)S.zoneHistory=[];
   S.zoneHistory.push(resolvedOutcome);
@@ -446,6 +475,9 @@ function doNextShot(){
   requestAnimationFrame(() => {
       setTimeout(() => {
         try{
+          if(typeof applyQueuedShortcutAfterTeeShot === 'function'){
+            applyQueuedShortcutAfterTeeShot();
+          }
           const pendingGridWildcard = !!(WCS && (
             (typeof hasPendingGridWildcardForCurrentContext === 'function' && hasPendingGridWildcardForCurrentContext()) ||
             (S.zone === 'grn' && (WCS.greenReadQueued || WCS.greenReadActive || WCS.goldenPutterActive)) ||
