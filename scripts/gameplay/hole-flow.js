@@ -233,8 +233,8 @@ function completeHole(){
       const newStreak=d<0?prevStreak+1:0;
       S._gameUnderParStreak=newStreak;
       p.bestUnderParStreak=Math.max(p.bestUnderParStreak||0,newStreak);
-      if(newStreak>=3) unlockAchievement('on_a_roll');
       profiles[idx]=p;saveProfiles(profiles);
+      if(prevStreak<3 && newStreak>=3) unlockAchievement('on_a_roll');
       setTimeout(()=>checkAndAwardAchievements(),300);
     }
   }
