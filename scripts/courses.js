@@ -143,6 +143,40 @@ const T_APP_CATH_E  = ()=>cells(['grn',28],['chip',2],['rgh',4],['sand',2]);
 const T_APP_CATH_M  = ()=>cells(['grn',23],['chip',3],['rgh',6],['sand',4]);
 const T_APP_CATH_H  = ()=>cells(['grn',18],['chip',4],['rgh',8],['sand',6]);
 
+// Gator Creek — lagoon/swamp pressure inspired by TPC Sawgrass routing.
+// These are course-specific and do not replace any shared/desert templates.
+const T_GATOR_TEE_MARSH_E = ()=>cells(['fwy',26],['rgh',6],['h2o',2],['sand',2]);
+const T_GATOR_TEE_MARSH_M = ()=>cells(['fwy',22],['rgh',8],['h2o',4],['sand',2]);
+const T_GATOR_TEE_MARSH_H = ()=>cells(['fwy',18],['rgh',9],['h2o',6],['sand',3]);
+
+const T_GATOR_FAR_MARSH_E = ()=>cells(['fwy',24],['rgh',7],['h2o',3],['sand',2]);
+const T_GATOR_FAR_MARSH_M = ()=>cells(['fwy',20],['rgh',8],['h2o',5],['sand',3]);
+const T_GATOR_FAR_MARSH_H = ()=>cells(['fwy',16],['rgh',9],['h2o',7],['sand',4]);
+
+const T_GATOR_APP_MARSH_E = ()=>cells(['grn',28],['chip',2],['rgh',2],['h2o',2],['sand',2]);
+const T_GATOR_APP_MARSH_M = ()=>cells(['grn',24],['chip',3],['rgh',3],['h2o',4],['sand',2]);
+const T_GATOR_APP_MARSH_H = ()=>cells(['grn',20],['chip',4],['rgh',4],['h2o',5],['sand',3]);
+
+const T_GATOR_P3_SIDEWATER_E = ()=>cells(['grn',27],['chip',3],['h2o',3],['sand',2],['hole',1]);
+const T_GATOR_P3_SIDEWATER_M = ()=>cells(['grn',23],['chip',4],['h2o',5],['sand',3],['hole',1]);
+const T_GATOR_P3_SIDEWATER_H = ()=>cells(['grn',19],['chip',5],['h2o',7],['sand',4],['hole',1]);
+
+const T_GATOR_P3_ISLAND_E = ()=>cells(['grn',24],['chip',2],['h2o',8],['sand',1],['hole',1]);
+const T_GATOR_P3_ISLAND_M = ()=>cells(['grn',20],['chip',3],['h2o',10],['sand',2],['hole',1]);
+const T_GATOR_P3_ISLAND_H = ()=>cells(['grn',16],['chip',4],['h2o',12],['sand',3],['hole',1]);
+
+const T_GATOR_FINISH_TEE_E = ()=>cells(['fwy',22],['rgh',6],['h2o',6],['sand',2]);
+const T_GATOR_FINISH_TEE_M = ()=>cells(['fwy',18],['rgh',7],['h2o',8],['sand',3]);
+const T_GATOR_FINISH_TEE_H = ()=>cells(['fwy',14],['rgh',8],['h2o',10],['sand',4]);
+
+const T_GATOR_FINISH_FAR_E = ()=>cells(['fwy',20],['rgh',7],['h2o',6],['sand',3]);
+const T_GATOR_FINISH_FAR_M = ()=>cells(['fwy',16],['rgh',8],['h2o',8],['sand',4]);
+const T_GATOR_FINISH_FAR_H = ()=>cells(['fwy',13],['rgh',8],['h2o',11],['sand',4]);
+
+const T_GATOR_FINISH_APP_E = ()=>cells(['grn',26],['chip',2],['h2o',5],['sand',3]);
+const T_GATOR_FINISH_APP_M = ()=>cells(['grn',22],['chip',3],['h2o',7],['sand',4]);
+const T_GATOR_FINISH_APP_H = ()=>cells(['grn',18],['chip',4],['h2o',9],['sand',5]);
+
 // Pacific tee — course-specific hard-mode tuning without changing shared templates
 const T_PAC_TEE_OPEN_SOFT_E = ()=>cells(['fwy',31],['rgh',4],['sand',1]);
 const T_PAC_TEE_OPEN_SOFT_M = ()=>cells(['fwy',29],['rgh',5],['sand',2]);
@@ -224,7 +258,8 @@ const T_PUTT_3H = ()=>cells(['p1',16], ['p2',14],['p3',6]);// ★★★ hole, ha
 // COURSES & HOLES
 // ═══════════════════════════════════════
 const DEFAULT_COURSE_ID='little-pines';
-const COURSE_ORDER=['little-pines','pacific-beach','desert-golf-links','septembra-national'];
+const COURSE_ALIASES={ 'desert-golf-links':'gator-creek' };
+const COURSE_ORDER=['little-pines','pacific-beach','gator-creek','septembra-national'];
 const COURSES={
   'little-pines':{
     id:'little-pines', name:'LITTLE PINES', shortName:'LITTLE PINES',
@@ -273,27 +308,27 @@ const COURSES={
       {name:'HOLE 18',yards:541,par:5,baseDiff:3,diff:3,layout:'bunkerFwy',teeLayout:'bunkerFwy',firstFwyLayout:'bunkerFwy',farLayout:'coastalPacific',appLayout:'bunkerGreen'},
     ]
   },
-  'desert-golf-links':{
-    id:'desert-golf-links', name:'DESERT GOLF LINKS', shortName:'DESERT LINKS',
+  'gator-creek':{
+    id:'gator-creek', name:'GATOR CREEK', shortName:'GATOR CREEK',
     holes:[
-      {name:'HOLE 1', yards:403,par:4,baseDiff:1,diff:1,layout:'desertWash'},
-      {name:'HOLE 2', yards:442,par:4,baseDiff:2,diff:2,layout:'desertWash'},
-      {name:'HOLE 3', yards:558,par:5,baseDiff:2,diff:2,layout:'desertWash'},
-      {name:'HOLE 4', yards:183,par:3,baseDiff:2,diff:2,layout:'bunkerGreen'},
-      {name:'HOLE 5', yards:470,par:4,baseDiff:2,diff:2,layout:'desertWash'},
-      {name:'HOLE 6', yards:432,par:4,baseDiff:2,diff:2,layout:'desertWash'},
-      {name:'HOLE 7', yards:215,par:3,baseDiff:3,diff:3,layout:'bunkerGreen'},
-      {name:'HOLE 8', yards:475,par:4,baseDiff:3,diff:3,layout:'desertWash'},
-      {name:'HOLE 9', yards:453,par:4,baseDiff:3,diff:3,layout:'desertWash'},
-      {name:'HOLE 10',yards:428,par:4,baseDiff:1,diff:1,layout:'desertWash'},
-      {name:'HOLE 11',yards:472,par:4,baseDiff:3,diff:3,layout:'waterApproach'},
-      {name:'HOLE 12',yards:192,par:3,baseDiff:3,diff:3,layout:'waterCross'},
-      {name:'HOLE 13',yards:558,par:5,baseDiff:2,diff:2,layout:'waterApproach'},
-      {name:'HOLE 14',yards:490,par:4,baseDiff:3,diff:3,layout:'desertWash'},
-      {name:'HOLE 15',yards:553,par:5,baseDiff:3,diff:3,layout:'waterCross'},
-      {name:'HOLE 16',yards:163,par:3,baseDiff:2,diff:2,layout:'bunkerGreen',par3Layout:'stadium'},
-      {name:'HOLE 17',yards:332,par:4,baseDiff:2,diff:2,layout:'waterCross'},
-      {name:'HOLE 18',yards:442,par:4,baseDiff:3,diff:3,layout:'waterApproach'},
+      {name:'HOLE 1', yards:424,par:4,baseDiff:2,diff:2,layout:'gatorMarsh',appLayout:'bunkerGreen'},
+      {name:'HOLE 2', yards:555,par:5,baseDiff:1,diff:1,layout:'gatorMarsh',farLayout:'waterApproach',appLayout:'waterApproach'},
+      {name:'HOLE 3', yards:182,par:3,baseDiff:2,diff:2,layout:'bunkerGreen'},
+      {name:'HOLE 4', yards:387,par:4,baseDiff:2,diff:2,layout:'waterApproach'},
+      {name:'HOLE 5', yards:469,par:4,baseDiff:3,diff:3,layout:'doglegs',appLayout:'bunkerGreen'},
+      {name:'HOLE 6', yards:413,par:4,baseDiff:2,diff:2,layout:'gatorMarsh'},
+      {name:'HOLE 7', yards:450,par:4,baseDiff:2,diff:2,layout:'gatorMarsh',appLayout:'bunkerGreen'},
+      {name:'HOLE 8', yards:236,par:3,baseDiff:3,diff:3,layout:'stadium',par3Layout:'stadium'},
+      {name:'HOLE 9', yards:601,par:5,baseDiff:3,diff:3,layout:'gatorMarsh',farLayout:'waterApproach',appLayout:'waterApproach'},
+      {name:'HOLE 10',yards:419,par:4,baseDiff:2,diff:2,layout:'bunkerFwy'},
+      {name:'HOLE 11',yards:573,par:5,baseDiff:2,diff:2,layout:'waterApproach'},
+      {name:'HOLE 12',yards:365,par:4,baseDiff:1,diff:1,layout:'bunkerGreen'},
+      {name:'HOLE 13',yards:183,par:3,baseDiff:2,diff:2,layout:'gatorSideWater',par3Layout:'gatorSideWater'},
+      {name:'HOLE 14',yards:485,par:4,baseDiff:3,diff:3,layout:'bunkerFwy'},
+      {name:'HOLE 15',yards:470,par:4,baseDiff:3,diff:3,layout:'waterCross',appLayout:'bunkerGreen'},
+      {name:'HOLE 16',yards:537,par:5,baseDiff:2,diff:2,layout:'waterApproach'},
+      {name:'HOLE 17',yards:141,par:3,baseDiff:3,diff:3,layout:'gatorIsland',par3Layout:'gatorIsland'},
+      {name:'HOLE 18',yards:462,par:4,baseDiff:3,diff:3,layout:'gatorFinish',farLayout:'gatorFinish',appLayout:'gatorFinish'},
     ]
   },
   'septembra-national':{
@@ -322,7 +357,8 @@ const COURSES={
 };
 
 function normalizeCourseId(courseId){
-  return COURSE_ORDER.includes(courseId) ? courseId : DEFAULT_COURSE_ID;
+  const resolved = COURSE_ALIASES[courseId] || courseId;
+  return COURSE_ORDER.includes(resolved) ? resolved : DEFAULT_COURSE_ID;
 }
 function getCourseConfig(courseId){
   return COURSES[normalizeCourseId(courseId)];
@@ -380,7 +416,7 @@ function applyCourseVisualTheme(courseId){
   const themeColorMap = {
     'little-pines':'#102116',
     'pacific-beach':'#0e1c2f',
-    'desert-golf-links':'#3f2710',
+    'gator-creek':'#2a100f',
     'septembra-national':'#162319'
   };
   const currentTheme = body ? body.getAttribute('data-course-theme') : null;
