@@ -380,12 +380,13 @@ function renderTournamentStatsPanel(selectedKey=S.currentRound){
   if(!statsContainer) return;
 
   const rounds = Array.from({ length: Math.max(1, S.currentRound || 1) }, (_,i)=>i+1);
-  const showRoundPills = S.mode === 'tournament' && rounds.length > 1;
+  const showRoundPills = (S.mode === 'tournament' || S.mode === 'custom') && rounds.length > 1;
   const selectedRound = (typeof selectedKey === 'number' && rounds.includes(selectedKey))
     ? selectedKey
     : rounds[rounds.length - 1];
-  const pills = showRoundPills ? rounds : [selectedRound];
-  const stats = getRoundStats(selectedRound);
+  const selectedStatsKey = selectedKey === 'overall' ? 'overall' : selectedRound;
+  const pills = showRoundPills ? ['overall', ...rounds] : [selectedRound];
+  const stats = getRoundStats(selectedStatsKey);
 
   let html = `
     <div style="display:flex;flex-direction:column;min-height:0;">
@@ -395,8 +396,11 @@ function renderTournamentStatsPanel(selectedKey=S.currentRound){
       <div style="display:flex;gap:6px;overflow-x:auto;${showRoundPills ? '' : 'display:none;'}">
   `;
   pills.forEach(key => {
-    const isActive = key === selectedRound;
-    html += `<button onclick="renderTournamentStatsPanel(${key})" style="background:${isActive?'var(--c-fwy)':'rgba(255,255,255,.05)'};color:${isActive?'#fff':'var(--muted)'};border:1px solid ${isActive?'var(--c-fwyl)':'var(--border)'};border-radius:14px;padding:6px 12px;font-family:'Sen',sans-serif;font-size:10px;font-weight:bold;cursor:pointer;white-space:nowrap;transition:all 0.2s;">R${key}</button>`;
+    const isOverall = key === 'overall';
+    const isActive = isOverall ? selectedStatsKey === 'overall' : key === selectedRound && selectedStatsKey !== 'overall';
+    const pillLabel = isOverall ? 'ALL' : `R${key}`;
+    const clickExpr = isOverall ? "renderTournamentStatsPanel('overall')" : `renderTournamentStatsPanel(${key})`;
+    html += `<button onclick="${clickExpr}" style="background:${isActive?'var(--c-fwy)':'rgba(255,255,255,.05)'};color:${isActive?'#fff':'var(--muted)'};border:1px solid ${isActive?'var(--c-fwyl)':'var(--border)'};border-radius:14px;padding:6px 12px;font-family:'Sen',sans-serif;font-size:10px;font-weight:bold;cursor:pointer;white-space:nowrap;transition:all 0.2s;">${pillLabel}</button>`;
   });
   html += `</div></div>`;
 
@@ -442,7 +446,3 @@ function startNextRound() {
   saveGameState();
   showSingleRoundSplash();
 }
-
-// ═══════════════════════════════════════
-// THEME SYSTEM
-// ═══════════════════════════════════════
