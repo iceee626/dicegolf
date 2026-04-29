@@ -278,7 +278,11 @@ function vsStartTurn(){
   WCS.active=null; WCS.greenLightShots=0; WCS.sandCastleActive=false; WCS.luckyBounceActive=false;
   WCS.ironWillActive=false; WCS.ferrettActive=false; WCS.goldenPutterActive=false;
   WCS.eagleEyeActive=false; WCS.sandWedgeProActive=false; WCS.birdieBoostActive=false;
-  WCS.holeWallActive=false; WCS.hioActive=false;
+  WCS.holeWallActive=false; WCS.hioActive=false; WCS.greenReadActive=false; WCS.greenReadQueued=false;
+  WCS.bounceBackPending=false; WCS.bounceBackReady=false; WCS.bogeyShieldActive=false;
+  WCS.mowersRevengeActive=false; WCS.mowersRevengeQueued=false; WCS.cupMagnetActive=false;
+  WCS.highlightReelActive=false; WCS.shortcutActive=false;
+  S._pendingGridWildcardCommit = null;
 
   if (VS.wcs && VS.wcs[VS.currentPlayer]) {
       Object.assign(WCS, VS.wcs[VS.currentPlayer]); // Load persistent buffs
