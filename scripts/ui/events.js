@@ -57,7 +57,7 @@ function bindStaticUiEvents(){
   bindClick('courseBackBtn', navBackFromCourse);
   bindClick('courseLittlePinesBtn', () => selectCourse('little-pines'));
   bindClick('coursePacificBeachBtn', () => selectCourse('pacific-beach'));
-  bindClick('courseDesertLinksBtn', () => selectCourse('desert-golf-links'));
+  bindClick('courseGatorCreekBtn', () => selectCourse('gator-creek'));
   bindClick('courseSeptembraNationalBtn', () => selectCourse('septembra-national'));
   bindClick('vsCourseTeeOffBtn', teeOffFromCourse);
   bindClick('diffBackBtn', () => navBack('playModeScreen'));
