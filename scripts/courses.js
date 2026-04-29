@@ -107,7 +107,7 @@ const T_APP_OPEN_E  = ()=>cells(['grn',32],['chip',2],['rgh',2]);
 const T_APP_OPEN_M  = ()=>cells(['grn',27],['chip',3],['rgh',4],['sand',2]);
 const T_APP_OPEN_H  = ()=>cells(['grn',23],['chip',4],['rgh',6],['sand',3]);
 
-const T_APP_DOG_E   = ()=>cells(['grn',30],['chip',2],['rgh',4]);
+const T_APP_DOG_E   = ()=>cells(['grn',29],['chip',2],['rgh',4],['sand',1]);
 const T_APP_DOG_M   = ()=>cells(['grn',25],['chip',3],['rgh',6],['sand',2]);
 const T_APP_DOG_H   = ()=>cells(['grn',20],['chip',4],['rgh',8],['sand',4]);
 
@@ -334,21 +334,21 @@ const COURSES={
   'septembra-national':{
     id:'septembra-national', name:'SEPTEMBRA NATIONAL', shortName:'SEPTEMBRA',
     holes:[
-      {name:'HOLE 1', yards:445,par:4,baseDiff:2,diff:2,layout:'cathedral'},
-      {name:'HOLE 2', yards:585,par:5,baseDiff:2,diff:2,layout:'doglegs'},
-      {name:'HOLE 3', yards:350,par:4,baseDiff:1,diff:1,layout:'bunkerFwy'},
+      {name:'HOLE 1', yards:455,par:4,baseDiff:2,diff:2,layout:'cathedral'},
+      {name:'HOLE 2', yards:575,par:5,baseDiff:3,diff:3,layout:'doglegs'},
+      {name:'HOLE 3', yards:350,par:4,baseDiff:1,diff:1,layout:'pacOpenSoft',appLayout:'open'},
       {name:'HOLE 4', yards:240,par:3,baseDiff:3,diff:3,layout:'bunkerGreen'},
-      {name:'HOLE 5', yards:495,par:4,baseDiff:3,diff:3,layout:'cathedral'},
+      {name:'HOLE 5', yards:495,par:4,baseDiff:3,diff:3,layout:'open'},
       {name:'HOLE 6', yards:180,par:3,baseDiff:2,diff:2,layout:'open'},
-      {name:'HOLE 7', yards:450,par:4,baseDiff:2,diff:2,layout:'cathedral'},
-      {name:'HOLE 8', yards:570,par:5,baseDiff:2,diff:2,layout:'doglegs'},
+      {name:'HOLE 7', yards:450,par:4,baseDiff:2,diff:2,layout:'doglegs',appLayout:'bunkerGreen'},
+      {name:'HOLE 8', yards:570,par:5,baseDiff:2,diff:2,layout:'doglegs',appLayout:'open'},
       {name:'HOLE 9', yards:460,par:4,baseDiff:2,diff:2,layout:'doglegs'},
       {name:'HOLE 10',yards:495,par:4,baseDiff:3,diff:3,layout:'cathedral'},
-      {name:'HOLE 11',yards:520,par:4,baseDiff:3,diff:3,layout:'waterApproach',teeLayout:'cathedral',farLayout:'cathedral'},
+      {name:'HOLE 11',yards:505,par:4,baseDiff:3,diff:3,layout:'waterApproach',teeLayout:'cathedral',farLayout:'cathedral'},
       {name:'HOLE 12',yards:155,par:3,baseDiff:3,diff:3,layout:'waterTee',par3Layout:'waterTee'},
-      {name:'HOLE 13',yards:545,par:5,baseDiff:3,diff:3,layout:'doglegs',appLayout:'waterApproach'},
-      {name:'HOLE 14',yards:440,par:4,baseDiff:2,diff:2,layout:'bunkerGreen'},
-      {name:'HOLE 15',yards:550,par:5,baseDiff:3,diff:3,layout:'doglegs',appLayout:'waterApproach'},
+      {name:'HOLE 13',yards:510,par:5,baseDiff:3,diff:3,layout:'doglegs',appLayout:'waterApproach'},
+      {name:'HOLE 14',yards:440,par:4,baseDiff:1,diff:1,layout:'open'},
+      {name:'HOLE 15',yards:530,par:5,baseDiff:3,diff:3,layout:'doglegs',farLayout:'open',appLayout:'waterApproach'},
       {name:'HOLE 16',yards:170,par:3,baseDiff:3,diff:3,layout:'waterTee',par3Layout:'waterTee'},
       {name:'HOLE 17',yards:440,par:4,baseDiff:2,diff:2,layout:'cathedral'},
       {name:'HOLE 18',yards:465,par:4,baseDiff:3,diff:3,layout:'cathedral'},
