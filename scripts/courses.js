@@ -58,9 +58,9 @@ const T_P3_WCRS_M   = ()=>cells(['grn',25],['chip',4],['h2o',4],['sand',2],['hol
 const T_P3_WCRS_H   = ()=>cells(['grn',21],['chip',5],['h2o',6],['sand',3],['hole',1]);
 
 // waterTee par 3 — Augusta-style forced tee carry over water
-const T_P3_WTEE_E   = ()=>cells(['grn',24],['chip',3],['h2o',7],['sand',1],['hole',1]);
-const T_P3_WTEE_M   = ()=>cells(['grn',20],['chip',4],['h2o',9],['sand',2],['hole',1]);
-const T_P3_WTEE_H   = ()=>cells(['grn',17],['chip',4],['h2o',11],['sand',3],['hole',1]);
+const T_P3_WTEE_E   = ()=>cells(['grn',27],['chip',2],['h2o',5],['sand',1],['hole',1]);
+const T_P3_WTEE_M   = ()=>cells(['grn',24],['chip',2],['h2o',7],['sand',2],['hole',1]);
+const T_P3_WTEE_H   = ()=>cells(['grn',20],['chip',3],['h2o',9],['sand',3],['hole',1]);
 
 // bunkerGreen par 3 — bunkers all around green
 const T_P3_BGRN_E   = ()=>cells(['grn',27],['chip',3],['sand',5],['hole',1]);
