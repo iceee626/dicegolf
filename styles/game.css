@@ -117,9 +117,9 @@ html, body, .sc-wrap, .sum-tabs, .sc-table-wrapper { -ms-overflow-style: none; s
 .sc-head .sc-lbl{background:var(--c-fwy);color:#fff!important;opacity:1!important;filter:none!important;}
 #hcScreen .sc-lbl,
 #hcScreen .sc-head .sc-lbl{color:#fff!important;opacity:1!important;filter:none!important;}
-#hcScreen #hcScHead .sc-lbl{background:var(--c-fwy)!important;}
+#hcScreen #hcScHead .sc-lbl{background:var(--summary-head-from)!important;}
 #hcScreen #hcScPar .sc-lbl,
-#hcScreen #hcScYou .sc-lbl{background:var(--dark)!important;}
+#hcScreen #hcScYou .sc-lbl{background:var(--course-panel-strong)!important;}
 .sc-active{background:rgba(58,122,48,.2);color:var(--c-fwyl)!important;}
 .sc-eagle{color:var(--gold)!important;font-weight:700;}
 .sc-birdie{color:#ff6b9d!important;font-weight:700;}
