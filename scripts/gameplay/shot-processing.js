@@ -126,6 +126,16 @@ function freezeCurrentGridForFinish(){
   }
 }
 
+function clearQueuedGreenReadWithoutActivation(){
+  if(!WCS) return;
+  if(!WCS.greenReadQueued && !WCS.greenReadActive) return;
+  WCS.greenReadQueued = false;
+  WCS.greenReadActive = false;
+  if(typeof clearStoredGridWildcardCommit === 'function'){
+    clearStoredGridWildcardCommit('green_read');
+  }
+}
+
 function processShot(row,col){
   S._preserveGrid=false;
   if(false){
@@ -307,6 +317,7 @@ function processShot(row,col){
   trackImmediateRoundAchievementProgress(resolvedOutcome, false);
 
   if(resolvedOutcome==='hole'){
+    clearQueuedGreenReadWithoutActivation();
     const h=HOLES[S.holeIdx];
     if(h.par===3&&S.zone==='tee'){
       showHoleInConfirmation(row, col, snapGrid);
