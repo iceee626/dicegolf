@@ -196,12 +196,24 @@ function setCustomOpponent(opponent) {
   document.getElementById('customOpponentCpu')?.classList.toggle('active', SETUP.opponent === 'cpu');
 }
 
+function shouldEnableCpuModeForSetup(setup, isVersusActive, courseScreenFlow) {
+  return !isVersusActive
+    && courseScreenFlow === 'custom'
+    && setup
+    && setup.mode === 'custom'
+    && setup.opponent === 'cpu';
+}
+
+function isCpuLeaderboardEnabled() {
+  return !!(S && S.cpuMode && S.cpuField && !VS.active && S.mode === 'custom');
+}
+
 function resetGameState(){
   S.mode = SETUP.mode;
   S.totalRounds = SETUP.rounds;
   S.currentRound = 1;
   S.holesConfig = SETUP.holesConfig;
-  S.cpuMode = !VS.active && SETUP.mode === 'custom' && SETUP.opponent === 'cpu';
+  S.cpuMode = shouldEnableCpuModeForSetup(SETUP, VS.active, _courseScreenFlow);
   S.cpuField = null;
   S.startIdx = S.holesConfig === 'back' ? 9 : 0;
   S.endIdx = S.holesConfig === 'front' ? 8 : 17;
