@@ -103,6 +103,7 @@ function saveGameState(){
     _roundIceTriggered:!!S._roundIceTriggered,
     _roundEndProcessed:!!S._roundEndProcessed,
     _roundEndMeta:S._roundEndMeta||null,
+    _roundEndAchievementPopupsShown:!!S._roundEndAchievementPopupsShown,
     _waitingForNextShot:isShotBtnShown('nextShotBtn'),
     _pendingPuttResult:S._pendingPuttResult||null,
     _pendingHoleFinish:S._pendingHoleFinish||null,
@@ -207,6 +208,7 @@ function continueGame(){
     S._roundIceTriggered=!!save._roundIceTriggered;
     S._roundEndProcessed=!!save._roundEndProcessed;
     S._roundEndMeta=save._roundEndMeta||null;
+    S._roundEndAchievementPopupsShown=!!save._roundEndAchievementPopupsShown;
     S._pendingPuttResult=save._pendingPuttResult||null;
     S._pendingHoleFinish=save._pendingHoleFinish||null;
     S._forceP1PuttGrid=!!save._forceP1PuttGrid;
