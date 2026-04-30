@@ -435,6 +435,7 @@ function startNextRound() {
   S._roundIceTriggered = false;
   S._roundEndProcessed = false;
   S._roundEndMeta = null;
+  S._roundEndAchievementPopupsShown = false;
   _summaryBackTarget = null;
   document.getElementById('overlay').classList.remove('show');
   document.getElementById('summaryModal').classList.remove('show');
