@@ -175,6 +175,15 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   sc.appendChild(table);
   body.appendChild(sc);
   if(tournamentTotalBox) body.appendChild(tournamentTotalBox);
+  if(S.cpuMode && S.cpuField && typeof renderCpuLeaderboardInto === 'function'){
+    renderCpuLeaderboardInto(body, {
+      field: S.cpuField,
+      holes: HOLES,
+      playerName: PLAYER_NAME,
+      playerScores: S.scorecards,
+      currentRound: isOverallStats ? S.currentRound : scorecardRound
+    });
+  }
 
   const detailSec=document.createElement('div');
   detailSec.className = 'sum-detail-hint';
@@ -345,6 +354,7 @@ function restoreReplaySetupFromCurrentState(versusReplay){
   SETUP.mode = S.mode || SETUP.mode || 'single';
   SETUP.rounds = Math.max(1, S.totalRounds || SETUP.rounds || 1);
   SETUP.holesConfig = S.holesConfig || SETUP.holesConfig || '18';
+  SETUP.opponent = S.cpuMode ? 'cpu' : 'solo';
   SETUP.course = restoredCourseId;
   SETUP.courseSelected = true;
 }
