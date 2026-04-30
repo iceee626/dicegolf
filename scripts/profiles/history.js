@@ -426,6 +426,15 @@ function startNextRound() {
   S.scorecards.push(Array(18).fill(null));
   S.histories.push(Array(18).fill(null));
   S.holeIdx = S.startIdx;
+  if(S.cpuMode && S.cpuField && typeof assignCpuRoundOrder === 'function'){
+    assignCpuRoundOrder(S.cpuField, {
+      holes: HOLES,
+      roundIdx: S.currentRound - 1,
+      playerName: PLAYER_NAME,
+      playerScores: S.scorecards,
+      now: new Date()
+    });
+  }
   S._wcUsedThisRound = 0;
   S._wcDiscardedThisRound = 0; 
   S._roundWaterHits = 0;
