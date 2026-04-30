@@ -19,6 +19,8 @@ function _teeTmpl(h){
     case 'pacHole8':     return _byDiff(gd,T_PAC_TEE_H8_E,T_PAC_TEE_H8_M,T_PAC_TEE_H8_H);
     case 'pacOpenEasy':  return T_PAC_TEE_OPEN_EASY();
     case 'pacBfwyMed':   return T_PAC_TEE_BFWY_MED();
+    case 'doglegsNoOb':  return d===1?T_TEE_DOG_NOOB_E(): d===2?T_TEE_DOG_NOOB_M(): T_TEE_DOG_NOOB_H();
+    case 'cathedralNoOb':return d===1?T_TEE_CATH_NOOB_E():d===2?T_TEE_CATH_NOOB_M():T_TEE_CATH_NOOB_H();
     case 'doglegs':      return d===1?T_TEE_DOG_E(): d===2?T_TEE_DOG_M(): T_TEE_DOG_H();
     case 'bunkerFwy':    return d===1?T_TEE_BFWY_E():d===2?T_TEE_BFWY_M():T_TEE_BFWY_H();
     case 'waterCross':   return d===1?T_TEE_WCRS_E():d===2?T_TEE_WCRS_M():T_TEE_WCRS_H();
@@ -73,6 +75,7 @@ function _appTmpl(h){
     case 'gatorMarsh':   return _byDiff(gd,T_GATOR_APP_MARSH_E,T_GATOR_APP_MARSH_M,T_GATOR_APP_MARSH_H);
     case 'gatorFinish':  return _byDiff(gd,T_GATOR_FINISH_APP_E,T_GATOR_FINISH_APP_M,T_GATOR_FINISH_APP_H);
     case 'cathedral':    return d===1?T_APP_CATH_E():d===2?T_APP_CATH_M():T_APP_CATH_H();
+    case 'clean':        return d===1?T_APP_CLEAN_E():d===2?T_APP_CLEAN_M():T_APP_CLEAN_H();
     default:             return d===1?T_APP_OPEN_E():d===2?T_APP_OPEN_M():T_APP_OPEN_H();
   }
 }
@@ -90,6 +93,7 @@ function _farTmpl(h){
     case 'desertWash':   return d===1?T_FAR_DSRT_E():d===2?T_FAR_DSRT_M():T_FAR_DSRT_H();
     case 'gatorMarsh':   return _byDiff(gd,T_GATOR_FAR_MARSH_E,T_GATOR_FAR_MARSH_M,T_GATOR_FAR_MARSH_H);
     case 'gatorFinish':  return _byDiff(gd,T_GATOR_FINISH_FAR_E,T_GATOR_FINISH_FAR_M,T_GATOR_FINISH_FAR_H);
+    case 'openEasy':     return d===1?T_FAR_OPENEASY_E():d===2?T_FAR_OPENEASY_M():T_FAR_OPENEASY_H();
     default:             return d===1?T_FAR_OPEN_E():d===2?T_FAR_OPEN_M():T_FAR_OPEN_H();
   }
 }
