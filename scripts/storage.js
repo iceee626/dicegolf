@@ -84,6 +84,8 @@ function saveGameState(){
     mode:S.mode, totalRounds:S.totalRounds, currentRound:S.currentRound, holesConfig:S.holesConfig,
     courseId: normalizeCourseId(S.courseId || selectedCourseIdForFlow()),
     startIdx:S.startIdx, endIdx:S.endIdx,
+    cpuMode:!!S.cpuMode,
+    cpuField:(S.cpuMode && typeof snapshotCpuField === 'function') ? snapshotCpuField(S.cpuField) : null,
     holeIdx:S.holeIdx, zone:S.zone, strokes:S.strokes, shotNum:S.shotNum, log:S.log,
     scorecards:S.scorecards, histories:S.histories,
     holeDone:S.holeDone, yrdRemain:S.yrdRemain, yrdTotal:S.yrdTotal, fwyVisits:S.fwyVisits, prevZone:S.prevZone, shotCount:S.shotCount,
@@ -178,6 +180,9 @@ function continueGame(){
     S.mode=save.mode||'single'; S.totalRounds=save.totalRounds||1; S.currentRound=save.currentRound||1;
     S.courseId=savedCourseId;
     S.holesConfig=save.holesConfig||'18'; S.startIdx=save.startIdx||0; S.endIdx=save.endIdx||17;
+    S.cpuMode=!!save.cpuMode;
+    S.cpuField=(S.cpuMode && typeof restoreCpuFieldSnapshot === 'function') ? restoreCpuFieldSnapshot(save.cpuField) : null;
+    SETUP.opponent = S.cpuMode ? 'cpu' : 'solo';
     S.holeIdx=save.holeIdx; S.zone=save.zone; S.strokes=save.strokes; S.shotNum=save.shotNum; S.log=save.log||[];
     S.currentGrid=save.currentGrid||null;
     
@@ -404,6 +409,15 @@ function updateMenuContinueBtn(){
         const holeDisplay = save.holeIdx + 1;
         const format = save.vsState.format === 'match' ? 'MATCH PLAY' : 'STROKE PLAY';
         btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> CONTINUE VERSUS</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${format} · H${holeDisplay} · ${p1Html} vs ${p2Html}</div>`;
+        btn.style.display='flex';
+        btn.classList.add('menu-glow');
+    } else if (save.cpuMode) {
+        const courseId = normalizeCourseId(save.courseId || DEFAULT_COURSE_ID);
+        const courseCfg = getCourseConfig(courseId);
+        const cName = courseCfg.shortName || courseCfg.name;
+        const holeDisplay = save.holeIdx + 1;
+        const rnd = save.currentRound || 1;
+        btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> CONTINUE VS CPU</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${cName} Â· R${rnd} Â· H${holeDisplay} Â· FIELD</div>`;
         btn.style.display='flex';
         btn.classList.add('menu-glow');
     } else {
