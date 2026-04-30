@@ -1,7 +1,7 @@
 // Global Runtime State, Setup Defaults, and Navigation State
 // STATE & CONFIG
 // ═══════════════════════════════════════
-let SETUP={ mode:'single', rounds:1, holesConfig:'18', course:null, courseSelected:false };
+let SETUP={ mode:'single', rounds:1, holesConfig:'18', opponent:'solo', course:null, courseSelected:false };
 
 let S={
   mode: 'single', totalRounds: 1, currentRound: 1, holesConfig: '18', startIdx: 0, endIdx: 17,
@@ -19,7 +19,8 @@ let S={
   _ferrettArmedShot:false, _highlightReelArmedShot:false,
   _lastShotOriginZone:null, _lastShotResultZone:null, _lastShotHoleIdx:null,
   _roundWaterHits:0, _roundSandHits:0, _roundRoughHits:0,
-  _roundPrevWasDoubleOrWorse:false, _roundIceTriggered:false
+  _roundPrevWasDoubleOrWorse:false, _roundIceTriggered:false,
+  cpuMode:false, cpuField:null
 };
 
 // ── Menu Navigation ──
@@ -91,6 +92,7 @@ function navToCustom() {
   SETUP.course = null;
   _lastMenuScreen = 'customScreen'; 
   SETUP.mode = 'custom';
+  setCustomOpponent('solo');
   setCustomRounds(1);
   setCustomHoles('18');
   setCustomDiff(1);
@@ -188,12 +190,19 @@ function setCustomHoles(h) {
   SETUP.holesConfig=h;
   ['18','front','back'].forEach(i=>document.getElementById(`ch-${i}`)?.classList.toggle('active', i===h));
 }
+function setCustomOpponent(opponent) {
+  SETUP.opponent = opponent === 'cpu' ? 'cpu' : 'solo';
+  document.getElementById('customOpponentSolo')?.classList.toggle('active', SETUP.opponent === 'solo');
+  document.getElementById('customOpponentCpu')?.classList.toggle('active', SETUP.opponent === 'cpu');
+}
 
 function resetGameState(){
   S.mode = SETUP.mode;
   S.totalRounds = SETUP.rounds;
   S.currentRound = 1;
   S.holesConfig = SETUP.holesConfig;
+  S.cpuMode = !VS.active && SETUP.mode === 'custom' && SETUP.opponent === 'cpu';
+  S.cpuField = null;
   S.startIdx = S.holesConfig === 'back' ? 9 : 0;
   S.endIdx = S.holesConfig === 'front' ? 8 : 17;
   S.holeIdx = S.startIdx;
@@ -329,6 +338,18 @@ function startGame(){
   PLAYER_NAME=p?p.name.toUpperCase():'PLAYER';
   const diffMap={ 1: [1, 1, 2], 2: [1, 2, 3], 3: [2, 3, 3] };
   HOLES.forEach(h=>{ h.diff=diffMap[h.baseDiff][GAME_DIFF-1]; });
+  if(S.cpuMode && typeof createCpuField === 'function'){
+    S.cpuField = createCpuField({
+      holes: HOLES,
+      startIdx: S.startIdx,
+      endIdx: S.endIdx,
+      totalRounds: S.totalRounds,
+      gameDiff: GAME_DIFF,
+      courseId,
+      seed: Date.now(),
+      now: new Date()
+    });
+  }
   hideScreen('diffScreen');
   hideScreen('courseScreen');
   hideMainAppImmediate();
