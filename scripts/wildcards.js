@@ -658,9 +658,7 @@ function currentGridMatchesTitle(expectedText){
 }
 
 function isBirdieBoostApproachContext(zone = S.zone, yrdRemain = S.yrdRemain){
-  return ['fwy','rgh','sand','chip'].includes(zone)
-    && S._lastShotHoleIdx === S.holeIdx
-    && S._lastShotOriginZone === 'tee';
+  return ['fwy','rgh','sand','chip'].includes(zone);
 }
 
 function collectBirdieBoostEligibleCells(grid){
