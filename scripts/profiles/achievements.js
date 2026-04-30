@@ -179,9 +179,17 @@ function checkAndAwardAchievements(options = {}){
   ctx.profiles[ctx.idx]=ctx.p;
   saveProfiles(ctx.profiles);
   if(!options.silent){
-    newlyEarned.forEach((a,i)=>setTimeout(()=>showAchievementPopup(a),i*2000));
+    showAchievementPopups(newlyEarned);
   }
   return newlyEarned;
+}
+
+function showAchievementPopups(achievements, initialDelay = 0){
+  if(!Array.isArray(achievements) || !achievements.length) return;
+  achievements.forEach((achievement, i)=>{
+    const ach = typeof achievement === 'string' ? _findAchievementById(achievement) : achievement;
+    if(ach) setTimeout(()=>showAchievementPopup(ach), initialDelay + (i * 2000));
+  });
 }
 
 function applyCompletionModeAchievements(){
