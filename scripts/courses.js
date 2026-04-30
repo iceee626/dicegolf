@@ -1,8 +1,9 @@
 // Grid Templates, Course Definitions, and Course Theme Helpers
 // GRID TEMPLATES
 // ═══════════════════════════════════════
-// Layout families: open | doglegs | bunkerFwy | bunkerGreen | waterCross | waterApproach
-//                  cathedral | coastal | desertWash | waterTee | stadium(par3 only)
+// Layout families: open | openEasy | clean | doglegs | doglegsNoOb | bunkerFwy
+//                  bunkerGreen | waterCross | waterApproach | cathedral
+//                  cathedralNoOb | coastal | desertWash | waterTee | stadium(par3 only)
 // Each template = exactly 36 cells (6×6 grid)
 
 // ── TEE SHOTS (par 4/5) ─────────────────────────────────────
@@ -15,6 +16,9 @@ const T_TEE_OPEN_H  = ()=>cells(['fwy',18],['rgh',15],['sand',3]);
 const T_TEE_DOG_E   = ()=>cells(['fwy',28],['rgh',8]);
 const T_TEE_DOG_M   = ()=>cells(['fwy',23],['rgh',12],['ob',1]);
 const T_TEE_DOG_H   = ()=>cells(['fwy',19],['rgh',16],['ob',1]);
+const T_TEE_DOG_NOOB_E = ()=>cells(['fwy',28],['rgh',8]);
+const T_TEE_DOG_NOOB_M = ()=>cells(['fwy',23],['rgh',13]);
+const T_TEE_DOG_NOOB_H = ()=>cells(['fwy',19],['rgh',17]);
 
 // bunkerFwy — fairway bunker sits in landing zone
 const T_TEE_BFWY_E  = ()=>cells(['fwy',29],['rgh',5],['sand',2]);
@@ -45,6 +49,9 @@ const T_TEE_WTEE_H  = ()=>cells(['fwy',16],['rgh',6],['h2o',14]);
 const T_TEE_CATH_E  = ()=>cells(['fwy',26],['rgh',10]);
 const T_TEE_CATH_M  = ()=>cells(['fwy',21],['rgh',14],['ob',1]);
 const T_TEE_CATH_H  = ()=>cells(['fwy',18],['rgh',15],['ob',1],['sand',2]);
+const T_TEE_CATH_NOOB_E = ()=>cells(['fwy',26],['rgh',10]);
+const T_TEE_CATH_NOOB_M = ()=>cells(['fwy',21],['rgh',15]);
+const T_TEE_CATH_NOOB_H = ()=>cells(['fwy',18],['rgh',16],['sand',2]);
 
 // ── TEE SHOTS (par 3) ──────────────────────────────────────
 // open par 3 — short, generous green
@@ -76,6 +83,10 @@ const T_P3_STAD_H   = ()=>cells(['grn',25],['chip',5],['sand',5],['hole',1]);
 const T_FAR_OPEN_E  = ()=>cells(['fwy',30],['rgh',6]);
 const T_FAR_OPEN_M  = ()=>cells(['fwy',24],['rgh',12]);
 const T_FAR_OPEN_H  = ()=>cells(['fwy',20],['rgh',16]);
+const T_FAR_OPENEASY_E = ()=>cells(['fwy',35],['rgh',1]);
+const T_FAR_OPENEASY_M = ()=>cells(['fwy',34],['rgh',2]);
+const T_FAR_OPENEASY_H = ()=>cells(['fwy',32],['rgh',4]);
+const T_FAR_OPENEASY = ()=>T_FAR_OPENEASY_M();
 
 // tight (doglegs/cathedral) — narrower corridor
 const T_FAR_TGHT_E  = ()=>cells(['fwy',26],['rgh',10]);
@@ -106,6 +117,9 @@ const T_FAR_DSRT_H  = ()=>cells(['fwy',14],['rgh',10],['sand',12]);
 const T_APP_OPEN_E  = ()=>cells(['grn',32],['chip',2],['rgh',2]);
 const T_APP_OPEN_M  = ()=>cells(['grn',27],['chip',3],['rgh',4],['sand',2]);
 const T_APP_OPEN_H  = ()=>cells(['grn',23],['chip',4],['rgh',6],['sand',3]);
+const T_APP_CLEAN_E = ()=>cells(['grn',34],['chip',2]);
+const T_APP_CLEAN_M = ()=>cells(['grn',32],['chip',4]);
+const T_APP_CLEAN_H = ()=>cells(['grn',30],['chip',6]);
 
 const T_APP_DOG_E   = ()=>cells(['grn',29],['chip',2],['rgh',4],['sand',1]);
 const T_APP_DOG_M   = ()=>cells(['grn',25],['chip',3],['rgh',6],['sand',2]);
