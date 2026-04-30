@@ -175,7 +175,7 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   sc.appendChild(table);
   body.appendChild(sc);
   if(tournamentTotalBox) body.appendChild(tournamentTotalBox);
-  if(S.cpuMode && S.cpuField && typeof renderCpuLeaderboardInto === 'function'){
+  if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
     renderCpuLeaderboardInto(body, {
       field: S.cpuField,
       holes: HOLES,
