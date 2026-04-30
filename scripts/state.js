@@ -214,7 +214,7 @@ function resetGameState(){
   S._lastShotOriginZone=null; S._lastShotResultZone=null; S._lastShotHoleIdx=null;
   S._roundWaterHits=0; S._roundSandHits=0; S._roundRoughHits=0;
   S._roundPrevWasDoubleOrWorse=false; S._roundIceTriggered=false;
-  S._roundEndProcessed=false; S._roundEndMeta=null;
+  S._roundEndProcessed=false; S._roundEndMeta=null; S._roundEndAchievementPopupsShown=false;
   if(typeof wcReset==='function')wcReset();
 }
 
