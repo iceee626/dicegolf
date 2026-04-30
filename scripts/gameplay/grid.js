@@ -19,8 +19,8 @@ function _teeTmpl(h){
     case 'pacHole8':     return _byDiff(gd,T_PAC_TEE_H8_E,T_PAC_TEE_H8_M,T_PAC_TEE_H8_H);
     case 'pacOpenEasy':  return T_PAC_TEE_OPEN_EASY();
     case 'pacBfwyMed':   return T_PAC_TEE_BFWY_MED();
-    case 'doglegsNoOb':  return d===1?T_TEE_DOG_NOOB_E(): d===2?T_TEE_DOG_NOOB_M(): T_TEE_DOG_NOOB_H();
-    case 'cathedralNoOb':return d===1?T_TEE_CATH_NOOB_E():d===2?T_TEE_CATH_NOOB_M():T_TEE_CATH_NOOB_H();
+    case 'doglegsClean': return d===1?T_TEE_DOG_CLEAN_E(): d===2?T_TEE_DOG_CLEAN_M(): T_TEE_DOG_CLEAN_H();
+    case 'cathedralClean':return d===1?T_TEE_CATH_CLEAN_E():d===2?T_TEE_CATH_CLEAN_M():T_TEE_CATH_CLEAN_H();
     case 'doglegs':      return d===1?T_TEE_DOG_E(): d===2?T_TEE_DOG_M(): T_TEE_DOG_H();
     case 'bunkerFwy':    return d===1?T_TEE_BFWY_E():d===2?T_TEE_BFWY_M():T_TEE_BFWY_H();
     case 'waterCross':   return d===1?T_TEE_WCRS_E():d===2?T_TEE_WCRS_M():T_TEE_WCRS_H();
@@ -95,6 +95,24 @@ function _farTmpl(h){
     case 'gatorFinish':  return _byDiff(gd,T_GATOR_FINISH_FAR_E,T_GATOR_FINISH_FAR_M,T_GATOR_FINISH_FAR_H);
     case 'openEasy':     return d===1?T_FAR_OPENEASY_E():d===2?T_FAR_OPENEASY_M():T_FAR_OPENEASY_H();
     default:             return d===1?T_FAR_OPEN_E():d===2?T_FAR_OPEN_M():T_FAR_OPEN_H();
+  }
+}
+function _farReachTmpl(h){
+  const d=h.diff;
+  const gd=GAME_DIFF||d;
+  const layout=_layoutForStage(h,'far');
+  switch(layout){
+    case 'doglegs':
+    case 'cathedral':    return d===1?T_FAR_REACH_TGHT_E():d===2?T_FAR_REACH_TGHT_M():T_FAR_REACH_TGHT_H();
+    case 'bunkerFwy':    return d===1?T_FAR_REACH_BFWY_E():d===2?T_FAR_REACH_BFWY_M():T_FAR_REACH_BFWY_H();
+    case 'waterCross':   return d===1?T_FAR_REACH_WCRS_E():d===2?T_FAR_REACH_WCRS_M():T_FAR_REACH_WCRS_H();
+    case 'coastal':      return d===1?T_FAR_REACH_COAST_E():d===2?T_FAR_REACH_COAST_M():T_FAR_REACH_COAST_H();
+    case 'coastalPacific': return _byDiff(gd,T_FAR_REACH_PAC_COAST_E,T_FAR_REACH_PAC_COAST_M,T_FAR_REACH_PAC_COAST_H);
+    case 'desertWash':   return d===1?T_FAR_REACH_DSRT_E():d===2?T_FAR_REACH_DSRT_M():T_FAR_REACH_DSRT_H();
+    case 'gatorMarsh':   return _byDiff(gd,T_FAR_REACH_GATOR_MARSH_E,T_FAR_REACH_GATOR_MARSH_M,T_FAR_REACH_GATOR_MARSH_H);
+    case 'gatorFinish':  return _byDiff(gd,T_FAR_REACH_GATOR_FINISH_E,T_FAR_REACH_GATOR_FINISH_M,T_FAR_REACH_GATOR_FINISH_H);
+    case 'openEasy':     return d===1?T_FAR_REACH_OPENEASY_E():d===2?T_FAR_REACH_OPENEASY_M():T_FAR_REACH_OPENEASY_H();
+    default:             return d===1?T_FAR_REACH_OPEN_E():d===2?T_FAR_REACH_OPEN_M():T_FAR_REACH_OPEN_H();
   }
 }
 function _isPacificHole18Approach(h){
@@ -220,8 +238,10 @@ function buildGrid(){
     }
     if(gate==='short'||gate==='nearpin'){
       tmpl=_appTmpl(h); // approach templates have no raw fwy cells
-    } else if(gate==='mid'){
+    } else if(S.yrdRemain <= 200){
       tmpl=_appTmpl(h);
+    } else if(S.yrdRemain <= 250){
+      tmpl=_farReachTmpl(h);
     } else {
       tmpl=_farTmpl(h);
     }
