@@ -26,7 +26,7 @@ const WILDCARDS=[
   {id:'birdie_boost',    weight: 30, icon:'🚀', name:'Birdie Boost',      desc:'Add 8 extra Green cells to next approach grid.'},
   
   // EPIC (Weight 15) - Very powerful
-  {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Use anytime; activates on NEXT SHOT after a playable par 4/5 tee shot.'},
+  {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone (only par 4/5 after tee shot).'},
   {id:'bogey_shield',    weight: 15, icon:'🛡️', name:'Bogey Shield',      desc:'Next Bogey+ result converted into a Par.'},
   {id:'sand_wedge_pro',  weight: 15, icon:'🏖️', name:'Sand Wedge Pro',    desc:'Next Sand shot: 80% of grid converted into Green.'},
   {id:'mulligan',        weight: 15, icon:'↩️',  name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
@@ -658,7 +658,9 @@ function currentGridMatchesTitle(expectedText){
 }
 
 function isBirdieBoostApproachContext(zone = S.zone, yrdRemain = S.yrdRemain){
-  return ['fwy','rgh','sand','chip'].includes(zone);
+  return ['fwy','rgh','sand','chip'].includes(zone)
+    && S._lastShotHoleIdx === S.holeIdx
+    && S._lastShotOriginZone === 'tee';
 }
 
 function collectBirdieBoostEligibleCells(grid){
@@ -692,6 +694,19 @@ function applyBirdieBoostToCurrentGrid(maxCells = 8){
   const chosenKeys = new Set(chosen.map(({r,c}) => `${r}:${c}`));
   replaceCurrentGridCells((_cell, r, c) => chosenKeys.has(`${r}:${c}`), 'grn');
   return chosen.length;
+}
+
+function applyHoleWallToGrid(grid){
+  if(!Array.isArray(grid)) return 0;
+  const changedCells = replaceGridCells(grid, c => c === 'rgh' || c === 'sand' || c === 'fwy' || c === 'ob', 'chip');
+  return changedCells + replaceGridCells(grid, c => c !== 'chip' && c !== 'grn', 'grn');
+}
+
+function applyHoleWallToCurrentGrid(){
+  syncCurrentGridFromVisibleCells();
+  if(!Array.isArray(S.currentGrid)) return 0;
+  const changedCells = replaceCurrentGridCells(c => c === 'rgh' || c === 'sand' || c === 'fwy' || c === 'ob', 'chip');
+  return changedCells + replaceCurrentGridCells(c => c !== 'chip' && c !== 'grn', 'grn');
 }
 
 function applyGreenReadToGrid(grid){
@@ -939,8 +954,7 @@ function applyGridWildcardToGrid(grid, source = 'build'){
     WCS.holeWallActive = false;
     showWcToast('🕳️ Hole In The Wall activated!');
     appendWcNote('🕳️ Hole In The Wall');
-    const changedCells = replaceGridCells(grid, c => c === 'rgh' || c === 'sand' || c === 'fwy' || c === 'ob', 'chip');
-    changed += changedCells + replaceGridCells(grid, c => c !== 'chip' && c !== 'grn', 'grn');
+    changed += applyHoleWallToGrid(grid);
     applied.push('hole_wall');
   }
 
@@ -1133,7 +1147,21 @@ function applyWildcardEffect(wc){
       }
       break;
     }
-    case 'hole_wall': WCS.holeWallActive = true; toastMsg = `🕳️ ${wc.name} applied!`; break;
+    case 'hole_wall':
+      WCS.holeWallActive = true;
+      toastMsg = `🕳️ ${wc.name} applied!`;
+      if(h.par === 3 && S.zone === 'tee' && isCurrentVisibleGridPlayable()){
+        const changed = applyHoleWallToCurrentGrid();
+        if(changed > 0){
+          WCS.holeWallActive = false;
+          toastMsg = null;
+          afterApply = () => {
+            showWcToast(`🕳️ ${wc.name} activated!`);
+            appendWcNote(`🕳️ ${wc.name}`);
+          };
+        }
+      }
+      break;
     case 'the_ferrett': 
       if (S.zone === 'sand' && S.yrdRemain > 87) {
           toastMsg = `🦡 The Ferrett only works on greenside bunkers!`;
