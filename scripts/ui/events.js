@@ -50,6 +50,8 @@ function bindStaticUiEvents(){
   bindClick('ch-18', () => setCustomHoles('18'));
   bindClick('ch-front', () => setCustomHoles('front'));
   bindClick('ch-back', () => setCustomHoles('back'));
+  bindClick('customOpponentSolo', () => setCustomOpponent('solo'));
+  bindClick('customOpponentCpu', () => setCustomOpponent('cpu'));
   bindClick('cdiff-btn-1', () => setCustomDiff(1));
   bindClick('cdiff-btn-2', () => setCustomDiff(2));
   bindClick('cdiff-btn-3', () => setCustomDiff(3));
