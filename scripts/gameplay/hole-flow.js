@@ -473,12 +473,13 @@ function showRoundEnd(){
       : !!(p && (p.bestDiff === undefined || roundDiff < p.bestDiff));
 
     let xpAward = roundEndMeta && roundEndMeta.xpAward ? roundEndMeta.xpAward : null;
+    let achievementIds = roundEndMeta && Array.isArray(roundEndMeta.achievementIds) ? roundEndMeta.achievementIds : [];
     if(!alreadyProcessed){
       updateProfileAfterRound(roundTotal, roundPar);
       updateProfileStatsAfterRound(roundTotal, roundPar, S._wcUsedThisRound||0);
       applyCompletionModeAchievements();
       incrementCompletedGameCounters();
-      checkAndAwardAchievements({silent:true});
+      achievementIds = checkAndAwardAchievements({silent:true}).map(a => a.id);
       xpAward = awardRoundExperience({
         source: 'round',
         title: 'GAINED XP',
@@ -491,7 +492,7 @@ function showRoundEnd(){
         gameDiff: GAME_DIFF
       });
       S._roundEndProcessed = true;
-      S._roundEndMeta = { xpAward, isNewPB };
+      S._roundEndMeta = { xpAward, isNewPB, achievementIds };
     }
     
     let globalTotal = 0, globalPar = 0;
@@ -576,12 +577,18 @@ function showRoundEnd(){
 
     setMainAppConcealed(true);
     hcScreen.classList.add('show');
+    if(achievementIds.length && !S._roundEndAchievementPopupsShown && typeof showAchievementPopups === 'function'){
+      S._roundEndAchievementPopupsShown = true;
+      try{ saveGameState(); }catch{}
+      showAchievementPopups(achievementIds, 650);
+    }
   } else {
     let xpAward = roundEndMeta && roundEndMeta.xpAward ? roundEndMeta.xpAward : null;
+    let achievementIds = roundEndMeta && Array.isArray(roundEndMeta.achievementIds) ? roundEndMeta.achievementIds : [];
     if(!alreadyProcessed){
       updateProfileAfterRound(roundTotal, roundPar);
       updateProfileStatsAfterRound(roundTotal, roundPar, S._wcUsedThisRound||0);
-      checkAndAwardAchievements({silent:true});
+      achievementIds = checkAndAwardAchievements({silent:true}).map(a => a.id);
       xpAward = awardRoundExperience({
         source: 'round',
         title: 'GAINED XP',
@@ -594,7 +601,7 @@ function showRoundEnd(){
         gameDiff: GAME_DIFF
       });
       S._roundEndProcessed = true;
-      S._roundEndMeta = { xpAward };
+      S._roundEndMeta = { xpAward, achievementIds };
       saveGameState();
     }
 
@@ -674,5 +681,10 @@ function showRoundEnd(){
 
     setMainAppConcealed(true);
     hcScreen.classList.add('show');
+    if(achievementIds.length && !S._roundEndAchievementPopupsShown && typeof showAchievementPopups === 'function'){
+      S._roundEndAchievementPopupsShown = true;
+      try{ saveGameState(); }catch{}
+      showAchievementPopups(achievementIds, 650);
+    }
   }
 }
