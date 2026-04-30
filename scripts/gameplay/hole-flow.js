@@ -168,6 +168,16 @@ function completeHole(){
   
   curSc[S.holeIdx] = score;
   curHist[S.holeIdx] = {log:[...S.log], strokes:score, par:h.par, name:h.name, yards:h.yards, diff:h.diff, wcsUsed: [...(S._wcsUsedThisHole||[])]};
+  if(S.cpuMode && S.cpuField && !restoringCompletedHole && typeof advanceCpuFieldForPlayerHole === 'function'){
+    advanceCpuFieldForPlayerHole(S.cpuField, {
+      holes: HOLES,
+      currentRound: S.currentRound,
+      completedHoleIdx: S.holeIdx,
+      playerScores: S.scorecards,
+      gameDiff: GAME_DIFF,
+      courseId: S.courseId || ACTIVE_COURSE_ID
+    });
+  }
 
  // --- RESTORE SP VIEW (In case VS modified it) ---
   ['hcIcon', 'hcTitle', 'hcSub', 'hcTot'].forEach(id => {
@@ -365,6 +375,19 @@ function completeHole(){
           youCells[activeIndex].scrollIntoView({behavior: 'smooth', block: 'nearest', inline: 'center'});
       }
   }, 50);
+
+  if(S.cpuMode && S.cpuField && typeof renderCpuLeaderboardInto === 'function'){
+    renderCpuLeaderboardInto(midSection, {
+      field: S.cpuField,
+      holes: HOLES,
+      playerName: PLAYER_NAME,
+      playerScores: S.scorecards,
+      currentRound: S.currentRound,
+      compact: true
+    });
+  } else if(midSection) {
+    midSection.querySelectorAll('.cpu-lb-block').forEach(el => el.remove());
+  }
   
   const btn = document.getElementById('hcBtn');
   if (S.holeIdx === S.endIdx) {
@@ -461,6 +484,14 @@ function showRoundEnd(){
   
   const curSc = S.scorecards[S.currentRound - 1];
   const activeHoles = HOLES.slice(S.startIdx, S.endIdx + 1);
+  if(S.cpuMode && S.cpuField && !alreadyProcessed && typeof completeCpuFieldRound === 'function'){
+    completeCpuFieldRound(S.cpuField, {
+      holes: HOLES,
+      currentRound: S.currentRound,
+      gameDiff: GAME_DIFF,
+      courseId: S.courseId || ACTIVE_COURSE_ID
+    });
+  }
   const roundTotal = curSc.reduce((a,b)=>a+(b||0),0);
   const roundPar = activeHoles.reduce((a,h)=>a+h.par,0);
   const roundDiff = roundTotal - roundPar;
