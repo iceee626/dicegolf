@@ -489,6 +489,31 @@ body.nav-back .summary-modal.show .summary-card{transform:translateX(0) scale(1)
 .sum-total-par{font-family:'Sen', sans-serif;font-size:11px;color:var(--muted);}
 .sum-sc-table td{font-size:11px;}
 
+/* VS CPU leaderboard */
+.cpu-lb-block{flex-shrink:0;margin:12px 0 14px;min-width:0;}
+.cpu-lb-block.compact{margin:10px 0 0;}
+.cpu-lb-title{margin:0 0 7px;}
+.cpu-lb-scroll{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow-x:hidden;overflow-y:auto;max-height:240px;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;-ms-overflow-style:none;scrollbar-width:none;}
+.cpu-lb-block.compact .cpu-lb-scroll{height:144px;max-height:144px;}
+.cpu-lb-scroll::-webkit-scrollbar{display:none;}
+.cpu-lb-table{width:100%;border-collapse:collapse;font-family:'Sen',sans-serif;font-size:10px;table-layout:fixed;min-width:0;}
+.cpu-lb-table th{position:sticky;top:0;z-index:1;background:var(--summary-head-from);color:#fff;font-size:9px;letter-spacing:1px;text-align:center;height:24px;padding:0 6px;border:1px solid rgba(255,255,255,.07);white-space:nowrap;}
+.cpu-lb-table th:nth-child(2){text-align:left;}
+.cpu-lb-table th:nth-child(1),.cpu-lb-table td:nth-child(1){width:42px;}
+.cpu-lb-table th:nth-child(3),.cpu-lb-table td:nth-child(3){width:58px;}
+.cpu-lb-table th:nth-child(4),.cpu-lb-table td:nth-child(4){width:54px;}
+.cpu-lb-table td{height:24px;padding:0 6px;text-align:center;border:1px solid var(--border);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cpu-lb-table td:nth-child(2){text-align:left;font-weight:600;letter-spacing:.2px;}
+.cpu-lb-table td:nth-child(1){color:var(--muted);font-weight:700;}
+.cpu-lb-table td:nth-child(3){color:var(--muted);}
+.cpu-lb-table td:nth-child(4){font-weight:800;}
+.cpu-lb-table td.good{color:var(--gold);}
+.cpu-lb-table td.even{color:var(--c-fwyl);}
+.cpu-lb-table td.bad{color:#e05252;}
+.cpu-lb-you{background:rgba(78,158,66,.16);}
+.cpu-lb-you td{border-top:1px solid rgba(120,220,96,.24);border-bottom:1px solid rgba(120,220,96,.24);}
+.cpu-lb-you td:nth-child(2){font-weight:800;color:#fff;}
+
 /* REDESIGNED HOLE COMPLETE SCREEN */
 .hc-screen { position:fixed; inset:0; background:linear-gradient(180deg,var(--course-bg-top) 0%,var(--course-bg-bottom) 100%); z-index:550; display:flex; flex-direction:column; padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 16px); overflow-y:hidden; opacity:0; visibility:hidden; pointer-events:none; transform:translateY(12px) scale(.985); transition:opacity .26s ease,transform .26s cubic-bezier(0.22,1,0.36,1),visibility 0s linear .26s; }
 .hc-screen.show { opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0) scale(1); transition:opacity .26s ease,transform .26s cubic-bezier(0.22,1,0.36,1),visibility 0s; }
