@@ -1,9 +1,9 @@
 // Grid Templates, Course Definitions, and Course Theme Helpers
 // GRID TEMPLATES
 // ═══════════════════════════════════════
-// Layout families: open | openEasy | clean | doglegs | doglegsNoOb | bunkerFwy
+// Layout families: open | openEasy | clean | doglegs | doglegsClean | bunkerFwy
 //                  bunkerGreen | waterCross | waterApproach | cathedral
-//                  cathedralNoOb | coastal | desertWash | waterTee | stadium(par3 only)
+//                  cathedralClean | coastal | desertWash | waterTee | stadium(par3 only)
 // Each template = exactly 36 cells (6×6 grid)
 
 // ── TEE SHOTS (par 4/5) ─────────────────────────────────────
@@ -16,9 +16,9 @@ const T_TEE_OPEN_H  = ()=>cells(['fwy',18],['rgh',15],['sand',3]);
 const T_TEE_DOG_E   = ()=>cells(['fwy',28],['rgh',8]);
 const T_TEE_DOG_M   = ()=>cells(['fwy',23],['rgh',12],['ob',1]);
 const T_TEE_DOG_H   = ()=>cells(['fwy',19],['rgh',16],['ob',1]);
-const T_TEE_DOG_NOOB_E = ()=>cells(['fwy',28],['rgh',8]);
-const T_TEE_DOG_NOOB_M = ()=>cells(['fwy',23],['rgh',13]);
-const T_TEE_DOG_NOOB_H = ()=>cells(['fwy',19],['rgh',17]);
+const T_TEE_DOG_CLEAN_E = ()=>cells(['fwy',28],['rgh',8]);
+const T_TEE_DOG_CLEAN_M = ()=>cells(['fwy',23],['rgh',13]);
+const T_TEE_DOG_CLEAN_H = ()=>cells(['fwy',19],['rgh',17]);
 
 // bunkerFwy — fairway bunker sits in landing zone
 const T_TEE_BFWY_E  = ()=>cells(['fwy',29],['rgh',5],['sand',2]);
@@ -49,9 +49,9 @@ const T_TEE_WTEE_H  = ()=>cells(['fwy',16],['rgh',6],['h2o',14]);
 const T_TEE_CATH_E  = ()=>cells(['fwy',26],['rgh',10]);
 const T_TEE_CATH_M  = ()=>cells(['fwy',21],['rgh',14],['ob',1]);
 const T_TEE_CATH_H  = ()=>cells(['fwy',18],['rgh',15],['ob',1],['sand',2]);
-const T_TEE_CATH_NOOB_E = ()=>cells(['fwy',26],['rgh',10]);
-const T_TEE_CATH_NOOB_M = ()=>cells(['fwy',21],['rgh',15]);
-const T_TEE_CATH_NOOB_H = ()=>cells(['fwy',18],['rgh',16],['sand',2]);
+const T_TEE_CATH_CLEAN_E = ()=>cells(['fwy',26],['rgh',10]);
+const T_TEE_CATH_CLEAN_M = ()=>cells(['fwy',21],['rgh',15]);
+const T_TEE_CATH_CLEAN_H = ()=>cells(['fwy',18],['rgh',16],['sand',2]);
 
 // ── TEE SHOTS (par 3) ──────────────────────────────────────
 // open par 3 — short, generous green
@@ -78,6 +78,7 @@ const T_P3_BGRN_H   = ()=>cells(['grn',20],['chip',5],['sand',10],['hole',1]);
 const T_P3_STAD_E   = ()=>cells(['grn',29],['chip',3],['sand',3],['hole',1]);
 const T_P3_STAD_M   = ()=>cells(['grn',27],['chip',4],['sand',4],['hole',1]);
 const T_P3_STAD_H   = ()=>cells(['grn',25],['chip',5],['sand',5],['hole',1]);
+// Regular far templates now cover 251+ yds; 201-250 yds uses far reach.
 
 // ── FAIRWAY FAR (>200 yds) ─────────────────────────────────
 const T_FAR_OPEN_E  = ()=>cells(['fwy',30],['rgh',6]);
@@ -112,6 +113,46 @@ const T_FAR_COAST_H = ()=>cells(['fwy',14],['rgh',8],['h2o',8],['ob',3],['sand',
 const T_FAR_DSRT_E  = ()=>cells(['fwy',22],['rgh',8],['sand',6]);
 const T_FAR_DSRT_M  = ()=>cells(['fwy',18],['rgh',9],['sand',9]);
 const T_FAR_DSRT_H  = ()=>cells(['fwy',14],['rgh',10],['sand',12]);
+
+function addFarReachGreens(grid, maxGreens){
+  const target = Math.max(0, maxGreens || 0);
+  let changed = 0;
+  ['rgh','sand'].forEach(zone=>{
+    if(changed >= target) return;
+    grid.forEach(row=>{
+      if(changed >= target) return;
+      row.forEach((cell, idx)=>{
+        if(changed >= target) return;
+        if(cell === zone){
+          row[idx] = 'grn';
+          changed++;
+        }
+      });
+    });
+  });
+  return grid;
+}
+const T_FAR_REACH_OPEN_E = ()=>addFarReachGreens(T_FAR_OPEN_E(), 6);
+const T_FAR_REACH_OPEN_M = ()=>addFarReachGreens(T_FAR_OPEN_M(), 5);
+const T_FAR_REACH_OPEN_H = ()=>addFarReachGreens(T_FAR_OPEN_H(), 4);
+const T_FAR_REACH_TGHT_E = ()=>addFarReachGreens(T_FAR_TGHT_E(), 6);
+const T_FAR_REACH_TGHT_M = ()=>addFarReachGreens(T_FAR_TGHT_M(), 5);
+const T_FAR_REACH_TGHT_H = ()=>addFarReachGreens(T_FAR_TGHT_H(), 4);
+const T_FAR_REACH_BFWY_E = ()=>addFarReachGreens(T_FAR_BFWY_E(), 6);
+const T_FAR_REACH_BFWY_M = ()=>addFarReachGreens(T_FAR_BFWY_M(), 5);
+const T_FAR_REACH_BFWY_H = ()=>addFarReachGreens(T_FAR_BFWY_H(), 4);
+const T_FAR_REACH_WCRS_E = ()=>addFarReachGreens(T_FAR_WCRS_E(), 6);
+const T_FAR_REACH_WCRS_M = ()=>addFarReachGreens(T_FAR_WCRS_M(), 5);
+const T_FAR_REACH_WCRS_H = ()=>addFarReachGreens(T_FAR_WCRS_H(), 4);
+const T_FAR_REACH_COAST_E = ()=>addFarReachGreens(T_FAR_COAST_E(), 6);
+const T_FAR_REACH_COAST_M = ()=>addFarReachGreens(T_FAR_COAST_M(), 5);
+const T_FAR_REACH_COAST_H = ()=>addFarReachGreens(T_FAR_COAST_H(), 4);
+const T_FAR_REACH_DSRT_E = ()=>addFarReachGreens(T_FAR_DSRT_E(), 6);
+const T_FAR_REACH_DSRT_M = ()=>addFarReachGreens(T_FAR_DSRT_M(), 5);
+const T_FAR_REACH_DSRT_H = ()=>addFarReachGreens(T_FAR_DSRT_H(), 4);
+const T_FAR_REACH_OPENEASY_E = ()=>addFarReachGreens(T_FAR_OPENEASY_E(), 6);
+const T_FAR_REACH_OPENEASY_M = ()=>addFarReachGreens(T_FAR_OPENEASY_M(), 5);
+const T_FAR_REACH_OPENEASY_H = ()=>addFarReachGreens(T_FAR_OPENEASY_H(), 4);
 
 // ── APPROACH (80-200 yds from green) ──────────────────────
 const T_APP_OPEN_E  = ()=>cells(['grn',32],['chip',2],['rgh',2]);
@@ -225,6 +266,15 @@ const T_PAC_FIRST_H8_H      = ()=>cells(['grn',20],['rgh',6],['chip',3],['h2o',1
 const T_PAC_FAR_COAST_E     = ()=>cells(['fwy',20],['rgh',4],['h2o',2],['sand',4],['grn',6]);
 const T_PAC_FAR_COAST_M     = ()=>cells(['fwy',18],['rgh',5],['h2o',3],['sand',5],['grn',5]);
 const T_PAC_FAR_COAST_H     = ()=>cells(['fwy',16],['rgh',6],['h2o',4],['sand',6],['grn',4]);
+const T_FAR_REACH_GATOR_MARSH_E = ()=>addFarReachGreens(T_GATOR_FAR_MARSH_E(), 6);
+const T_FAR_REACH_GATOR_MARSH_M = ()=>addFarReachGreens(T_GATOR_FAR_MARSH_M(), 5);
+const T_FAR_REACH_GATOR_MARSH_H = ()=>addFarReachGreens(T_GATOR_FAR_MARSH_H(), 4);
+const T_FAR_REACH_GATOR_FINISH_E = ()=>addFarReachGreens(T_GATOR_FINISH_FAR_E(), 6);
+const T_FAR_REACH_GATOR_FINISH_M = ()=>addFarReachGreens(T_GATOR_FINISH_FAR_M(), 5);
+const T_FAR_REACH_GATOR_FINISH_H = ()=>addFarReachGreens(T_GATOR_FINISH_FAR_H(), 4);
+const T_FAR_REACH_PAC_COAST_E = ()=>addFarReachGreens(T_PAC_FAR_COAST_E(), 6);
+const T_FAR_REACH_PAC_COAST_M = ()=>addFarReachGreens(T_PAC_FAR_COAST_M(), 5);
+const T_FAR_REACH_PAC_COAST_H = ()=>addFarReachGreens(T_PAC_FAR_COAST_H(), 4);
 
 // ── ROUGH ──────────────────────────────────────────────────
 const T_RGH_FAR_E   = ()=>cells(['fwy',28],['rgh',8]);
