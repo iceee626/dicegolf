@@ -155,6 +155,49 @@ function clearSavedGame(){
   try{localStorage.removeItem(LEGACY_SAVE_KEY);}catch{}
 }
 
+function continueDiffFromScorecards(scorecards, holes){
+  let totalScore = 0;
+  let totalPar = 0;
+  if(Array.isArray(scorecards)){
+    scorecards.forEach(sc => {
+      if(!Array.isArray(sc)) return;
+      sc.forEach((s, i) => {
+        if(s !== null && s !== undefined){
+          totalScore += s;
+          totalPar += (holes[i]?.par ?? HOLES[i]?.par ?? 4);
+        }
+      });
+    });
+  }
+  const diff = totalScore - totalPar;
+  return diff > 0 ? `+${diff}` : diff === 0 ? 'E' : `${diff}`;
+}
+
+function getCpuContinueButtonContent(save){
+  const courseId = normalizeCourseId(save.courseId || DEFAULT_COURSE_ID);
+  const courseCfg = getCourseConfig(courseId);
+  const courseHoles = courseCfg.holes || HOLES;
+  const cName = courseCfg.shortName || courseCfg.name;
+  const holeDisplay = (save.holeIdx || 0) + 1;
+  const rnd = save.currentRound || 1;
+  const diffStr = continueDiffFromScorecards(save.scorecards, courseHoles);
+  let pos = '';
+  if(save.cpuField && typeof getCpuLeaderboardRows === 'function'){
+    const rows = getCpuLeaderboardRows(save.cpuField, {
+      holes: courseHoles,
+      playerName: save.playerName || PLAYER_NAME || 'YOU',
+      playerScores: save.scorecards || [],
+      currentRound: rnd
+    });
+    const playerRow = rows.find(row => row.isPlayer);
+    pos = playerRow && playerRow.pos ? playerRow.pos : '';
+  }
+  return {
+    title: 'CONTINUE',
+    meta: [cName, `R${rnd}`, `H${holeDisplay}`, diffStr, pos].filter(Boolean).join(' · ')
+  };
+}
+
 function continueGame(){
   try{
     const save = getSavedGameForActiveProfile();
@@ -412,12 +455,8 @@ function updateMenuContinueBtn(){
         btn.style.display='flex';
         btn.classList.add('menu-glow');
     } else if (save.cpuMode) {
-        const courseId = normalizeCourseId(save.courseId || DEFAULT_COURSE_ID);
-        const courseCfg = getCourseConfig(courseId);
-        const cName = courseCfg.shortName || courseCfg.name;
-        const holeDisplay = save.holeIdx + 1;
-        const rnd = save.currentRound || 1;
-        btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> CONTINUE VS CPU</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${cName} Â· R${rnd} Â· H${holeDisplay} Â· FIELD</div>`;
+        const content = getCpuContinueButtonContent(save);
+        btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> ${escapeHtml(content.title)}</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${escapeHtml(content.meta)}</div>`;
         btn.style.display='flex';
         btn.classList.add('menu-glow');
     } else {
