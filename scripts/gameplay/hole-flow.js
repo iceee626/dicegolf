@@ -168,7 +168,7 @@ function completeHole(){
   
   curSc[S.holeIdx] = score;
   curHist[S.holeIdx] = {log:[...S.log], strokes:score, par:h.par, name:h.name, yards:h.yards, diff:h.diff, wcsUsed: [...(S._wcsUsedThisHole||[])]};
-  if(S.cpuMode && S.cpuField && !restoringCompletedHole && typeof advanceCpuFieldForPlayerHole === 'function'){
+  if(isCpuLeaderboardEnabled() && !restoringCompletedHole && typeof advanceCpuFieldForPlayerHole === 'function'){
     advanceCpuFieldForPlayerHole(S.cpuField, {
       holes: HOLES,
       currentRound: S.currentRound,
@@ -376,7 +376,7 @@ function completeHole(){
       }
   }, 50);
 
-  if(S.cpuMode && S.cpuField && typeof renderCpuLeaderboardInto === 'function'){
+  if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
     renderCpuLeaderboardInto(midSection, {
       field: S.cpuField,
       holes: HOLES,
@@ -484,7 +484,7 @@ function showRoundEnd(){
   
   const curSc = S.scorecards[S.currentRound - 1];
   const activeHoles = HOLES.slice(S.startIdx, S.endIdx + 1);
-  if(S.cpuMode && S.cpuField && !alreadyProcessed && typeof completeCpuFieldRound === 'function'){
+  if(isCpuLeaderboardEnabled() && !alreadyProcessed && typeof completeCpuFieldRound === 'function'){
     completeCpuFieldRound(S.cpuField, {
       holes: HOLES,
       currentRound: S.currentRound,
