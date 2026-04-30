@@ -85,10 +85,11 @@ function cpuFormatDiff(diff){
 
 function cpuFormatTeeTime(date, offsetMinutes){
   const base = date instanceof Date ? date : new Date(date || Date.now());
-  const tee = new Date(base.getTime() + offsetMinutes * 60000);
-  if(tee.getMinutes() === 0) tee.setMinutes(tee.getMinutes() + 8);
-  const h = String(tee.getHours());
-  const m = String(tee.getMinutes()).padStart(2, '0');
+  const minuteOffset = Math.abs(Math.round(offsetMinutes || 0)) % 60;
+  let minutes = minuteOffset === 0 ? 8 : minuteOffset;
+  if(minutes === 0) minutes = 8;
+  const h = String(base.getHours());
+  const m = String(minutes).padStart(2, '0');
   return `${h}:${m}`;
 }
 
@@ -481,8 +482,8 @@ function renderCpuLeaderboardBlock(options){
   block.className = 'cpu-lb-block';
   if(options.compact) block.classList.add('compact');
   const title = document.createElement('div');
-  title.className = 'cpu-lb-title';
-  title.innerHTML = '<span>LEADERBOARD</span><div></div>';
+  title.className = 'sec-title cpu-lb-title';
+  title.textContent = 'LEADERBOARD';
   block.appendChild(title);
 
   const scroll = document.createElement('div');
@@ -506,10 +507,12 @@ function renderCpuLeaderboardBlock(options){
   scroll.appendChild(table);
   block.appendChild(scroll);
 
-  setTimeout(() => {
-    const playerRow = block.querySelector('.cpu-lb-you');
-    if(playerRow && scroll) playerRow.scrollIntoView({ block:'nearest', inline:'nearest' });
-  }, 50);
+  if(!options.compact){
+    setTimeout(() => {
+      const playerRow = block.querySelector('.cpu-lb-you');
+      if(playerRow && scroll) playerRow.scrollIntoView({ block:'nearest', inline:'nearest' });
+    }, 50);
+  }
   return block;
 }
 
