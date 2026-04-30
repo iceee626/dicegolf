@@ -424,27 +424,37 @@ function getCpuLeaderboardRows(field, options){
   field.opponents.forEach(opp => {
     const score = cpuOpponentCumulative(opp, holes, field.startIdx, field.endIdx, currentRound);
     const roundState = opp.rounds[currentRound - 1] || {};
+    const notStarted = score.thru === 0;
     rows.push({
       id: opp.id,
       name: opp.name,
       isPlayer: false,
       thru: score.thru,
-      thruLabel: score.thru === 0 ? (roundState.teeTime || '') : String(score.thru),
+      thruLabel: notStarted ? (roundState.teeTime || '') : String(score.thru),
       total: score.total,
       par: score.par,
       diff: score.diff,
-      totalLabel: cpuFormatDiff(score.diff)
+      totalLabel: cpuFormatDiff(score.diff),
+      notStarted
     });
   });
-  rows.sort((a, b) => a.diff - b.diff || b.thru - a.thru || (a.isPlayer ? -1 : b.isPlayer ? 1 : a.name.localeCompare(b.name)));
+  rows.sort((a, b) => {
+    if(!!a.notStarted !== !!b.notStarted) return a.notStarted ? 1 : -1;
+    if(a.notStarted && b.notStarted) return String(a.thruLabel).localeCompare(String(b.thruLabel)) || a.name.localeCompare(b.name);
+    return a.diff - b.diff || b.thru - a.thru || (a.isPlayer ? -1 : b.isPlayer ? 1 : a.name.localeCompare(b.name));
+  });
   let lastDiff = null;
   let lastPos = 0;
   rows.forEach((row, idx) => {
+    if(row.notStarted){
+      row.pos = '-';
+      return;
+    }
     if(row.diff !== lastDiff){
-      lastPos = idx + 1;
+      lastPos = rows.slice(0, idx).filter(r => !r.notStarted).length + 1;
       lastDiff = row.diff;
     }
-    const tied = rows.some(other => other !== row && other.diff === row.diff);
+    const tied = rows.some(other => other !== row && !other.notStarted && other.diff === row.diff);
     row.pos = tied ? `T${lastPos}` : String(lastPos);
   });
   return rows;
