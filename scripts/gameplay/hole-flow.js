@@ -182,6 +182,9 @@ function completeHole(){
       gameDiff: GAME_DIFF,
       courseId: S.courseId || ACTIVE_COURSE_ID
     });
+    if(S.holeIdx === S.endIdx){
+      S._cpuRoundCompleteForSummary = S.currentRound;
+    }
   }
 
  // --- RESTORE SP VIEW (In case VS modified it) ---
@@ -381,7 +384,7 @@ function completeHole(){
       }
   }, 50);
 
-  if(isCpuLeaderboardEnabled() && S.holeIdx !== S.endIdx && typeof renderCpuLeaderboardInto === 'function'){
+  if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
     renderCpuLeaderboardInto(midSection, {
       field: S.cpuField,
       holes: HOLES,
@@ -504,7 +507,7 @@ function showRoundEnd(){
   
   const curSc = S.scorecards[S.currentRound - 1];
   const activeHoles = HOLES.slice(S.startIdx, S.endIdx + 1);
-  if(isCpuLeaderboardEnabled() && !alreadyProcessed && typeof completeCpuFieldRound === 'function'){
+  if(isCpuLeaderboardEnabled() && !alreadyProcessed && S._cpuRoundCompleteForSummary !== S.currentRound && typeof completeCpuFieldRound === 'function'){
     completeCpuFieldRound(S.cpuField, {
       holes: HOLES,
       currentRound: S.currentRound,
@@ -512,6 +515,7 @@ function showRoundEnd(){
       courseId: S.courseId || ACTIVE_COURSE_ID,
       playerScores: S.scorecards
     });
+    S._cpuRoundCompleteForSummary = S.currentRound;
   }
   const roundTotal = curSc.reduce((a,b)=>a+(b||0),0);
   const roundPar = activeHoles.reduce((a,h)=>a+h.par,0);
