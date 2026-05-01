@@ -37,6 +37,11 @@ function completeHole(){
   S.strokes = score;
   const roundXpWrap = document.getElementById('hcRoundXpWrap');
   if(roundXpWrap) roundXpWrap.style.display = 'none';
+  const roundCpuLeaderboardWrap = document.getElementById('hcRoundCpuLeaderboardWrap');
+  if(roundCpuLeaderboardWrap){
+    roundCpuLeaderboardWrap.style.display = 'none';
+    roundCpuLeaderboardWrap.innerHTML = '';
+  }
   
   // VERSUS MODE
   if(VS.active){
@@ -376,7 +381,7 @@ function completeHole(){
       }
   }, 50);
 
-  if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
+  if(isCpuLeaderboardEnabled() && S.holeIdx !== S.endIdx && typeof renderCpuLeaderboardInto === 'function'){
     renderCpuLeaderboardInto(midSection, {
       field: S.cpuField,
       holes: HOLES,
@@ -471,6 +476,21 @@ function ensureRoundXpPanel(){
   return xpWrap;
 }
 
+function ensureRoundCpuLeaderboardPanel(){
+  const hcScreen = document.getElementById('hcScreen');
+  if(!hcScreen) return null;
+  let wrap = document.getElementById('hcRoundCpuLeaderboardWrap');
+  if(wrap) return wrap;
+  const xpWrap = ensureRoundXpPanel();
+  const mid = document.getElementById('hcMidSection');
+  if(!xpWrap || !mid || !xpWrap.parentNode) return null;
+  wrap = document.createElement('div');
+  wrap.id = 'hcRoundCpuLeaderboardWrap';
+  wrap.style.cssText = 'margin-top:-2px;margin-bottom:12px;display:none;flex-shrink:0;';
+  xpWrap.parentNode.insertBefore(wrap, mid);
+  return wrap;
+}
+
 function showRoundEnd(){
   setMainAppConcealed(true);
   hideMainAppImmediate();
@@ -489,7 +509,8 @@ function showRoundEnd(){
       holes: HOLES,
       currentRound: S.currentRound,
       gameDiff: GAME_DIFF,
-      courseId: S.courseId || ACTIVE_COURSE_ID
+      courseId: S.courseId || ACTIVE_COURSE_ID,
+      playerScores: S.scorecards
     });
   }
   const roundTotal = curSc.reduce((a,b)=>a+(b||0),0);
@@ -579,6 +600,23 @@ function showRoundEnd(){
       roundXpWrapFinal.innerHTML = xpAward ? renderXpAwardCardHtml(xpAward) : '';
       roundXpWrapFinal.style.display = xpAward ? 'block' : 'none';
       if(xpAward) animateXpBars(roundXpWrapFinal);
+    }
+    const roundCpuLeaderboardWrap = ensureRoundCpuLeaderboardPanel();
+    if(roundCpuLeaderboardWrap){
+      if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
+        roundCpuLeaderboardWrap.style.display = 'block';
+        renderCpuLeaderboardInto(roundCpuLeaderboardWrap, {
+          field: S.cpuField,
+          holes: HOLES,
+          playerName: PLAYER_NAME,
+          playerScores: S.scorecards,
+          currentRound: S.currentRound,
+          compact: true
+        });
+      } else {
+        roundCpuLeaderboardWrap.style.display = 'none';
+        roundCpuLeaderboardWrap.innerHTML = '';
+      }
     }
 
     document.querySelectorAll('#hcScreen .sec-title').forEach(t => t.style.display = 'none');
@@ -681,6 +719,23 @@ function showRoundEnd(){
       roundXpWrap.innerHTML = xpAward ? renderXpAwardCardHtml(xpAward) : '';
       roundXpWrap.style.display = xpAward ? 'block' : 'none';
       if (xpAward) animateXpBars(roundXpWrap);
+    }
+    const roundCpuLeaderboardWrap = ensureRoundCpuLeaderboardPanel();
+    if(roundCpuLeaderboardWrap){
+      if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
+        roundCpuLeaderboardWrap.style.display = 'block';
+        renderCpuLeaderboardInto(roundCpuLeaderboardWrap, {
+          field: S.cpuField,
+          holes: HOLES,
+          playerName: PLAYER_NAME,
+          playerScores: S.scorecards,
+          currentRound: S.currentRound,
+          compact: true
+        });
+      } else {
+        roundCpuLeaderboardWrap.style.display = 'none';
+        roundCpuLeaderboardWrap.innerHTML = '';
+      }
     }
 
     // Show tournament statistics only
