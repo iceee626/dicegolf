@@ -78,6 +78,12 @@ function cpuOpponentCumulative(opp, holes, startIdx, endIdx, currentRound){
   return { total, par, diff: total - par, thru: currentThru };
 }
 
+function cpuRoundGrossLabel(scores, holes, startIdx, endIdx){
+  const round = cpuRoundScoresTotal(scores || [], holes || [], startIdx, endIdx);
+  const totalHoles = Math.max(0, (endIdx || 0) - (startIdx || 0) + 1);
+  return round.thru >= totalHoles && totalHoles > 0 ? String(round.total) : String(round.thru);
+}
+
 function cpuFormatDiff(diff){
   if(diff === 0) return 'E';
   return diff > 0 ? `+${diff}` : `${diff}`;
@@ -200,6 +206,35 @@ function cpuNudgeRoundToTarget(field, opp, roundIdx, holes){
       roundState.scores[idx] -= 1;
     }
   }
+}
+
+function cpuPlayerRoundDiff(playerScores, holes, field, roundIdx){
+  const scores = (playerScores && playerScores[roundIdx]) || [];
+  return cpuRoundScoresTotal(scores, holes || [], field.startIdx, field.endIdx).diff;
+}
+
+function cpuApplyPlayerFormTarget(field, opp, roundIdx, holes, playerScores, gameDiff){
+  const roundState = opp && opp.rounds ? opp.rounds[roundIdx] : null;
+  if(!roundState || typeof roundState.targetDiff !== 'number') return;
+  const playerDiff = cpuPlayerRoundDiff(playerScores || [], holes || [], field, roundIdx);
+  const cpuNum = Number(String(opp.id || '').replace('cpu','')) || 1;
+  const random = seededRandom((field.seed || 1) + roundIdx * 8111 + cpuNum * 97 + 17);
+  const spread = Math.round((random() - 0.5) * 6) + Math.floor((cpuNum - 1) / 3) - 1;
+  const baseTarget = roundState.targetDiff;
+  let adjusted = baseTarget;
+
+  if(playerDiff >= 8){
+    adjusted = cpuClamp(baseTarget, playerDiff - 14 + Math.max(0, spread), playerDiff + 3);
+  } else if(playerDiff <= -8){
+    adjusted = cpuClamp(baseTarget, playerDiff - 3, playerDiff + 20 + spread);
+  } else {
+    adjusted = cpuClamp(baseTarget, playerDiff - 10 + spread, playerDiff + 14 + spread);
+  }
+
+  const bounds = cpuRoundTargetBounds(gameDiff || field.gameDiff, Math.max(1, field.endIdx - field.startIdx + 1));
+  const floor = Math.min(bounds.min, playerDiff - 4);
+  const ceiling = Math.max(bounds.max, playerDiff + 8);
+  roundState.targetDiff = Math.round(cpuClamp(adjusted, floor, ceiling));
 }
 
 function createCpuField(options){
@@ -446,9 +481,11 @@ function advanceCpuFieldForPlayerHole(field, options){
     if(roundState.complete) cpuNudgeRoundToTarget(field, opp, roundIdx, holes);
   });
   if(playerThru >= totalHoles){
-    resolveCpuFinalWinnerTies(field, {
+    completeCpuFieldRound(field, {
       holes,
       currentRound: roundIdx + 1,
+      gameDiff: options.gameDiff || field.gameDiff,
+      courseId: options.courseId || field.courseId,
       playerScores: options.playerScores || []
     });
   }
@@ -483,6 +520,7 @@ function completeCpuFieldRound(field, options){
       roundState.thru++;
     }
     roundState.complete = true;
+    cpuApplyPlayerFormTarget(field, opp, roundIdx, holes, options.playerScores || [], options.gameDiff || field.gameDiff);
     cpuNudgeRoundToTarget(field, opp, roundIdx, holes);
   });
   resolveCpuFinalWinnerTies(field, {
@@ -553,12 +591,13 @@ function getCpuLeaderboardRows(field, options){
   const currentRound = Math.max(1, options.currentRound || 1);
   const rows = [];
   const player = cpuPlayerCumulative(options.playerScores || [], holes, field.startIdx, field.endIdx, currentRound);
+  const playerRoundScores = (options.playerScores || [])[currentRound - 1] || [];
   rows.push({
     id: 'player',
     name: options.playerName || 'YOU',
     isPlayer: true,
     thru: player.thru,
-    thruLabel: String(player.thru),
+    thruLabel: cpuRoundGrossLabel(playerRoundScores, holes, field.startIdx, field.endIdx),
     total: player.total,
     par: player.par,
     diff: player.diff,
@@ -573,7 +612,7 @@ function getCpuLeaderboardRows(field, options){
       name: opp.name,
       isPlayer: false,
       thru: score.thru,
-      thruLabel: notStarted ? (roundState.teeTime || '') : String(score.thru),
+      thruLabel: notStarted ? (roundState.teeTime || '') : cpuRoundGrossLabel(roundState.scores || [], holes, field.startIdx, field.endIdx),
       total: score.total,
       par: score.par,
       diff: score.diff,
