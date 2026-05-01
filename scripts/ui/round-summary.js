@@ -257,6 +257,9 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   }
   
   body.appendChild(btnRow);
+  requestAnimationFrame(()=>{
+    body.scrollTop = 0;
+  });
   const summaryModal = document.getElementById('summaryModal');
   summaryModal.scrollTop = 0;
   summaryModal.classList.add('show');
