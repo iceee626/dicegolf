@@ -175,15 +175,6 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   sc.appendChild(table);
   body.appendChild(sc);
   if(tournamentTotalBox) body.appendChild(tournamentTotalBox);
-  if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
-    renderCpuLeaderboardInto(body, {
-      field: S.cpuField,
-      holes: HOLES,
-      playerName: PLAYER_NAME,
-      playerScores: S.scorecards,
-      currentRound: isOverallStats ? S.currentRound : scorecardRound
-    });
-  }
 
   const detailSec=document.createElement('div');
   detailSec.className = 'sum-detail-hint';
