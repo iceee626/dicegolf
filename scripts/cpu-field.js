@@ -149,9 +149,9 @@ function cpuExpectedDelta(weights, deltas){
 function cpuRoundTargetBounds(gameDiff, holeCount){
   const scale = Math.max(0.45, (holeCount || 18) / 18);
   const raw = {
-    1: { center:-3.5, min:-10, max:8 },
-    2: { center:0, min:-8, max:10 },
-    3: { center:4, min:-4, max:16 }
+    1: { center:-2.5, min:-7, max:10 },
+    2: { center:1, min:-6, max:12 },
+    3: { center:4.5, min:-3, max:14 }
   }[Math.max(1, Math.min(3, gameDiff || 1))];
   return {
     center: raw.center * scale,
@@ -168,7 +168,7 @@ function cpuEnsureRoundTarget(field, opp, roundIdx, holes, gameDiff){
   const bounds = cpuRoundTargetBounds(gameDiff || field.gameDiff, activeCount);
   const cpuNum = Number(String(opp.id || '').replace('cpu','')) || 1;
   const random = seededRandom((field.seed || 1) + roundIdx * 7001 + cpuNum * 331 + 91);
-  const bell = (random() + random() + random() + random() - 2) * 4.4;
+  const bell = (random() + random() + random() + random() - 2) * 2.8;
   const traits = opp.traits || {};
   const fit = traits.courseFit && field.courseId ? (traits.courseFit[field.courseId] || 0) : 0;
   const skill =
@@ -179,62 +179,9 @@ function cpuEnsureRoundTarget(field, opp, roundIdx, holes, gameDiff){
     ((traits.consistency || 0) * 0.35) +
     (fit * 0.75) +
     ((traits.pressure || 0) * 0.25);
-  const target = Math.round(cpuClamp(bounds.center + bell - skill, bounds.min, bounds.max));
+  const target = Math.round(cpuClamp(bounds.center + bell - skill * 0.75, bounds.min, bounds.max));
   roundState.targetDiff = target;
   return target;
-}
-
-function cpuNudgeRoundToTarget(field, opp, roundIdx, holes){
-  const roundState = opp && opp.rounds ? opp.rounds[roundIdx] : null;
-  if(!roundState || typeof roundState.targetDiff !== 'number') return;
-  const activeIndexes = cpuActiveHoleIndexes(field.startIdx, field.endIdx);
-  let guard = 0;
-  while(guard < 80){
-    guard++;
-    const diff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, field.endIdx).diff;
-    if(diff === roundState.targetDiff) break;
-    if(diff < roundState.targetDiff){
-      const idx = activeIndexes.find(i => roundState.scores[i] != null && roundState.scores[i] < (((holes[i] && holes[i].par) || 4) + 3));
-      if(idx == null) break;
-      roundState.scores[idx] += 1;
-    } else {
-      const idx = activeIndexes.find(i => {
-        const par = (holes[i] && holes[i].par) || 4;
-        return roundState.scores[i] != null && roundState.scores[i] > Math.max(1, par - 2);
-      });
-      if(idx == null) break;
-      roundState.scores[idx] -= 1;
-    }
-  }
-}
-
-function cpuPlayerRoundDiff(playerScores, holes, field, roundIdx){
-  const scores = (playerScores && playerScores[roundIdx]) || [];
-  return cpuRoundScoresTotal(scores, holes || [], field.startIdx, field.endIdx).diff;
-}
-
-function cpuApplyPlayerFormTarget(field, opp, roundIdx, holes, playerScores, gameDiff){
-  const roundState = opp && opp.rounds ? opp.rounds[roundIdx] : null;
-  if(!roundState || typeof roundState.targetDiff !== 'number') return;
-  const playerDiff = cpuPlayerRoundDiff(playerScores || [], holes || [], field, roundIdx);
-  const cpuNum = Number(String(opp.id || '').replace('cpu','')) || 1;
-  const random = seededRandom((field.seed || 1) + roundIdx * 8111 + cpuNum * 97 + 17);
-  const spread = Math.round((random() - 0.5) * 6) + Math.floor((cpuNum - 1) / 3) - 1;
-  const baseTarget = roundState.targetDiff;
-  let adjusted = baseTarget;
-
-  if(playerDiff >= 8){
-    adjusted = cpuClamp(baseTarget, playerDiff - 14 + Math.max(0, spread), playerDiff + 3);
-  } else if(playerDiff <= -8){
-    adjusted = cpuClamp(baseTarget, playerDiff - 3, playerDiff + 20 + spread);
-  } else {
-    adjusted = cpuClamp(baseTarget, playerDiff - 10 + spread, playerDiff + 14 + spread);
-  }
-
-  const bounds = cpuRoundTargetBounds(gameDiff || field.gameDiff, Math.max(1, field.endIdx - field.startIdx + 1));
-  const floor = Math.min(bounds.min, playerDiff - 4);
-  const ceiling = Math.max(bounds.max, playerDiff + 8);
-  roundState.targetDiff = Math.round(cpuClamp(adjusted, floor, ceiling));
 }
 
 function createCpuField(options){
@@ -376,13 +323,26 @@ function cpuScoreHole(options){
   const target = options.targetContext;
   if(target && typeof target.targetDiff === 'number' && target.remainingHoles > 0){
     const needed = target.targetDiff - (target.currentDiff || 0);
+    const neededPerHole = needed / target.remainingHoles;
     if(target.remainingHoles <= 1){
       const finalDelta = cpuClamp(Math.round(needed), -2, 3);
       return Math.max(1, hole.par + finalDelta);
     }
+    if(neededPerHole >= 1.35){
+      return Math.max(1, hole.par + (random() < 0.6 ? 2 : 1));
+    }
+    if(neededPerHole >= 0.75){
+      return Math.max(1, hole.par + 1);
+    }
+    if(neededPerHole <= -1.2){
+      return Math.max(1, hole.par - (random() < 0.55 ? 2 : 1));
+    }
+    if(neededPerHole <= -0.75){
+      return Math.max(1, hole.par - 1);
+    }
     const desiredDelta = needed / target.remainingHoles;
     const expectedDelta = cpuExpectedDelta(weights, deltas);
-    weights = cpuShiftWeights(weights, cpuClamp((desiredDelta - expectedDelta) * 0.13, -0.16, 0.16));
+    weights = cpuShiftWeights(weights, cpuClamp((desiredDelta - expectedDelta) * 0.28, -0.24, 0.24));
   }
 
   let roll = random();
@@ -478,7 +438,6 @@ function advanceCpuFieldForPlayerHole(field, options){
       roundState.thru++;
     }
     roundState.complete = roundState.thru >= totalHoles;
-    if(roundState.complete) cpuNudgeRoundToTarget(field, opp, roundIdx, holes);
   });
   if(playerThru >= totalHoles){
     completeCpuFieldRound(field, {
@@ -520,8 +479,6 @@ function completeCpuFieldRound(field, options){
       roundState.thru++;
     }
     roundState.complete = true;
-    cpuApplyPlayerFormTarget(field, opp, roundIdx, holes, options.playerScores || [], options.gameDiff || field.gameDiff);
-    cpuNudgeRoundToTarget(field, opp, roundIdx, holes);
   });
   resolveCpuFinalWinnerTies(field, {
     holes,
@@ -589,15 +546,18 @@ function getCpuLeaderboardRows(field, options){
   if(!field || !Array.isArray(field.opponents)) return [];
   const holes = options.holes || [];
   const currentRound = Math.max(1, options.currentRound || 1);
+  const totalHoles = Math.max(0, (field.endIdx || 17) - (field.startIdx || 0) + 1);
   const rows = [];
   const player = cpuPlayerCumulative(options.playerScores || [], holes, field.startIdx, field.endIdx, currentRound);
   const playerRoundScores = (options.playerScores || [])[currentRound - 1] || [];
+  const playerRoundComplete = totalHoles > 0 && player.thru >= totalHoles;
   rows.push({
     id: 'player',
     name: options.playerName || 'YOU',
     isPlayer: true,
     thru: player.thru,
     thruLabel: cpuRoundGrossLabel(playerRoundScores, holes, field.startIdx, field.endIdx),
+    roundComplete: playerRoundComplete,
     total: player.total,
     par: player.par,
     diff: player.diff,
@@ -607,12 +567,14 @@ function getCpuLeaderboardRows(field, options){
     const score = cpuOpponentCumulative(opp, holes, field.startIdx, field.endIdx, currentRound);
     const roundState = opp.rounds[currentRound - 1] || {};
     const notStarted = score.thru === 0;
+    const roundComplete = totalHoles > 0 && score.thru >= totalHoles;
     rows.push({
       id: opp.id,
       name: opp.name,
       isPlayer: false,
       thru: score.thru,
       thruLabel: notStarted ? (roundState.teeTime || '') : cpuRoundGrossLabel(roundState.scores || [], holes, field.startIdx, field.endIdx),
+      roundComplete,
       total: score.total,
       par: score.par,
       diff: score.diff,
@@ -708,7 +670,7 @@ function renderCpuLeaderboardBlock(options){
     tr.innerHTML = `
       <td>${cpuEscapeHtml(row.pos)}</td>
       <td>${cpuEscapeHtml(row.name)}</td>
-      <td>${cpuEscapeHtml(row.thruLabel)}</td>
+      <td class="${row.roundComplete ? 'thru-complete' : ''}">${cpuEscapeHtml(row.thruLabel)}</td>
       <td class="${row.diff < 0 ? 'good' : row.diff > 0 ? 'bad' : 'even'}">${cpuEscapeHtml(row.totalLabel)}</td>
     `;
     tbody.appendChild(tr);
