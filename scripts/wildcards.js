@@ -15,7 +15,7 @@ const WILDCARDS=[
   {id:'lucky_bounce',    weight: 50, icon:'🍀', name:'Lucky Bounce',      desc:'Next OOB or Water result treated as Rough (or Sand on Par 3).'},
   {id:'iron_will',       weight: 50, icon:'🔩', name:'Iron Will',         desc:'Next Rough result treated as Fairway.'},
   {id:'tailwind',        weight: 50, icon:'💨', name:'Tailwind',          desc:'Re-roll one die of your choice this hole.'},
-  {id:'green_read',      weight: 50, icon:'🌱', name:'Green Read',        desc:'On your next unresolved putting attempt, convert all 3-putt cells into 2-putt.'},
+  {id:'green_read',      weight: 50, icon:'🌱', name:'Green Read',        desc:'On your next putting attempt, convert all 3-putt cells into 2-putt.'},
   {id:'bounce_back',     weight: 50, icon:'🪃', name:'Bounce Back',       desc:'After a bogey or worse, your next tee shot is guaranteed to be Fairway (or Green if on Par 3)'},
   
   // RARE (Weight 30) - Solid utility
@@ -1044,6 +1044,10 @@ function applyWildcardEffect(wc){
   switch(wc.id){
     case 'shortcut':
       WCS.shortcutActive = true;
+      if(typeof applyQueuedShortcutAfterTeeShot === 'function' && applyQueuedShortcutAfterTeeShot()){
+        toastMsg = null;
+        break;
+      }
       toastMsg = `⚡ ${wc.name} applied!`;
       break;
     case 'phantom_stroke':
