@@ -508,6 +508,7 @@ body.nav-back .summary-modal.show .summary-card{transform:translateX(0) scale(1)
 .cpu-lb-table td:nth-child(1){color:var(--muted);font-weight:700;}
 .cpu-lb-table td:nth-child(3){color:var(--muted);}
 .cpu-lb-table td:nth-child(4){font-weight:800;}
+.cpu-lb-table td.thru-complete{color:#fff!important;}
 .cpu-lb-table td.good{color:#52c87a!important;}
 .cpu-lb-table td.even{color:#fff!important;}
 .cpu-lb-table td.bad{color:#e05252!important;}
