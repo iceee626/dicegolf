@@ -707,6 +707,16 @@ function applyHoleWallToCurrentGrid(){
   return changedCells + replaceCurrentGridCells(c => c !== 'chip' && c !== 'grn', 'grn');
 }
 
+function applyHoleInOneToGrid(grid){
+  return replaceGridCells(grid, () => true, () => Math.random() < .80 ? 'hole' : 'grn');
+}
+
+function applyHoleInOneToCurrentGrid(){
+  syncCurrentGridFromVisibleCells();
+  if(!Array.isArray(S.currentGrid)) return 0;
+  return replaceCurrentGridCells(() => true, () => Math.random() < .80 ? 'hole' : 'grn');
+}
+
 function applyGreenReadToGrid(grid){
   return replaceGridCells(grid, cell => cell === 'p3', 'p2');
 }
@@ -915,7 +925,7 @@ function applyGridWildcardToGrid(grid, source = 'build'){
   const beforeCounts = countGridZones(grid);
   const applied = [];
   let changed = 0;
-  const h = HOLES[S.holeIdx];
+  const h = HOLES[S.holeIdx || 0] || {};
 
   if(isPuttingGrid(grid) && !S._pendingPuttResult && (WCS.greenReadQueued || WCS.greenReadActive)){
     const before = countGridZones(grid).p3 || 0;
@@ -960,7 +970,7 @@ function applyGridWildcardToGrid(grid, source = 'build'){
     WCS.hioActive = false;
     showWcToast('🌟 Hole In One activated!');
     appendWcNote('🌟 Hole In One');
-    changed += replaceGridCells(grid, () => true, () => Math.random() < .80 ? 'hole' : 'grn');
+    changed += applyHoleInOneToGrid(grid);
     applied.push('hole_in_one');
   }
 
@@ -1013,7 +1023,7 @@ function applyPendingGridWildcardsToCurrentGrid(){
 
 function applyWildcardEffect(wc){
   syncCurrentGridFromVisibleCells();
-  const h=HOLES[S.holeIdx];
+  const h=HOLES[S.holeIdx || 0] || {};
   let applied = true;
   let toastMsg = `${wc.icon} ${wc.name} applied!`;
   let afterApply = null;
@@ -1184,7 +1194,19 @@ function applyWildcardEffect(wc){
           toastMsg = `🦡 ${wc.name} applied!`; 
       }
       break;
-    case 'hole_in_one': WCS.hioActive = true; toastMsg = `🌟 ${wc.name} applied!`; break;
+    case 'hole_in_one':
+      WCS.hioActive = true;
+      toastMsg = `🌟 ${wc.name} applied!`;
+      if(h.par === 3 && S.zone === 'tee' && isCurrentVisibleGridPlayable()){
+        const changed = applyHoleInOneToCurrentGrid();
+        if(changed > 0){
+          WCS.hioActive = false;
+          toastMsg = null;
+          showWcToast(`🌟 ${wc.name} activated!`);
+          appendWcNote(`🌟 ${wc.name}`);
+        }
+      }
+      break;
     case 'golden_putter':
       if(isCurrentVisiblePuttingGridAvailable()){
         WCS.goldenPutterActive = false;
@@ -1264,6 +1286,9 @@ function _removeWcToast(item){
 }
 function showWcToast(msg, _legacyBottom){
   if(!msg) return;
+  if(typeof globalThis !== 'undefined' && Array.isArray(globalThis._wcToasts)){
+    globalThis._wcToasts.push(msg);
+  }
   if(!_wcToastResizeBound){
     _wcToastResizeBound = true;
     window.addEventListener('resize', syncWcToastStackPosition);
@@ -1283,6 +1308,9 @@ function showWcToast(msg, _legacyBottom){
 }
 
 function appendWcNote(noteStr) {
+    if(typeof globalThis !== 'undefined' && Array.isArray(globalThis._wcNotes)){
+        globalThis._wcNotes.push(noteStr);
+    }
     if (!S._wcNextShotNote) {
         S._wcNextShotNote = ` (${noteStr})`;
     } else {
