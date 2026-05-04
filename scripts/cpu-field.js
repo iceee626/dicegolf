@@ -47,6 +47,10 @@ function cpuRoundScoresTotal(scores, holes, startIdx, endIdx){
   return { total, par, diff: total - par, thru };
 }
 
+function cpuScoreClass(diff){
+  return diff < 0 ? 'good' : diff > 0 ? 'bad' : 'even';
+}
+
 function cpuPlayerCumulative(playerScores, holes, startIdx, endIdx, currentRound){
   let total = 0;
   let par = 0;
@@ -352,6 +356,34 @@ function cpuScoreHole(options){
   return Math.max(1, hole.par + deltas[deltas.length - 1]);
 }
 
+function cpuIsFinalRound(field, roundIdx){
+  return !!field && roundIdx >= Math.max(1, field.totalRounds || 1) - 1;
+}
+
+function cpuAvoidFinalCpuWinnerTie(field, opp, roundIdx, absIdx, proposedScore, holes){
+  if(!field || !opp || !cpuIsFinalRound(field, roundIdx)) return proposedScore;
+  const finalIdx = field.endIdx == null ? 17 : field.endIdx;
+  if(absIdx !== finalIdx) return proposedScore;
+  const totalHoles = Math.max(0, finalIdx - (field.startIdx || 0) + 1);
+  const roundState = opp.rounds && opp.rounds[roundIdx];
+  if(!roundState || roundState.thru !== totalHoles - 1) return proposedScore;
+
+  const completedRows = field.opponents
+    .filter(other => other && other.id !== opp.id)
+    .map(other => ({
+      opp: other,
+      score: cpuOpponentCumulative(other, holes, field.startIdx, finalIdx, roundIdx + 1)
+    }))
+    .filter(row => row.score.thru >= totalHoles);
+  if(!completedRows.length) return proposedScore;
+
+  const bestCompletedDiff = Math.min(...completedRows.map(row => row.score.diff));
+  const currentDiff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, finalIdx).diff;
+  const par = (holes[absIdx] && holes[absIdx].par) || 4;
+  const proposedDiff = currentDiff + proposedScore - par;
+  return proposedDiff === bestCompletedDiff ? proposedScore + 1 : proposedScore;
+}
+
 function cpuBuildScoresContext(field, holes, playerScores, roundIdx){
   const currentRound = roundIdx + 1;
   const player = cpuPlayerCumulative(playerScores, holes, field.startIdx, field.endIdx, currentRound);
@@ -420,7 +452,7 @@ function advanceCpuFieldForPlayerHole(field, options){
       const latePressure = roundIdx === field.totalRounds - 1 && holeProgress > 0.72
         ? Math.max(0, (opp.traits.pressure || 0)) * 0.015
         : 0;
-      roundState.scores[absIdx] = cpuScoreHole({
+      let score = cpuScoreHole({
         hole: holes[absIdx],
         gameDiff: options.gameDiff || field.gameDiff,
         traits: opp.traits,
@@ -434,6 +466,8 @@ function advanceCpuFieldForPlayerHole(field, options){
           remainingHoles: totalHoles - roundState.thru
         }
       });
+      score = cpuAvoidFinalCpuWinnerTie(field, opp, roundIdx, absIdx, score, holes);
+      roundState.scores[absIdx] = score;
       roundState.thru++;
     }
     roundState.complete = roundState.thru >= totalHoles;
@@ -463,7 +497,7 @@ function completeCpuFieldRound(field, options){
       const random = seededRandom(field.seed + roundIdx * 10000 + Number(opp.id.replace('cpu','')) * 100 + absIdx);
       const roundTargetDiff = cpuEnsureRoundTarget(field, opp, roundIdx, holes, options.gameDiff || field.gameDiff);
       const currentDiff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, field.endIdx).diff;
-      roundState.scores[absIdx] = cpuScoreHole({
+      let score = cpuScoreHole({
         hole: holes[absIdx],
         gameDiff: options.gameDiff || field.gameDiff,
         traits: opp.traits,
@@ -475,6 +509,8 @@ function completeCpuFieldRound(field, options){
           remainingHoles: activeIndexes.length - roundState.thru
         }
       });
+      score = cpuAvoidFinalCpuWinnerTie(field, opp, roundIdx, absIdx, score, holes);
+      roundState.scores[absIdx] = score;
       roundState.thru++;
     }
     roundState.complete = true;
@@ -488,34 +524,6 @@ function completeCpuFieldRound(field, options){
 }
 
 function resolveCpuFinalWinnerTies(field, options){
-  if(!field || !Array.isArray(field.opponents)) return field;
-  const holes = options.holes || [];
-  const currentRound = Math.max(1, options.currentRound || 1);
-  const player = cpuPlayerCumulative(options.playerScores || [], holes, field.startIdx, field.endIdx, currentRound);
-  const cpuRows = field.opponents.map(opp => ({
-    opp,
-    score: cpuOpponentCumulative(opp, holes, field.startIdx, field.endIdx, currentRound)
-  })).filter(row => row.score.thru >= ((field.endIdx || 17) - (field.startIdx || 0) + 1));
-  if(!cpuRows.length) return field;
-  const bestCpuDiff = Math.min(...cpuRows.map(row => row.score.diff));
-  const topCpu = cpuRows.filter(row => row.score.diff === bestCpuDiff);
-  if(topCpu.length < 2) return field;
-  if(player.thru > 0 && player.diff <= bestCpuDiff) return field;
-
-  const winner = topCpu.slice().sort((a, b) => {
-    const aNum = Number(String(a.opp.id || '').replace('cpu','')) || 0;
-    const bNum = Number(String(b.opp.id || '').replace('cpu','')) || 0;
-    const ar = seededRandom((field.seed || 1) + currentRound * 919 + aNum * 17)();
-    const br = seededRandom((field.seed || 1) + currentRound * 919 + bNum * 17)();
-    return ar - br || a.opp.name.localeCompare(b.opp.name);
-  })[0];
-  const finalIdx = field.endIdx == null ? 17 : field.endIdx;
-  topCpu.forEach(row => {
-    if(row.opp.id === winner.opp.id) return;
-    const roundState = row.opp.rounds[currentRound - 1];
-    if(!roundState || roundState.scores[finalIdx] == null) return;
-    roundState.scores[finalIdx] += 1;
-  });
   return field;
 }
 
@@ -549,6 +557,7 @@ function getCpuLeaderboardRows(field, options){
   const rows = [];
   const player = cpuPlayerCumulative(options.playerScores || [], holes, field.startIdx, field.endIdx, currentRound);
   const playerRoundScores = (options.playerScores || [])[currentRound - 1] || [];
+  const playerNotStarted = player.thru === 0;
   const playerRoundComplete = totalHoles > 0 && player.thru >= totalHoles;
   rows.push({
     id: 'player',
@@ -560,7 +569,8 @@ function getCpuLeaderboardRows(field, options){
     total: player.total,
     par: player.par,
     diff: player.diff,
-    totalLabel: cpuFormatDiff(player.diff)
+    totalLabel: playerNotStarted ? '-' : cpuFormatDiff(player.diff),
+    totalClass: playerNotStarted ? '' : cpuScoreClass(player.diff)
   });
   field.opponents.forEach(opp => {
     const score = cpuOpponentCumulative(opp, holes, field.startIdx, field.endIdx, currentRound);
@@ -578,6 +588,7 @@ function getCpuLeaderboardRows(field, options){
       par: score.par,
       diff: score.diff,
       totalLabel: cpuFormatDiff(score.diff),
+      totalClass: cpuScoreClass(score.diff),
       notStarted
     });
   });
@@ -670,7 +681,7 @@ function renderCpuLeaderboardBlock(options){
       <td>${cpuEscapeHtml(row.pos)}</td>
       <td>${cpuEscapeHtml(row.name)}</td>
       <td class="${row.roundComplete ? 'thru-complete' : ''}">${cpuEscapeHtml(row.thruLabel)}</td>
-      <td class="${row.diff < 0 ? 'good' : row.diff > 0 ? 'bad' : 'even'}">${cpuEscapeHtml(row.totalLabel)}</td>
+      <td class="${row.totalClass || ''}">${cpuEscapeHtml(row.totalLabel)}</td>
     `;
     tbody.appendChild(tr);
   });
