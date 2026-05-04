@@ -115,6 +115,10 @@ function _farReachTmpl(h){
     default:             return d===1?T_FAR_REACH_OPEN_E():d===2?T_FAR_REACH_OPEN_M():T_FAR_REACH_OPEN_H();
   }
 }
+function _farReachGreenCount(h){
+  const gd = GAME_DIFF || (h && h.diff) || 1;
+  return gd === 1 ? 6 : gd === 2 ? 5 : 4;
+}
 function _isPacificHole18Approach(h){
   return h && h.name === 'HOLE 18' && h.farLayout === 'coastalPacific' && h.appLayout === 'bunkerGreen';
 }
@@ -232,19 +236,17 @@ function buildGrid(){
     if(_isPacificHole18Approach(h) && S.yrdRemain <= 200 && S.yrdRemain > 80){
       return _emit('Fairway Shot Grid',_appTmpl(h),{keepFarChips:true});
     }
+    if(gate==='short'||gate==='nearpin'||S.yrdRemain <= 200){
+      return _emit('Fairway Shot Grid',_appTmpl(h));
+    }
+    if(S.yrdRemain <= 250){
+      return _emit('Fairway Shot Grid',_farReachTmpl(h));
+    }
     if(S.prevZone==='tee'){
       const firstFwy=_firstFwyTmpl(h);
       if(firstFwy) return _emit('Fairway Shot Grid',firstFwy,{keepFarChips:true});
     }
-    if(gate==='short'||gate==='nearpin'){
-      tmpl=_appTmpl(h); // approach templates have no raw fwy cells
-    } else if(S.yrdRemain <= 200){
-      tmpl=_appTmpl(h);
-    } else if(S.yrdRemain <= 250){
-      tmpl=_farReachTmpl(h);
-    } else {
-      tmpl=_farTmpl(h);
-    }
+    tmpl=_farTmpl(h);
     return _emit('Fairway Shot Grid',tmpl);
   }
 
@@ -257,6 +259,9 @@ function buildGrid(){
       tmpl=h.diff===1?T_RGH_FAR_E():h.diff===2?T_RGH_FAR_M():T_RGH_FAR_H();
     } else {
       tmpl=h.diff===1?T_RGH_MID_E():h.diff===2?T_RGH_MID_M():T_RGH_MID_H();
+    }
+    if(S.yrdRemain > 200 && S.yrdRemain <= 250 && typeof addFarReachGreens === 'function'){
+      tmpl = addFarReachGreens(tmpl, _farReachGreenCount(h));
     }
     return _emit('Rough Shot Grid',tmpl);
   }
