@@ -19,6 +19,46 @@ function startDiceIdle(){
   },500);
 }
 
+function countRecentOutcomes(zones){
+  if(!Array.isArray(S.log)) return 0;
+  const zoneSet = zones instanceof Set ? zones : new Set(zones);
+  let count = 0;
+  for(let i = S.log.length - 1; i >= 0; i--){
+    if(zoneSet.has(S.log[i]?.zk)) count++;
+    else break;
+  }
+  return count;
+}
+
+function findFirstCellOutsideZones(zones){
+  if(!Array.isArray(S.currentGrid)) return null;
+  const zoneSet = zones instanceof Set ? zones : new Set(zones);
+  for(let r = 0; r < 6; r++){
+    if(!Array.isArray(S.currentGrid[r])) continue;
+    for(let c = 0; c < 6; c++){
+      if(!zoneSet.has(S.currentGrid[r][c])) return { r1:r + 1, r2:c + 1 };
+    }
+  }
+  return null;
+}
+
+function avoidThirdConsecutiveOutcome(r1, r2, zones){
+  if(TUT.active || !Array.isArray(S.currentGrid)) return { r1, r2 };
+  const zoneSet = zones instanceof Set ? zones : new Set(zones);
+  if(countRecentOutcomes(zoneSet) < 2) return { r1, r2 };
+  let attempts = 0;
+  while(zoneSet.has(S.currentGrid[r1 - 1]?.[r2 - 1]) && attempts < 50){
+    r1 = Math.ceil(Math.random() * 6);
+    r2 = Math.ceil(Math.random() * 6);
+    attempts++;
+  }
+  if(zoneSet.has(S.currentGrid[r1 - 1]?.[r2 - 1])){
+    const fallback = findFirstCellOutsideZones(zoneSet);
+    if(fallback) return fallback;
+  }
+  return { r1, r2 };
+}
+
 function doRoll(){
   if(S.rolling||S.holeDone||_rerollChoiceActive)return;
   if(TUT.active && TUT.blocked) return;
@@ -34,23 +74,9 @@ function doRoll(){
     if(td){ r1=td.r; r2=td.c; }
   }
 
-  // Anti-frustration: Max 2 consecutive hazards (Water/OB)
-  if(!TUT.active && S.currentGrid) {
-    let penCount = 0;
-    for(let i=S.log.length-1; i>=0; i--){
-        if(S.log[i].zk === 'h2o' || S.log[i].zk === 'ob') penCount++;
-        else break;
-    }
-    if(penCount >= 2) {
-        let attempts = 0;
-        // Secretly reroll the dice until they land on a non-penalty cell
-        while((S.currentGrid[r1-1][r2-1] === 'h2o' || S.currentGrid[r1-1][r2-1] === 'ob') && attempts < 50) {
-            r1=Math.ceil(Math.random()*6);
-            r2=Math.ceil(Math.random()*6);
-            attempts++;
-        }
-    }
-  }
+  // Anti-frustration: max 2 consecutive penalty or rough outcomes.
+  ({ r1, r2 } = avoidThirdConsecutiveOutcome(r1, r2, ['h2o','ob']));
+  ({ r1, r2 } = avoidThirdConsecutiveOutcome(r1, r2, ['rgh']));
 
   const d1=document.getElementById('die1'),d2=document.getElementById('die2');
 
