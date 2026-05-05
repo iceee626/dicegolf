@@ -148,7 +148,13 @@ function _sandTmpl(h){
   const looping=_sandChipLoopDepth()>=2;
   const d=looping?1:h.diff;
   // Far bunker (>80m) — fwy-exit grid, no rgh cells
-  if(S.yrdRemain>87) return d===1?T_SAND_FAR_E():d===2?T_SAND_FAR_M():T_SAND_FAR_H();
+  if(S.yrdRemain>87){
+    let tmpl=d===1?T_SAND_FAR_E():d===2?T_SAND_FAR_M():T_SAND_FAR_H();
+    if(S.yrdRemain > 200 && S.yrdRemain <= 250 && typeof addFarReachGreens === 'function'){
+      tmpl = addFarReachGreens(tmpl, _farReachGreenCount(h));
+    }
+    return tmpl;
+  }
   // Near-green bunker (≤80m) — green+chip+hole, no rgh
   return d===1?T_SAND_E():d===2?T_SAND_M():T_SAND_H();
 }
