@@ -9,6 +9,20 @@ function fmtYds(yds){
   }
   return yds+' yds';
 }
+function refreshMetricText(text, yds){
+  if(!Number.isFinite(yds)) return text;
+  const distance = fmtYds(Math.max(0, yds));
+  return String(text || '')
+    .replace(/\d+\s+(?:yds|m)(?=\s+left\b)/gi, distance)
+    .replace(/\d+\s+(?:yds|m)(?=\s+to hole\b)/gi, distance);
+}
+function refreshMetricSensitiveDisplays(){
+  if(typeof renderLog === 'function') renderLog();
+  const sub = document.getElementById('resSub');
+  if(sub && /\b(?:yds|m)\b/i.test(sub.textContent || '')){
+    sub.textContent = refreshMetricText(sub.textContent, S.yrdRemain);
+  }
+}
 function updateMetricsUI(){
   const m=getMetrics();
   const el=document.getElementById('metricsToggle');
@@ -18,6 +32,7 @@ function updateMetricsUI(){
   if(h){
     document.getElementById('holeYards').textContent=fmtYds(h.yards);
   }
+  refreshMetricSensitiveDisplays();
 }
 function setMetricsPref(m){
   setMetrics(m);
@@ -27,6 +42,7 @@ function setMetricsPref(m){
   if(h){
     document.getElementById('holeYards').textContent=fmtYds(h.yards);
   }
+  refreshMetricSensitiveDisplays();
 }
 
 // ═══════════════════════════════════════
