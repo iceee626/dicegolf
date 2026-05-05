@@ -725,7 +725,7 @@ function showResult(zd,title,mode,sub){
 }
 
 function addLog(num,desc,zk,note,pen,row,col,gridSnap,prevZone,prevYrdRemain){
-  S.log.push({num,desc,zk,note,pen,row,col,gridSnap,prevZone,prevYrdRemain});
+  S.log.push({num,desc,zk,note,pen,row,col,gridSnap,prevZone,prevYrdRemain,yrdRemainAfter:S.yrdRemain});
   renderLog();
   saveGameState();
 }
@@ -849,7 +849,8 @@ function renderLog(targetEl,data){
   [...entries].reverse().forEach(e=>{
     const zd=Z[e.zk]||Z.fwy;
     const d=document.createElement('div');d.className='log-entry';
-    d.innerHTML=`<div class="log-n">${e.num}</div><div class="log-dot" style="background:${zd.color}"></div><span style="color:var(--text);flex:1">${e.desc}</span>${(e.note&&e.note!=='+1')?`<span class="log-r" style="color:${e.pen?'#e05252':'var(--muted)'}">${e.note}</span>`:''}`;
+    const desc = typeof refreshMetricText === 'function' ? refreshMetricText(e.desc, e.yrdRemainAfter) : e.desc;
+    d.innerHTML=`<div class="log-n">${e.num}</div><div class="log-dot" style="background:${zd.color}"></div><span style="color:var(--text);flex:1">${desc}</span>${(e.note&&e.note!=='+1')?`<span class="log-r" style="color:${e.pen?'#e05252':'var(--muted)'}">${e.note}</span>`:''}`;
     el.appendChild(d);
   });
 }
