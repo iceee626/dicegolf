@@ -351,6 +351,7 @@ function restoreReplaySetupFromCurrentState(versusReplay){
   SETUP.opponent = S.cpuMode ? 'cpu' : 'solo';
   SETUP.course = restoredCourseId;
   SETUP.courseSelected = true;
+  _courseScreenFlow = SETUP.mode;
 }
 
 function captureReplayProfileProgress(){
