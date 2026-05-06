@@ -63,6 +63,8 @@ function bindStaticUiEvents(){
   bindClick('courseSeptembraNationalBtn', () => selectCourse('septembra-national'));
   bindClick('vsCourseTeeOffBtn', teeOffFromCourse);
   bindClick('diffBackBtn', () => navBack('playModeScreen'));
+  bindClick('modeOpponentSolo', () => setModeOpponent('solo'));
+  bindClick('modeOpponentCpu', () => setModeOpponent('cpu'));
   bindClick('diff-btn-1', () => setDiff(1));
   bindClick('diff-btn-2', () => setDiff(2));
   bindClick('diff-btn-3', () => setDiff(3));
