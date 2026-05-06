@@ -587,8 +587,8 @@ function getCpuLeaderboardRows(field, options){
       total: score.total,
       par: score.par,
       diff: score.diff,
-      totalLabel: cpuFormatDiff(score.diff),
-      totalClass: cpuScoreClass(score.diff),
+      totalLabel: notStarted ? '-' : cpuFormatDiff(score.diff),
+      totalClass: notStarted ? '' : cpuScoreClass(score.diff),
       notStarted
     });
   });
