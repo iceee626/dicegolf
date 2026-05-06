@@ -78,7 +78,7 @@ const T_P3_BGRN_H   = ()=>cells(['grn',20],['chip',5],['sand',10],['hole',1]);
 const T_P3_STAD_E   = ()=>cells(['grn',29],['chip',3],['sand',3],['hole',1]);
 const T_P3_STAD_M   = ()=>cells(['grn',27],['chip',4],['sand',4],['hole',1]);
 const T_P3_STAD_H   = ()=>cells(['grn',25],['chip',5],['sand',5],['hole',1]);
-// Regular far templates now cover 251+ yds; 201-250 yds uses far reach.
+// Regular far templates now cover 276+ yds; 220-275 yds uses far reach.
 
 // ── FAIRWAY FAR (>200 yds) ─────────────────────────────────
 const T_FAR_OPEN_E  = ()=>cells(['fwy',30],['rgh',6]);
