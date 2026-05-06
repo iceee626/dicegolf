@@ -279,10 +279,17 @@ function summaryGoBack(){
     _setNavDir('back');
     const hc = document.getElementById('hcScreen');
     const summaryModal = document.getElementById('summaryModal');
+    const tv = document.getElementById('tvBar');
+    const fab = document.getElementById('wcFab');
     setMainAppConcealed(true);
     hideMainAppImmediate();
-    if(hc) hc.classList.add('show');
-    requestAnimationFrame(()=>{ if(summaryModal) summaryModal.classList.remove('show'); });
+    if(tv) tv.classList.remove('show');
+    if(fab) fab.classList.remove('visible');
+    if(hc){
+      hc.classList.add('show');
+      void hc.offsetWidth;
+    }
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{ if(summaryModal) summaryModal.classList.remove('show'); }));
     return;
   }
   if(target === 'overlay'){
