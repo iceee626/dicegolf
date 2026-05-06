@@ -77,6 +77,7 @@ function navToModeDifficulty(mode){
     SETUP.rounds = 4;
     SETUP.holesConfig = '18';
   }
+  setModeOpponent('solo');
   setDiff(1);
   _lastMenuScreen = 'playModeScreen';
   hideScreen('playModeScreen');
@@ -110,8 +111,8 @@ function navToCourse(mode) {
   }
   SETUP.courseSelected = false;
   SETUP.course = null;
-  if (mode === 'single') { SETUP.mode = 'single'; SETUP.rounds = 1; SETUP.holesConfig = '18'; setDiff(1); _lastMenuScreen = 'playModeScreen'; }
-  if (mode === 'tournament') { SETUP.mode = 'tournament'; SETUP.rounds = 4; SETUP.holesConfig = '18'; setDiff(1); _lastMenuScreen = 'playModeScreen'; }
+  if (mode === 'single') { SETUP.mode = 'single'; SETUP.rounds = 1; SETUP.holesConfig = '18'; setModeOpponent('solo'); setDiff(1); _lastMenuScreen = 'playModeScreen'; }
+  if (mode === 'tournament') { SETUP.mode = 'tournament'; SETUP.rounds = 4; SETUP.holesConfig = '18'; setModeOpponent('solo'); setDiff(1); _lastMenuScreen = 'playModeScreen'; }
   if (mode === 'custom') { _lastMenuScreen = 'customScreen'; }
   if(VS.setup) VS.setup.courseSelected = false;
   hideScreen(_lastMenuScreen); 
@@ -196,16 +197,23 @@ function setCustomOpponent(opponent) {
   document.getElementById('customOpponentCpu')?.classList.toggle('active', SETUP.opponent === 'cpu');
 }
 
+function setModeOpponent(opponent) {
+  SETUP.opponent = opponent === 'cpu' ? 'cpu' : 'solo';
+  document.getElementById('modeOpponentSolo')?.classList.toggle('active', SETUP.opponent === 'solo');
+  document.getElementById('modeOpponentCpu')?.classList.toggle('active', SETUP.opponent === 'cpu');
+}
+
 function shouldEnableCpuModeForSetup(setup, isVersusActive, courseScreenFlow) {
+  const cpuModes = ['single', 'tournament', 'custom'];
   return !isVersusActive
-    && courseScreenFlow === 'custom'
     && setup
-    && setup.mode === 'custom'
+    && cpuModes.includes(setup.mode)
+    && courseScreenFlow === setup.mode
     && setup.opponent === 'cpu';
 }
 
 function isCpuLeaderboardEnabled() {
-  return !!(S && S.cpuMode && S.cpuField && !VS.active && S.mode === 'custom');
+  return !!(S && S.cpuMode && S.cpuField && !VS.active);
 }
 
 function resetGameState(){
