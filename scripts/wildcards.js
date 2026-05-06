@@ -29,11 +29,11 @@ const WILDCARDS=[
   {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone (only par 4/5 after tee shot).'},
   {id:'bogey_shield',    weight: 15, icon:'🛡️', name:'Bogey Shield',      desc:'Next Bogey+ result converted into a Par.'},
   {id:'sand_wedge_pro',  weight: 15, icon:'🏖️', name:'Sand Wedge Pro',    desc:'Next Sand shot: 80% of grid converted into Green.'},
-  {id:'mulligan',        weight: 15, icon:'↩️',  name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
+  {id:'mulligan',        weight: 15, icon:'↩️', name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
   {id:'cup_magnet',      weight: 15, icon:'🧲', name:'Cup Magnet',        desc:'Next Green roll: If you miss the 1-putt by 1 cell, it \'sucks\' into the hole anyway.'},
   
   // LEGENDARY (Weight 5) - Game breakers
-  {id:'golden_putter',   weight: 5,  icon:'🥇', name:'Golden Putter',     desc:'On your next unresolved putting attempt, every putt cell becomes 1-putt.'},
+  {id:'golden_putter',   weight: 5,  icon:'🥇', name:'Golden Putter',     desc:'On your next putting attempt, every putt cell becomes 1-putt.'},
   {id:'the_ferrett',     weight: 5,  icon:'🦡', name:'The Ferrett',       desc:'Next Sand shot: 75% chance of holing out directly.'},
   {id:'hole_in_one',     weight: 5,  icon:'🌟', name:'Hole In One',       desc:'Next Par 3 tee shot: 80% chance of hole-in-one.'},
   {id:'commercial',      weight: 5,  icon:'🎥', name:'Highlight Reel',    desc:'Next Chip shot: 75% chance of holing out directly.'},
