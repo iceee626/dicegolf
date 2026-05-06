@@ -494,6 +494,26 @@ function ensureRoundCpuLeaderboardPanel(){
   return wrap;
 }
 
+function hideRoundCpuLeaderboardPanel(){
+  const roundCpuLeaderboardWrap = document.getElementById('hcRoundCpuLeaderboardWrap');
+  if(!roundCpuLeaderboardWrap) return;
+  roundCpuLeaderboardWrap.style.display = 'none';
+  roundCpuLeaderboardWrap.innerHTML = '';
+}
+
+function getCpuFinalPlacementLabel(){
+  if(!isCpuLeaderboardEnabled() || typeof getCpuLeaderboardRows !== 'function') return '';
+  const rows = getCpuLeaderboardRows(S.cpuField, {
+    holes: HOLES,
+    playerName: PLAYER_NAME,
+    playerScores: S.scorecards,
+    currentRound: S.currentRound
+  });
+  const playerRow = rows.find(row => row && row.isPlayer);
+  if(!playerRow || !playerRow.pos) return '-';
+  return String(playerRow.pos).replace(/^(\d+)$/, '$1.');
+}
+
 function showRoundEnd(){
   setMainAppConcealed(true);
   hideMainAppImmediate();
@@ -585,6 +605,10 @@ function showRoundEnd(){
     const roundsStr = S.totalRounds > 1 ? ` (${S.totalRounds} Rounds)` : '';
     const diffNamesFinal = {1:'EASY', 2:'MEDIUM', 3:'HARD'};
     const finalDiffLabel = diffNamesFinal[GAME_DIFF] || 'MEDIUM';
+    const cpuPlacement = getCpuFinalPlacementLabel();
+    const cpuPlacementHtml = cpuPlacement
+      ? `<div class="cpu-placement-line" style="font-family:'Sen',sans-serif;font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:1px;margin-top:4px;"><strong>${cpuPlacement}</strong> PLACE</div>`
+      : '';
 
     vsContainer.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:14px;">
@@ -592,6 +616,7 @@ function showRoundEnd(){
         <div style="font-family:'Bebas Neue',cursive;font-size:40px;color:var(--text);letter-spacing:2px;line-height:1;margin-bottom:6px;">FINAL SCORE</div>
         <div style="font-family:'Sen',sans-serif;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px;">${globalTotal} strokes</div>
         <div style="font-family:'Sen',sans-serif;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;">Par ${globalPar}${roundsStr} · ${finalDiffLabel}</div>
+        ${cpuPlacementHtml}
       </div>
       <div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;gap:4px;">
         <span style="font-family:'Sen',sans-serif;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;">TOTAL</span>
@@ -605,23 +630,7 @@ function showRoundEnd(){
       roundXpWrapFinal.style.display = xpAward ? 'block' : 'none';
       if(xpAward) animateXpBars(roundXpWrapFinal);
     }
-    const roundCpuLeaderboardWrap = ensureRoundCpuLeaderboardPanel();
-    if(roundCpuLeaderboardWrap){
-      if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
-        roundCpuLeaderboardWrap.style.display = 'block';
-        renderCpuLeaderboardInto(roundCpuLeaderboardWrap, {
-          field: S.cpuField,
-          holes: HOLES,
-          playerName: PLAYER_NAME,
-          playerScores: S.scorecards,
-          currentRound: S.currentRound,
-          compact: true
-        });
-      } else {
-        roundCpuLeaderboardWrap.style.display = 'none';
-        roundCpuLeaderboardWrap.innerHTML = '';
-      }
-    }
+    hideRoundCpuLeaderboardPanel();
 
     document.querySelectorAll('#hcScreen .sec-title').forEach(t => t.style.display = 'none');
     const shotTrailF = document.getElementById('hcShotTrail');
@@ -724,23 +733,7 @@ function showRoundEnd(){
       roundXpWrap.style.display = xpAward ? 'block' : 'none';
       if (xpAward) animateXpBars(roundXpWrap);
     }
-    const roundCpuLeaderboardWrap = ensureRoundCpuLeaderboardPanel();
-    if(roundCpuLeaderboardWrap){
-      if(isCpuLeaderboardEnabled() && typeof renderCpuLeaderboardInto === 'function'){
-        roundCpuLeaderboardWrap.style.display = 'block';
-        renderCpuLeaderboardInto(roundCpuLeaderboardWrap, {
-          field: S.cpuField,
-          holes: HOLES,
-          playerName: PLAYER_NAME,
-          playerScores: S.scorecards,
-          currentRound: S.currentRound,
-          compact: true
-        });
-      } else {
-        roundCpuLeaderboardWrap.style.display = 'none';
-        roundCpuLeaderboardWrap.innerHTML = '';
-      }
-    }
+    hideRoundCpuLeaderboardPanel();
 
     // Show tournament statistics only
     const shotTrailT = document.getElementById('hcShotTrail');
