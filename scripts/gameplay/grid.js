@@ -119,6 +119,16 @@ function _farReachGreenCount(h){
   const gd = GAME_DIFF || (h && h.diff) || 1;
   return gd === 1 ? 6 : gd === 2 ? 5 : 4;
 }
+const APPROACH_MAX_YDS_FOR_200M = 219;
+const FAR_REACH_MIN_YDS_FOR_201M = 220;
+const FAR_REACH_MAX_YDS_FOR_250M = 275;
+function _isApproachDistance(yds){
+  return Number(yds) <= APPROACH_MAX_YDS_FOR_200M;
+}
+function _isFarReachDistance(yds){
+  const distance = Number(yds);
+  return distance >= FAR_REACH_MIN_YDS_FOR_201M && distance <= FAR_REACH_MAX_YDS_FOR_250M;
+}
 function _isPacificHole18Approach(h){
   return h && h.name === 'HOLE 18' && h.farLayout === 'coastalPacific' && h.appLayout === 'bunkerGreen';
 }
@@ -150,7 +160,7 @@ function _sandTmpl(h){
   // Far bunker (>80m) — fwy-exit grid, no rgh cells
   if(S.yrdRemain>87){
     let tmpl=d===1?T_SAND_FAR_E():d===2?T_SAND_FAR_M():T_SAND_FAR_H();
-    if(S.yrdRemain > 200 && S.yrdRemain <= 250 && typeof addFarReachGreens === 'function'){
+    if(_isFarReachDistance(S.yrdRemain) && typeof addFarReachGreens === 'function'){
       tmpl = addFarReachGreens(tmpl, _farReachGreenCount(h));
     }
     return tmpl;
@@ -239,13 +249,13 @@ function buildGrid(){
 
   // FAIRWAY
   if(S.zone==='fwy'){
-    if(_isPacificHole18Approach(h) && S.yrdRemain <= 200 && S.yrdRemain > 80){
+    if(_isPacificHole18Approach(h) && _isApproachDistance(S.yrdRemain) && S.yrdRemain > 80){
       return _emit('Fairway Shot Grid',_appTmpl(h),{keepFarChips:true});
     }
-    if(gate==='short'||gate==='nearpin'||S.yrdRemain <= 200){
+    if(gate==='short'||gate==='nearpin'||_isApproachDistance(S.yrdRemain)){
       return _emit('Fairway Shot Grid',_appTmpl(h));
     }
-    if(S.yrdRemain <= 250){
+    if(_isFarReachDistance(S.yrdRemain)){
       return _emit('Fairway Shot Grid',_farReachTmpl(h));
     }
     if(S.prevZone==='tee'){
@@ -266,7 +276,7 @@ function buildGrid(){
     } else {
       tmpl=h.diff===1?T_RGH_MID_E():h.diff===2?T_RGH_MID_M():T_RGH_MID_H();
     }
-    if(S.yrdRemain > 200 && S.yrdRemain <= 250 && typeof addFarReachGreens === 'function'){
+    if(_isFarReachDistance(S.yrdRemain) && typeof addFarReachGreens === 'function'){
       tmpl = addFarReachGreens(tmpl, _farReachGreenCount(h));
     }
     return _emit('Rough Shot Grid',tmpl);
