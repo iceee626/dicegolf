@@ -318,14 +318,25 @@
   <div class="setup-card">
     <div class="setup-head-row">
       <button class="setup-back-btn" id="diffBackBtn" aria-label="Back">&#8592;</button>
-      <div class="setup-title" style="margin-bottom:0;">DIFFICULTY</div>
+      <div class="setup-title" style="margin-bottom:0;">GAME OPTIONS</div>
       <span class="setup-head-spacer"></span>
     </div>
     
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-      <button class="diff-btn active" id="diff-btn-1" style="padding:16px;font-size:20px;">EASY</button>
-      <button class="diff-btn" id="diff-btn-2" style="padding:16px;font-size:20px;">MEDIUM</button>
-      <button class="diff-btn" id="diff-btn-3" style="padding:16px;font-size:20px;">HARD</button>
+    <div class="setup-group">
+      <span class="setup-lbl">OPPONENT</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="modeOpponentSolo">SOLO</button>
+        <button class="diff-btn" id="modeOpponentCpu">VS CPU</button>
+      </div>
+    </div>
+
+    <div class="setup-group">
+      <span class="setup-lbl">DIFFICULTY</span>
+      <div class="diff-row">
+        <button class="diff-btn active" id="diff-btn-1">EASY</button>
+        <button class="diff-btn" id="diff-btn-2">MEDIUM</button>
+        <button class="diff-btn" id="diff-btn-3">HARD</button>
+      </div>
     </div>
     
     <button class="menu-btn-play" id="diffNextBtn" style="width:100%;font-size:20px;">NEXT</button>
@@ -515,14 +526,14 @@
 <script src="scripts/utils.js"></script>
 <script src="scripts/app.js?v=177714-fix1"></script>
 <script src="scripts/ui/navigation.js"></script>
-<script src="scripts/courses.js?v=177714-fix3"></script>
-<script src="scripts/state.js?v=177714-fix10"></script>
+<script src="scripts/courses.js?v=0.54"></script>
+<script src="scripts/state.js?v=0.54"></script>
 <script src="scripts/cpu-field.js?v=177714-fix7"></script>
 <script src="scripts/ui/scorecard.js?v=177714-fix3"></script>
-<script src="scripts/gameplay/grid.js?v=177714-fix14"></script>
+<script src="scripts/gameplay/grid.js?v=0.54"></script>
 <script src="scripts/gameplay/shot-processing.js?v=177714-fix16"></script>
 <script src="scripts/gameplay/hole-flow.js?v=177714-fix9"></script>
-<script src="scripts/ui/round-summary.js?v=177714-fix11"></script>
+<script src="scripts/ui/round-summary.js?v=0.54"></script>
 <script src="scripts/profiles/profile-core.js"></script>
 <script src="scripts/profiles/xp.js"></script>
 <script src="scripts/profiles/achievements.js?v=177714-fix1"></script>
@@ -533,7 +544,7 @@
 <script src="scripts/rules.js?v=177714-fix3"></script>
 <script src="scripts/tutorial.js"></script>
 <script src="scripts/versus.js?v=177714-fix7"></script>
-<script src="scripts/ui/events.js?v=177714-fix2"></script>
+<script src="scripts/ui/events.js?v=0.54"></script>
 <script src="scripts/wc-diagnostics.js?v=177714-fix12"></script>
 
 <div class="profile-modal" id="settingsModal">
