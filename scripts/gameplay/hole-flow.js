@@ -540,6 +540,7 @@ function showRoundEnd(){
   const roundTotal = curSc.reduce((a,b)=>a+(b||0),0);
   const roundPar = activeHoles.reduce((a,h)=>a+h.par,0);
   const roundDiff = roundTotal - roundPar;
+  const isProTourRound = S.mode === 'pro-tour';
   
   if (S.currentRound === S.totalRounds) {
     const profiles = loadProfiles();
@@ -575,6 +576,9 @@ function showRoundEnd(){
     S.scorecards.forEach(sc => sc.forEach((s, i) => { if(s!==null){ globalTotal+=s; globalPar+=HOLES[i].par; } }));
     const globalDiff = globalTotal - globalPar;
     const finalTotalStr = globalDiff===0?'E':globalDiff>0?`+${globalDiff}`:`${globalDiff}`;
+    if(isProTourRound && typeof ProTour === 'object' && typeof ProTour.handleRoundCompleteFromGame === 'function'){
+      ProTour.handleRoundCompleteFromGame();
+    }
     
     const hcScreen = document.getElementById('hcScreen');
     document.getElementById('hcHoleTitle').style.display = '';
@@ -651,8 +655,12 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    btn.textContent = 'NEXT';
+    btn.textContent = isProTourRound ? 'PRO TOUR' : 'NEXT';
     btn.onclick = () => {
+        if(isProTourRound && typeof ProTour === 'object' && typeof ProTour.returnFromRoundComplete === 'function'){
+          ProTour.returnFromRoundComplete();
+          return;
+        }
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
     };
