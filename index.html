@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="styles/modals.css">
 <link rel="stylesheet" href="styles/wildcards.css">
 <link rel="stylesheet" href="styles/versus.css">
-<link rel="stylesheet" href="styles/pro-tour.css?v=0.60.1">
+<link rel="stylesheet" href="styles/pro-tour.css?v=0.60.2">
 <link rel="stylesheet" href="styles/tutorial.css">
 </head>
 <body class="startup-no-anim">
@@ -270,8 +270,8 @@
     <div class="setup-group">
       <div class="setup-lbl">CAREER</div>
       <div class="diff-row pt-choice-row">
-        <button class="diff-btn active" data-pro-tour-career-type="long" type="button">LONG</button>
-        <button class="diff-btn" data-pro-tour-career-type="short" type="button">SHORT</button>
+        <button class="diff-btn active" data-pro-tour-career-type="long" type="button">FULL</button>
+        <button class="diff-btn" data-pro-tour-career-type="short" type="button">QUICK</button>
       </div>
     </div>
     <div class="setup-group">
@@ -302,7 +302,7 @@
       <button class="pt-settings-btn" id="proTourCareerSettingsBtn" type="button" title="Settings" aria-label="Settings"></button>
     </div>
     <div class="pt-season-meta" id="proTourCareerMeta">Season 1</div>
-    <div class="pt-dashboard-grid">
+    <div class="pt-dashboard-grid" id="proTourDashboardGrid">
       <article class="pt-info-card" id="proTourPastEventCard">
         <div class="pt-event-card-layout">
           <div class="pt-event-card-copy">
@@ -709,7 +709,7 @@
 <script src="scripts/state.js?v=0.60"></script>
 <script src="scripts/cpu-field.js?v=0.55"></script>
 <script src="scripts/pro-tour-core.js?v=0.60.1"></script>
-<script src="scripts/pro-tour.js?v=0.60.1"></script>
+<script src="scripts/pro-tour.js?v=0.60.2"></script>
 <script src="scripts/ui/scorecard.js?v=177714-fix3"></script>
 <script src="scripts/gameplay/grid.js?v=0.54"></script>
 <script src="scripts/gameplay/shot-processing.js?v=177714-fix16"></script>
