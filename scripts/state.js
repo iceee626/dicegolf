@@ -20,7 +20,8 @@ let S={
   _lastShotOriginZone:null, _lastShotResultZone:null, _lastShotHoleIdx:null,
   _roundWaterHits:0, _roundSandHits:0, _roundRoughHits:0,
   _roundPrevWasDoubleOrWorse:false, _roundIceTriggered:false,
-  cpuMode:false, cpuField:null
+  cpuMode:false, cpuField:null,
+  proTour:null, _proTourRoundSubmitted:false
 };
 
 // ── Menu Navigation ──
@@ -223,6 +224,8 @@ function resetGameState(){
   S.holesConfig = SETUP.holesConfig;
   S.cpuMode = shouldEnableCpuModeForSetup(SETUP, VS.active, _courseScreenFlow);
   S.cpuField = null;
+  S.proTour = null;
+  S._proTourRoundSubmitted = false;
   S.startIdx = S.holesConfig === 'back' ? 9 : 0;
   S.endIdx = S.holesConfig === 'front' ? 8 : 17;
   S.holeIdx = S.startIdx;
