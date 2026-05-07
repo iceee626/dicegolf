@@ -111,10 +111,11 @@
       `;
       actions.children[0].addEventListener('click', () => openCareer(slot.slotIndex));
       actions.children[1].addEventListener('click', () => {
-        if(!confirm(`Delete Pro Tour slot ${slot.slotIndex}?`)) return;
-        store = Core.deleteCareerSlot(store, profileId(), slot.slotIndex);
-        saveStore();
-        renderSlots();
+        showConfirm('ARE YOU SURE YOU WANT TO DELETE THIS SAVE?', () => {
+          store = Core.deleteCareerSlot(store, profileId(), slot.slotIndex);
+          saveStore();
+          renderSlots();
+        });
       });
       grid.appendChild(node);
     });
@@ -123,7 +124,7 @@
       const add = document.createElement('button');
       add.className = 'pt-slot-card pt-add-slot-card';
       add.type = 'button';
-      add.innerHTML = `<strong>+ ADD</strong><span>MAX. 3 SLOTS</span>`;
+      add.innerHTML = `<strong>NEW CAREER</strong><span>MAX. 3 SLOTS</span>`;
       add.addEventListener('click', () => openCreateCareer(firstEmpty.slotIndex));
       grid.appendChild(add);
     }
@@ -202,8 +203,10 @@
     $('proTourCareerMeta').innerHTML = `<span class="pt-season-pill">SEASON ${dashboard.seasonNumber}</span>`;
 
     const pastCard = $('proTourPastEventCard');
+    const dashboardGrid = $('proTourDashboardGrid');
     if(dashboard.pastEvent){
       pastCard.style.display = '';
+      if(dashboardGrid) dashboardGrid.classList.remove('single-next');
       $('proTourPastEventTitle').textContent = dashboard.pastEvent.courseName;
       $('proTourPastEventMeta').textContent = formatDot(dashboard.pastEvent.userPositionLabel, dashboard.pastEvent.userDiffLabel, `${dashboard.pastEvent.userPoints} PTS`);
       $('proTourPastEventEmoji').textContent = courseEmoji(dashboard.pastEvent.courseId, dashboard.pastEvent.courseName);
@@ -212,6 +215,7 @@
       pastCard.setAttribute('role', 'button');
     } else {
       pastCard.style.display = hasCompletedEvent ? '' : 'none';
+      if(dashboardGrid) dashboardGrid.classList.toggle('single-next', !hasCompletedEvent);
       $('proTourPastEventTitle').textContent = 'None yet';
       $('proTourPastEventMeta').textContent = 'Begin your first event.';
       $('proTourPastEventEmoji').textContent = '';
@@ -440,7 +444,7 @@
               ${group.rows.map(row => `<small>${escapeHtml(formatDot(`SEASON ${row.seasonNumber}`, row.scoreLabel))}</small>`).join('')}
             </div>
           </div>
-        `).join('') : '<div class="pt-empty">No event wins yet.</div>'}
+        `).join('') : '<div class="pt-empty">No event wins yet</div>'}
       </div>
       <div class="pt-section">
         <div class="pt-section-title">PRO TOUR CHAMPIONSHIPS</div>
@@ -449,7 +453,7 @@
             <div class="pt-trophy-icon">\u{1F3C6}</div>
             <div><strong>Season ${title.seasonNumber}</strong><small>${title.points} pts</small></div>
           </div>
-        `).join('') : '<div class="pt-empty">No championships yet.</div>'}
+        `).join('') : '<div class="pt-empty">No championships yet</div>'}
       </div>
     `;
     showTourView('proTourTrophyScreen', 'forward');
