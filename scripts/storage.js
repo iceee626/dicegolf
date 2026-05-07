@@ -73,12 +73,8 @@ function clearSavedGameForProfileId(profileId){
   }
 }
 
-function saveGameState(){
-  if(!S||S.holeIdx===undefined || TUT.active)return;
-  if(!VS.active && S.holeDone && S.holeIdx >= S.endIdx && S.currentRound >= S.totalRounds){
-    clearSavedGame();
-    return;
-  }
+function createCurrentGameSaveSnapshot(){
+  if(!S||S.holeIdx===undefined || TUT.active)return null;
   const vsTurnPending = !!(VS.active && document.getElementById('vsTurnScreen')?.classList.contains('show'));
   const save={
     mode:S.mode, totalRounds:S.totalRounds, currentRound:S.currentRound, holesConfig:S.holesConfig,
@@ -86,6 +82,8 @@ function saveGameState(){
     startIdx:S.startIdx, endIdx:S.endIdx,
     cpuMode:!!S.cpuMode,
     cpuField:(S.cpuMode && typeof snapshotCpuField === 'function') ? snapshotCpuField(S.cpuField) : null,
+    proTour:S.proTour || null,
+    _proTourRoundSubmitted:!!S._proTourRoundSubmitted,
     holeIdx:S.holeIdx, zone:S.zone, strokes:S.strokes, shotNum:S.shotNum, log:S.log,
     scorecards:S.scorecards, histories:S.histories,
     holeDone:S.holeDone, yrdRemain:S.yrdRemain, yrdTotal:S.yrdTotal, fwyVisits:S.fwyVisits, prevZone:S.prevZone, shotCount:S.shotCount,
@@ -136,12 +134,25 @@ function saveGameState(){
         wcs: VS.wcs
     } : null
   };
+  return save;
+}
+
+function saveGameState(){
+  if(!S||S.holeIdx===undefined || TUT.active)return;
+  if(S.mode === 'pro-tour') return;
+  if(!VS.active && S.holeDone && S.holeIdx >= S.endIdx && S.currentRound >= S.totalRounds){
+    clearSavedGame();
+    return;
+  }
+  const save = createCurrentGameSaveSnapshot();
+  if(!save) return;
   setSavedGameForActiveProfile(save);
 }
 
 function hasSavedGame(){
   try{
     const s = getSavedGameForActiveProfile();
+    if(s && s.mode === 'pro-tour') return false;
     if(s && !s.vsState && s.holeDone && s.holeIdx >= s.endIdx && (s.currentRound||1) >= (s.totalRounds||1)) return false;
     if(!s || !s.scorecards) return false;
     const firstRound = Array.isArray(s.scorecards[0]) ? s.scorecards[0] : [];
@@ -199,9 +210,8 @@ function getCpuContinueButtonContent(save){
   };
 }
 
-function continueGame(){
+function restoreGameFromSaveSnapshot(save){
   try{
-    const save = getSavedGameForActiveProfile();
     if(!save)return;
     const savedCourseId = normalizeCourseId(
       save.courseId || save.vsState?.setup?.course || DEFAULT_COURSE_ID
@@ -226,6 +236,8 @@ function continueGame(){
     S.holesConfig=save.holesConfig||'18'; S.startIdx=save.startIdx||0; S.endIdx=save.endIdx||17;
     S.cpuMode=!!save.cpuMode;
     S.cpuField=(S.cpuMode && typeof restoreCpuFieldSnapshot === 'function') ? restoreCpuFieldSnapshot(save.cpuField) : null;
+    S.proTour=save.proTour||null;
+    S._proTourRoundSubmitted=!!save._proTourRoundSubmitted;
     SETUP.opponent = S.cpuMode ? 'cpu' : 'solo';
     S.holeIdx=save.holeIdx; S.zone=save.zone; S.strokes=save.strokes; S.shotNum=save.shotNum; S.log=save.log||[];
     S.currentGrid=save.currentGrid||null;
@@ -397,6 +409,10 @@ function continueGame(){
   }catch(e){console.error('Continue failed:',e);}
 }
 
+function continueGame(){
+  restoreGameFromSaveSnapshot(getSavedGameForActiveProfile());
+}
+
 function abandonCurrentGame(){
   showConfirm('ARE YOU SURE YOU WANT TO ABANDON THIS GAME?', () => {
     clearSavedGame();
@@ -456,6 +472,8 @@ function updateMenuContinueBtn(){
         btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> CONTINUE VERSUS</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${format} · H${holeDisplay} · ${p1Html} vs ${p2Html}</div>`;
         btn.style.display='flex';
         btn.classList.add('menu-glow');
+    } else if (save.mode === 'pro-tour' && save.proTour) {
+        btn.style.display='none';
     } else if (save.cpuMode) {
         const content = getCpuContinueButtonContent(save);
         btn.innerHTML=`<div class="menu-continue-title"><span class="menu-continue-icon" aria-hidden="true"></span> ${escapeHtml(content.title)}</div><div style="font-family:'Sen', sans-serif;font-size:11px;color:rgba(255,255,255,0.7);letter-spacing:1px;font-weight:normal;margin-top:4px;">${escapeHtml(content.meta)}</div>`;
