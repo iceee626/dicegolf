@@ -126,6 +126,8 @@ function openGameScreenMenu(){
     tutMenuIntercept();
     return;
   }
+  const abandonBtn = document.getElementById('gameMenuAbandonBtn');
+  if(abandonBtn) abandonBtn.style.display = S && S.mode === 'pro-tour' ? 'none' : '';
   document.getElementById('gameMenuModal').classList.add('show');
 }
 
@@ -135,6 +137,9 @@ function resumeGameScreenMenu(){
 
 function saveAndMenuFromGameScreen(){
   resumeGameScreenMenu();
+  if(S && S.mode === 'pro-tour' && window.ProTour && typeof window.ProTour.saveAndReturnFromGameMenu === 'function'){
+    if(window.ProTour.saveAndReturnFromGameMenu()) return;
+  }
   returnToMenuSave();
 }
 
