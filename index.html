@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="styles/modals.css">
 <link rel="stylesheet" href="styles/wildcards.css">
 <link rel="stylesheet" href="styles/versus.css">
+<link rel="stylesheet" href="styles/pro-tour.css?v=0.60.1">
 <link rel="stylesheet" href="styles/tutorial.css">
 </head>
 <body class="startup-no-anim">
@@ -205,10 +206,10 @@
         </div>
         <span class="mode-menu-icon">🏆</span>
       </button>
-      <button class="menu-btn-sec mode-menu-card" disabled>
+      <button class="menu-btn-sec mode-menu-card" id="proTourModeBtn">
         <div class="mode-menu-copy">
           <span class="mode-menu-title">PRO TOUR</span>
-          <span class="mode-menu-sub">Season format • coming soon</span>
+          <span class="mode-menu-sub">SEASON FORMAT · 4 EVENTS</span>
         </div>
         <span class="mode-menu-icon">🌎</span>
       </button>
@@ -222,6 +223,184 @@
     </div>
   </div>
 </div>
+
+<div class="setup-screen pro-tour-screen" id="proTourSlotScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourSlotBackBtn" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">PRO TOUR</div>
+      <button class="mode-info-btn" id="proTourInfoBtn" style="position:static;">&#9432;</button>
+    </div>
+    <div class="pt-sub">Choose a career save</div>
+    <div id="proTourSlotsGrid" class="pt-slot-list"></div>
+  </div>
+</div>
+
+<div class="mode-info-overlay" id="proTourInfoOverlay">
+  <div class="mode-info-card" id="proTourInfoCard">
+    <div class="mode-info-head">
+      <div class="mode-info-head-title">PRO TOUR</div>
+      <button class="mode-info-close" id="proTourInfoCloseBtn">✕</button>
+    </div>
+    <div class="mode-info-body">
+      <div class="mode-info-section">
+        <div class="mode-info-row">
+          <div class="mode-info-icon">🌎</div>
+          <div class="mode-info-text">
+            <div class="mode-info-name">PRO TOUR</div>
+            <div class="mode-info-desc">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae libero sed arcu finibus volutpat.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourCreateCareerScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourCreateBackBtn" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">NEW CAREER</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    <div class="setup-group">
+      <label class="setup-lbl" for="proTourCreateCareerName">NAME</label>
+      <input class="pt-name-input" id="proTourCreateCareerName" maxlength="12" placeholder="PLAYER" value="PLAYER" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="setup-group">
+      <div class="setup-lbl">CAREER</div>
+      <div class="diff-row pt-choice-row">
+        <button class="diff-btn active" data-pro-tour-career-type="long" type="button">LONG</button>
+        <button class="diff-btn" data-pro-tour-career-type="short" type="button">SHORT</button>
+      </div>
+    </div>
+    <div class="setup-group">
+      <div class="setup-lbl">DIFFICULTY</div>
+      <div class="diff-row pt-choice-row">
+        <button class="diff-btn active" data-pro-tour-difficulty="1" type="button">EASY</button>
+        <button class="diff-btn" data-pro-tour-difficulty="2" type="button">MEDIUM</button>
+        <button class="diff-btn" data-pro-tour-difficulty="3" type="button">HARD</button>
+      </div>
+    </div>
+    <button class="menu-btn-play pt-main-action" id="proTourCreateCareerNextBtn" type="button">NEXT</button>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourSeasonStartScreen" style="display:none">
+  <div class="setup-card pro-tour-card pt-season-start-card">
+    <div class="pt-season-start-kicker">PRO TOUR</div>
+    <div class="setup-title" id="proTourSeasonStartTitle" data-template="SEASON [N]">SEASON [N]</div>
+    <div class="pt-season-player" id="proTourSeasonStartPlayer"></div>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourCareerScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourBackToCareersBtn" aria-label="Careers">&#8592;</button>
+      <div class="setup-title" id="proTourCareerTitle" style="margin-bottom:0;">CAREER</div>
+      <button class="pt-settings-btn" id="proTourCareerSettingsBtn" type="button" title="Settings" aria-label="Settings"></button>
+    </div>
+    <div class="pt-season-meta" id="proTourCareerMeta">Season 1</div>
+    <div class="pt-dashboard-grid">
+      <article class="pt-info-card" id="proTourPastEventCard">
+        <div class="pt-event-card-layout">
+          <div class="pt-event-card-copy">
+            <span>Past Event</span>
+            <strong id="proTourPastEventTitle">None yet</strong>
+            <small id="proTourPastEventMeta">Begin your first event.</small>
+          </div>
+          <span class="pt-course-emoji" id="proTourPastEventEmoji" aria-hidden="true"></span>
+        </div>
+      </article>
+      <article class="pt-info-card active">
+        <div class="pt-event-card-layout">
+          <div class="pt-event-card-copy">
+            <span id="proTourNextEventLabel">Next Event</span>
+            <strong id="proTourNextEventTitle">Little Pines Open</strong>
+            <small id="proTourNextEventMeta">Event 1 of 4</small>
+          </div>
+          <span class="pt-course-emoji" id="proTourNextEventEmoji" aria-hidden="true"></span>
+        </div>
+      </article>
+    </div>
+    <article class="pt-standing-card">
+      <div>
+        <span>Your Position</span>
+        <strong id="proTourSeasonStanding">-</strong>
+      </div>
+      <div id="proTourLeaderStandingBlock">
+        <span>Leader</span>
+        <strong id="proTourSeasonLeader">-</strong>
+      </div>
+    </article>
+    <button class="menu-btn-play pt-main-action" id="proTourMainActionBtn" type="button">NEXT EVENT</button>
+    <nav class="pt-bottom-panel" aria-label="Pro Tour panels">
+      <button class="diff-btn" id="proTourLeaderboardPanelBtn" type="button" aria-label="Tour leaderboard" title="Tour leaderboard">📋</button>
+      <button class="diff-btn" id="proTourStatsPanelBtn" type="button" aria-label="Stats" title="Stats">📊</button>
+      <button class="diff-btn" id="proTourTrophyPanelBtn" type="button" aria-label="Trophy room" title="Trophy room">🏆</button>
+    </nav>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourLeaderboardScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourLeaderboardBackBtn" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">TOUR LEADERBOARD</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    <div id="proTourLeaderboardBody" class="pt-page-body"></div>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourEventResultsScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourEventResultsBackBtn" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">EVENT RESULTS</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    <div id="proTourEventResultsBody" class="pt-page-body"></div>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourStatsScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourStatsBackBtn" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">STATS</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    <div id="proTourStatsBody" class="pt-page-body"></div>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourTrophyScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-head-row">
+      <button class="setup-back-btn" id="proTourTrophyBackBtn" aria-label="Back">&#8592;</button>
+      <div class="setup-title" style="margin-bottom:0;">TROPHY ROOM</div>
+      <span class="setup-head-spacer"></span>
+    </div>
+    <div id="proTourTrophyBody" class="pt-page-body"></div>
+  </div>
+</div>
+
+<div class="setup-screen pro-tour-screen" id="proTourSeasonFinaleScreen" style="display:none">
+  <div class="setup-card pro-tour-card">
+    <div class="setup-title">FINAL STANDINGS</div>
+    <div id="proTourSeasonFinaleBody" class="pt-page-body"></div>
+    <button class="menu-btn-play pt-main-action" id="proTourSeasonFinaleContinueBtn" type="button">CONTINUE</button>
+  </div>
+</div>
+
+<template id="proTourSlotTemplate">
+  <article class="pt-slot-card">
+    <div class="pt-slot-copy"></div>
+    <div class="pt-slot-actions"></div>
+  </article>
+</template>
 
 <div class="setup-screen" id="customScreen" style="display:none">
   <div class="setup-card">
@@ -290,7 +469,7 @@
     <button class="course-btn" id="coursePacificBeachBtn" data-course-id="pacific-beach">
       <div>
         <div style="font-family:'Bebas Neue',cursive;font-size:22px;letter-spacing:2px;color:var(--text);">PACIFIC BEACH</div>
-        <div style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">PAR 71 · COASTAL</div>
+        <div style="font-family:'Sen', sans-serif;font-size:10px;color:var(--muted);">PAR 72 · COASTAL</div>
       </div>
       <div style="font-size:24px;">🌊</div>
     </button>
@@ -527,12 +706,14 @@
 <script src="scripts/app.js?v=177714-fix1"></script>
 <script src="scripts/ui/navigation.js"></script>
 <script src="scripts/courses.js?v=0.54"></script>
-<script src="scripts/state.js?v=0.54"></script>
+<script src="scripts/state.js?v=0.60"></script>
 <script src="scripts/cpu-field.js?v=0.55"></script>
+<script src="scripts/pro-tour-core.js?v=0.60.1"></script>
+<script src="scripts/pro-tour.js?v=0.60.1"></script>
 <script src="scripts/ui/scorecard.js?v=177714-fix3"></script>
 <script src="scripts/gameplay/grid.js?v=0.54"></script>
 <script src="scripts/gameplay/shot-processing.js?v=177714-fix16"></script>
-<script src="scripts/gameplay/hole-flow.js?v=0.54.1"></script>
+<script src="scripts/gameplay/hole-flow.js?v=0.60"></script>
 <script src="scripts/ui/round-summary.js?v=0.54.1"></script>
 <script src="scripts/profiles/profile-core.js"></script>
 <script src="scripts/profiles/xp.js?v=0.56"></script>
@@ -540,8 +721,8 @@
 <script src="scripts/profiles/history.js?v=177714-fix4"></script>
 <script src="scripts/profiles/profile-settings.js"></script>
 <script src="scripts/wildcards.js?v=177714-fix21"></script>
-<script src="scripts/storage.js?v=177714-fix11"></script>
-<script src="scripts/rules.js?v=177714-fix3"></script>
+<script src="scripts/storage.js?v=0.60.1"></script>
+<script src="scripts/rules.js?v=0.60.1"></script>
 <script src="scripts/tutorial.js"></script>
 <script src="scripts/versus.js?v=177714-fix7"></script>
 <script src="scripts/ui/events.js?v=0.54"></script>
