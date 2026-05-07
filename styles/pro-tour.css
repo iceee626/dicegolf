@@ -18,19 +18,18 @@
 }
 .pt-slot-summary{line-height:1.25;text-align:right;max-width:72%;}
 .pt-name-input,.pt-create-grid select,.pt-round-form input{
-  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);min-height:44px;padding:10px 12px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;text-transform:uppercase;outline:none;
+  width:100%;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;color:var(--text);min-height:50px;padding:12px 12px;font-family:'Bebas Neue',cursive;font-size:18px;letter-spacing:2px;text-transform:uppercase;outline:none;text-align:center;
 }
 .pt-create-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .pt-slot-actions{display:grid;grid-template-columns:1fr;gap:8px;}
-.pt-slot-actions:has(.danger){grid-template-columns:1fr 1fr;}
-.pt-slot-actions button{min-height:62px;}
-.pt-slot-actions .danger{height:62px;border-color:rgba(224,82,82,.4);color:#ff9b9b;}
+.pt-slot-actions .menu-btn-play{min-height:62px;}
 .pt-slot-actions .continue-state{background:linear-gradient(135deg,#1a5f8a,#2a3a6e);box-shadow:0 4px 20px rgba(30,95,138,.4), inset 0 1px 0 rgba(255,255,255,.06);}
 .pt-choice-row{margin-bottom:0;}
 .pt-season-meta{text-align:center;margin:-8px 0 14px;color:var(--gold);}
 .pt-season-pill{display:inline-flex;align-items:center;justify-content:center;min-height:27px;padding:5px 12px;border-radius:999px;background:rgba(240,192,64,.14);border:1px solid rgba(240,192,64,.35);color:var(--gold);font-family:'Sen',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;}
 .pt-settings-btn{background:rgba(255,255,255,.08) url('../assets/settings.svg') center/18px 18px no-repeat;border:1px solid var(--border);color:transparent;border-radius:7px;width:32px;height:32px;font-size:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;line-height:1;}
 .pt-dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.pt-dashboard-grid.single-next{grid-template-columns:1fr;}
 .pt-info-card{padding:12px;min-height:116px;}
 .pt-info-card.has-results{cursor:pointer;}
 .pt-info-card.has-results:active{transform:translateY(1px) scale(.975);border-color:rgba(120,220,96,.42);}
