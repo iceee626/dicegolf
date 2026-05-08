@@ -361,6 +361,21 @@
     });
   }
 
+  function submitCpuRoundScoresForEligible(career, event, roundNumber, cpuScores){
+    const scores = cpuScores && typeof cpuScores === 'object' ? cpuScores : null;
+    career.field.forEach(player => {
+      if(player.isUser) return;
+      if(event.cutPlayerIds && !event.cutPlayerIds.includes(player.id)) return;
+      const rounds = event.rounds[player.id] || [];
+      if(typeof rounds[roundNumber - 1] === 'number') return;
+      const submitted = scores ? Number(scores[player.id]) : NaN;
+      rounds[roundNumber - 1] = Number.isFinite(submitted)
+        ? clamp(Math.round(submitted), event.par - 18, event.par + 36)
+        : cpuRoundScore(career, player, event, roundNumber);
+      event.rounds[player.id] = rounds;
+    });
+  }
+
   function finalizeEvent(career, event){
     const roundsPerEvent = event.roundsPerEvent || career.roundsPerEvent || 4;
     let finalRows = eventRows(career, event, roundsPerEvent);
@@ -480,7 +495,7 @@
 
     event.userRounds.push({ round:roundNumber, score, wildcardsUsed, wildcardsDiscarded });
     event.rounds[USER_ID][roundNumber - 1] = score;
-    simulateCpuRoundForEligible(next, event, roundNumber);
+    submitCpuRoundScoresForEligible(next, event, roundNumber, options && options.cpuScores);
 
     if(roundNumber === cutAfterRound){
       const cut = applyStrictCut(eventRows(next, event, cutAfterRound), CUT_SIZE);
