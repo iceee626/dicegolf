@@ -318,7 +318,8 @@
       pastCard.removeAttribute('role');
     }
 
-    const currentResults = Core.getCurrentEventResults(activeCareer);
+    const currentSave = Core.getActiveRoundSave(activeCareer);
+    const currentResults = Core.getCurrentEventResults(activeCareer, currentSave);
     const canOpenCurrentEvent = !!(dashboard.nextEvent && dashboard.nextEvent.inProgress && currentResults);
     $('proTourNextEventLabel').textContent = dashboard.nextEvent && dashboard.nextEvent.inProgress ? 'Current Event' : 'Next Event';
     $('proTourNextEventTitle').textContent = dashboard.nextEvent ? dashboard.nextEvent.courseName : 'Season Complete';
@@ -620,7 +621,7 @@
 
   function openCurrentEventResults(direction='forward'){
     if(!activeCareer) return false;
-    const result = Core.getCurrentEventResults(activeCareer);
+    const result = Core.getCurrentEventResults(activeCareer, Core.getActiveRoundSave(activeCareer));
     if(!result) return false;
     renderEventResults(result, { fromSummary:false, showNext:false });
     showTourView('proTourEventResultsScreen', direction);
