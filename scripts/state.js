@@ -21,7 +21,7 @@ let S={
   _roundWaterHits:0, _roundSandHits:0, _roundRoughHits:0,
   _roundPrevWasDoubleOrWorse:false, _roundIceTriggered:false,
   cpuMode:false, cpuField:null,
-  proTour:null, _proTourRoundSubmitted:false
+  proTour:null, proTourPostRound:null, _proTourRoundSubmitted:false
 };
 
 // ── Menu Navigation ──
@@ -220,19 +220,27 @@ function isCpuLeaderboardEnabled() {
 function resetGameState(){
   S.mode = SETUP.mode;
   S.totalRounds = SETUP.rounds;
-  S.currentRound = 1;
+  S.currentRound = Math.max(1, Math.min(S.totalRounds || 1, SETUP.startRound || 1));
+  SETUP.startRound = 1;
   S.holesConfig = SETUP.holesConfig;
-  S.cpuMode = shouldEnableCpuModeForSetup(SETUP, VS.active, _courseScreenFlow);
+  S.cpuMode = SETUP.mode === 'pro-tour' ? true : shouldEnableCpuModeForSetup(SETUP, VS.active, _courseScreenFlow);
   S.cpuField = null;
   S.proTour = null;
+  S.proTourPostRound = null;
   S._proTourRoundSubmitted = false;
   S.startIdx = S.holesConfig === 'back' ? 9 : 0;
   S.endIdx = S.holesConfig === 'front' ? 8 : 17;
   S.holeIdx = S.startIdx;
   
   S.zone='tee'; S.strokes=0; S.shotNum=1; S._tvShotNum=1; S.log=[];
-  S.scorecards = [Array(18).fill(null)];
-  S.histories = [Array(18).fill(null)];
+  S.scorecards = Array.from({ length: Math.max(1, S.totalRounds || 1) }, () => Array(18).fill(null));
+  S.histories = Array.from({ length: Math.max(1, S.totalRounds || 1) }, () => Array(18).fill(null));
+  const proTourPreviousScorecards = typeof window !== 'undefined' ? window.PRO_TOUR_PREVIOUS_SCORECARDS : null;
+  if(S.mode === 'pro-tour' && Array.isArray(proTourPreviousScorecards)){
+    proTourPreviousScorecards.forEach((row, idx) => {
+      if(idx < S.scorecards.length && Array.isArray(row)) S.scorecards[idx] = row.slice(0, 18);
+    });
+  }
   S.currentGrid=null; S.holeDone=false; S.rolling=false;
   S.yrdRemain=0; S.yrdTotal=0; S.fwyVisits=0; S.prevZone=null; S.shotCount=0;
   S._nextShotTransitioning=false;
@@ -347,9 +355,13 @@ function selectedCourseIdForFlow(){
 function startGame(){
   setMainAppConcealed(true);
   hideMainAppImmediate();
-  clearSavedGame();
+  if(typeof shouldClearProfileSaveForMode !== 'function' || shouldClearProfileSaveForMode(SETUP.mode)){
+    clearSavedGame();
+  }
   _skipGridScrollOnce = true;
-  clearSavedGame();
+  if(typeof shouldClearProfileSaveForMode !== 'function' || shouldClearProfileSaveForMode(SETUP.mode)){
+    clearSavedGame();
+  }
   resetGameState();
   const courseId = selectedCourseIdForFlow();
   applyCourse(courseId);
@@ -362,14 +374,18 @@ function startGame(){
   const diffMap={ 1: [1, 1, 2], 2: [1, 2, 3], 3: [2, 3, 3] };
   HOLES.forEach(h=>{ h.diff=diffMap[h.baseDiff][GAME_DIFF-1]; });
   if(S.cpuMode && typeof createCpuField === 'function'){
+    const proTourCpuOptions = SETUP.mode === 'pro-tour' && typeof window !== 'undefined' && window.PRO_TOUR_CPU_FIELD_OPTIONS
+      ? window.PRO_TOUR_CPU_FIELD_OPTIONS
+      : {};
     S.cpuField = createCpuField({
+      ...proTourCpuOptions,
       holes: HOLES,
       startIdx: S.startIdx,
       endIdx: S.endIdx,
-      totalRounds: S.totalRounds,
+      totalRounds: proTourCpuOptions.totalRounds || S.totalRounds,
       gameDiff: GAME_DIFF,
       courseId,
-      seed: Date.now(),
+      seed: proTourCpuOptions.seed || Date.now(),
       now: new Date()
     });
   }
