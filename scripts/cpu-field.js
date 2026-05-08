@@ -47,6 +47,30 @@ function cpuRoundScoresTotal(scores, holes, startIdx, endIdx){
   return { total, par, diff: total - par, thru };
 }
 
+function cpuDistributeGrossScore(grossScore, holes, startIdx, endIdx){
+  const scores = [];
+  const activeIndexes = cpuActiveHoleIndexes(startIdx, endIdx);
+  activeIndexes.forEach(absIdx => {
+    scores[absIdx] = Math.max(1, (holes[absIdx] && holes[absIdx].par) || 4);
+  });
+  let remaining = Math.round(Number(grossScore) || cpuTotalPar(holes, startIdx, endIdx))
+    - cpuTotalPar(holes, startIdx, endIdx);
+  if(remaining > 0){
+    for(let idx = activeIndexes.length - 1; remaining > 0; idx = (idx - 1 + activeIndexes.length) % activeIndexes.length){
+      scores[activeIndexes[idx]] += 1;
+      remaining--;
+    }
+  } else if(remaining < 0){
+    for(let idx = activeIndexes.length - 1; remaining < 0; idx = (idx - 1 + activeIndexes.length) % activeIndexes.length){
+      const absIdx = activeIndexes[idx];
+      if(scores[absIdx] <= 1) continue;
+      scores[absIdx] -= 1;
+      remaining++;
+    }
+  }
+  return scores;
+}
+
 function cpuScoreClass(diff){
   return diff < 0 ? 'good' : diff > 0 ? 'bad' : 'even';
 }
@@ -112,6 +136,12 @@ function cpuPickSurnames(random, count){
   return out;
 }
 
+function cpuOpponentNumber(id, fallback){
+  const match = String(id || '').match(/\d+/);
+  const n = match ? Number(match[0]) : NaN;
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
 function cpuMakeTraits(random, courseId){
   const trait = () => Math.round((random() * 2 - 1) * 100) / 100;
   const fit = {};
@@ -169,7 +199,7 @@ function cpuEnsureRoundTarget(field, opp, roundIdx, holes, gameDiff){
   if(typeof roundState.targetDiff === 'number') return roundState.targetDiff;
   const activeCount = Math.max(1, (field.endIdx || 17) - (field.startIdx || 0) + 1);
   const bounds = cpuRoundTargetBounds(gameDiff || field.gameDiff, activeCount);
-  const cpuNum = Number(String(opp.id || '').replace('cpu','')) || 1;
+  const cpuNum = cpuOpponentNumber(opp.id, 1);
   const random = seededRandom((field.seed || 1) + roundIdx * 7001 + cpuNum * 331 + 91);
   const bell = (random() + random() + random() + random() - 2) * 2.8;
   const traits = opp.traits || {};
@@ -195,9 +225,12 @@ function createCpuField(options){
   const seed = options.seed || Date.now();
   const random = seededRandom(seed);
   const now = options.now instanceof Date ? options.now : new Date(options.now || Date.now());
-  const surnames = cpuPickSurnames(random, CPU_FIELD_SIZE);
+  const customOpponents = Array.isArray(options.opponents) ? options.opponents.filter(Boolean) : null;
+  const surnames = customOpponents ? [] : cpuPickSurnames(random, CPU_FIELD_SIZE);
   const pacePattern = [-1, 0, 1, 2, -1, 1, 3, 0, -2];
-  const opponents = surnames.map((name, idx) => {
+  const sourceOpponents = customOpponents || surnames.map((name, index) => ({ id:`cpu${index + 1}`, name }));
+  const opponents = sourceOpponents.map((source, idx) => {
+    const name = String(source.name || `CPU${idx + 1}`).trim().toUpperCase().slice(0, 14) || `CPU${idx + 1}`;
     const teeOffset = 8 + idx * 9 + Math.floor(random() * 5);
     const rounds = [];
     for(let r = 0; r < totalRounds; r++){
@@ -208,10 +241,20 @@ function createCpuField(options){
         pacePattern[idx % pacePattern.length]
       ));
     }
+    const priorScores = options.roundScoresByOpponentId && options.roundScoresByOpponentId[source.id];
+    if(Array.isArray(priorScores)){
+      priorScores.forEach((gross, roundIdx) => {
+        if(roundIdx >= rounds.length || typeof gross !== 'number') return;
+        rounds[roundIdx].scores = cpuDistributeGrossScore(gross, holes, startIdx, endIdx);
+        rounds[roundIdx].thru = cpuActiveHoleIndexes(startIdx, endIdx).length;
+        rounds[roundIdx].complete = true;
+      });
+    }
     return {
-      id: `cpu${idx + 1}`,
+      id: source.id || `cpu${idx + 1}`,
       name,
-      traits: cpuMakeTraits(random, options.courseId),
+      traits: source.traits && typeof source.traits === 'object' ? cpuClone(source.traits) : cpuMakeTraits(random, options.courseId),
+      careerPlayerId: source.careerPlayerId || source.id || null,
       rounds
     };
   });
@@ -490,7 +533,7 @@ function cpuShouldHoldFinalContender(field, opp, context, roundIdx, playerThru, 
 
 function cpuTargetThru(field, opp, roundState, playerThru, totalHoles, context, roundIdx){
   if(opp.id === field.pairedOpponentId) return playerThru;
-  const cpuNum = Number(String(opp.id || '').replace('cpu','')) || 1;
+  const cpuNum = cpuOpponentNumber(opp.id, 1);
   const order = typeof roundState.order === 'number' ? roundState.order : cpuNum - 1;
   const groupSeed = Math.max(0, opp.id === field.pairedOpponentId ? 0 : Math.floor(Math.max(0, order - 1) / 2));
   const groupOffsets = [-2, -1, 1, 2];
@@ -503,7 +546,7 @@ function cpuTargetThru(field, opp, roundState, playerThru, totalHoles, context, 
 }
 
 function cpuHoleRandom(field, roundIdx, opp, absIdx){
-  const cpuNum = Number(String(opp.id || '').replace('cpu','')) || 1;
+  const cpuNum = cpuOpponentNumber(opp.id, 1);
   return seededRandom((field.seed || 1) + roundIdx * 10007 + cpuNum * 1009 + absIdx * 7919 + 173);
 }
 
