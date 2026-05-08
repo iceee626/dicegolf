@@ -423,8 +423,15 @@ function renderTournamentStatsPanel(selectedKey=S.currentRound){
 
 function startNextRound() {
   S.currentRound++;
-  S.scorecards.push(Array(18).fill(null));
-  S.histories.push(Array(18).fill(null));
+  if(S.proTour){
+    S.proTour.roundNumber = S.currentRound;
+    S._proTourRoundSubmitted = false;
+    S.proTourPostRound = null;
+  }
+  if(!Array.isArray(S.scorecards)) S.scorecards = [];
+  if(!Array.isArray(S.histories)) S.histories = [];
+  if(!Array.isArray(S.scorecards[S.currentRound - 1])) S.scorecards[S.currentRound - 1] = Array(18).fill(null);
+  if(!Array.isArray(S.histories[S.currentRound - 1])) S.histories[S.currentRound - 1] = Array(18).fill(null);
   S.holeIdx = S.startIdx;
   if(S.cpuMode && S.cpuField && typeof assignCpuRoundOrder === 'function'){
     assignCpuRoundOrder(S.cpuField, {
@@ -454,6 +461,10 @@ function startNextRound() {
   setMainAppConcealed(true);
   hideMainAppImmediate();
   loadHole();
-  saveGameState();
+  if(S.mode === 'pro-tour' && typeof window !== 'undefined' && window.ProTour && typeof window.ProTour.saveCurrentRoundToCareer === 'function'){
+    window.ProTour.saveCurrentRoundToCareer();
+  } else {
+    saveGameState();
+  }
   showSingleRoundSplash();
 }
