@@ -121,7 +121,7 @@
 #proTourStatsScreen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #proTourStatsScreen .pro-tour-card{min-height:auto;}
 #proTourStatsScreen .pt-page-body{padding-bottom:4px;min-height:0;}
-.pt-long-panel-screen .setup-head-row{position:sticky;top:0;z-index:5;padding-top:4px;flex-shrink:0;background:rgba(10,15,18,.92);backdrop-filter:blur(8px);border-radius:0 0 12px 12px;}
+.pt-long-panel-screen .setup-head-row{position:sticky;top:0;z-index:5;padding:10px 0 12px;margin-bottom:18px;flex-shrink:0;background:var(--dark);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08);}
 #proTourSettingsOverlay{align-items:flex-start;padding:calc(env(safe-area-inset-top) + 16px) 20px 20px;overflow-y:auto;}
 #proTourSettingsOverlay .profile-card{max-width:430px;max-height:calc(100vh - env(safe-area-inset-top) - 36px);display:flex;flex-direction:column;}
 #proTourSettingsOverlay .profile-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
