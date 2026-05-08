@@ -400,7 +400,9 @@ function completeHole(){
   
   const btn = document.getElementById('hcBtn');
   if (S.holeIdx === S.endIdx) {
-      if (S.currentRound < S.totalRounds) {
+      if (isProTourRound) {
+          btn.textContent = `COMPLETE ROUND ${S.currentRound}`;
+      } else if (S.currentRound < S.totalRounds) {
           btn.textContent = `COMPLETE ROUND ${S.currentRound}`;
       } else {
           btn.textContent = 'VIEW SUMMARY';
@@ -656,8 +658,7 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    const proTourCompleteRoundLabel = `COMPLETE ROUND ${S.currentRound}`;
-    btn.textContent = isProTourRound ? proTourCompleteRoundLabel : 'NEXT';
+    btn.textContent = 'VIEW SUMMARY';
     btn.onclick = () => {
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
@@ -767,8 +768,7 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    const proTourCompleteRoundLabel = `COMPLETE ROUND ${S.currentRound}`;
-    btn.textContent = isProTourRound ? proTourCompleteRoundLabel : 'VIEW SUMMARY';
+    btn.textContent = 'VIEW SUMMARY';
     btn.onclick = () => {
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
