@@ -61,15 +61,19 @@
 .pt-bottom-panel{grid-template-columns:repeat(3,1fr);margin-top:0;background:transparent;border:0;border-radius:0;padding:0;}
 .pt-bottom-panel .diff-btn{font-size:22px;line-height:1;min-height:48px;padding:8px 6px;border-radius:10px;}
 .pt-page-body{display:flex;flex-direction:column;gap:10px;}
-.pt-table{width:100%;table-layout:fixed;border-collapse:collapse;font-family:'Sen',sans-serif;font-size:11px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-.pt-table th,.pt-table td{padding:8px 5px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;white-space:nowrap;}
+.pt-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-family:'Sen',sans-serif;font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.pt-table th,.pt-table td{height:32px;padding:0 6px;text-align:right;white-space:nowrap;border-right:1px solid rgba(255,255,255,.07);border-bottom:1px solid var(--border);}
 .pt-table th:first-child,.pt-table td:first-child{width:42px;text-align:left;padding-left:6px;padding-right:3px;}
 .pt-table th:nth-child(2),.pt-table td:nth-child(2){text-align:left;}
 .pt-table th:nth-child(3),.pt-table td:nth-child(3),.pt-table th:last-child,.pt-table td:last-child{text-align:center;}
 .pt-table th:last-child,.pt-table td:last-child{width:54px;padding-right:6px;}
 .pt-table td:nth-child(2){overflow:hidden;text-overflow:ellipsis;}
-.pt-table th{font-size:9px;color:#fff;background:var(--summary-head-from);letter-spacing:1px;text-transform:uppercase;}
+.pt-table th{font-size:9px;color:#fff;background:var(--summary-head-from);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--summary-head-from);box-shadow:0 1px 0 var(--summary-head-from);}
+.pt-table th:last-child,.pt-table td:last-child{border-right:none;}
+.pt-table tbody tr:last-child td{border-bottom:none;}
 .pt-table .you-row{background:rgba(78,158,66,.16);}
+.pt-table .you-row td{border-top:1px solid rgba(120,220,96,.24);border-bottom:1px solid rgba(120,220,96,.24);}
+.pt-table .you-row td:nth-child(2){font-weight:800;color:#fff;}
 .pt-table .cut-row{opacity:.55;}
 .pt-section{padding:12px;}
 .pt-section-title{font-family:'Sen',sans-serif;font-size:10px;color:var(--gold);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
@@ -103,6 +107,8 @@
 .pt-season-player{display:flex;flex-direction:column;align-items:center;gap:10px;margin-top:22px;animation:ptFinalePop .42s cubic-bezier(.34,1.56,.64,1);}
 .pt-season-golfer{font-size:52px;line-height:1;filter:drop-shadow(0 4px 10px rgba(0,0,0,.32));}
 .pt-season-player strong{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;color:var(--text);line-height:1;}
+.pt-season-player small{font-family:'Sen',sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;text-align:center;}
+#proTourCutMissedScreen .pt-main-action{margin-top:22px;margin-bottom:0;}
 #proTourSeasonStartScreen.pt-season-exit .pt-season-start-card{animation:ptSeasonFade .24s ease forwards;}
 #proTourEventResultsScreen.pro-tour-screen{padding-top:calc(env(safe-area-inset-top) + 22px);}
 #proTourEventResultsScreen .setup-head-row{padding-top:4px;}
