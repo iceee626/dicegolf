@@ -29,6 +29,24 @@
     return JSON.parse(JSON.stringify(value));
   }
 
+  function normalizeRoundScorecard(scorecard){
+    if(!Array.isArray(scorecard)) return null;
+    const row = Array(18).fill(null);
+    scorecard.slice(0, 18).forEach((score, index) => {
+      if(typeof score === 'number' && Number.isFinite(score)) row[index] = score;
+    });
+    return row;
+  }
+
+  function normalizeRoundHistory(history){
+    if(!Array.isArray(history)) return null;
+    const row = Array(18).fill(null);
+    history.slice(0, 18).forEach((entry, index) => {
+      row[index] = entry == null ? null : clone(entry);
+    });
+    return row;
+  }
+
   function clamp(value, min, max){
     return Math.max(min, Math.min(max, value));
   }
@@ -493,7 +511,12 @@
     const wildcardsUsed = clamp(Math.round(Number(options && options.wildcardsUsed) || 0), 0, 99);
     const wildcardsDiscarded = clamp(Math.round(Number(options && options.wildcardsDiscarded) || 0), 0, 99);
 
-    event.userRounds.push({ round:roundNumber, score, wildcardsUsed, wildcardsDiscarded });
+    const submittedRound = { round:roundNumber, score, wildcardsUsed, wildcardsDiscarded };
+    const scorecard = normalizeRoundScorecard(options && options.scorecard);
+    const history = normalizeRoundHistory(options && options.history);
+    if(scorecard) submittedRound.scorecard = scorecard;
+    if(history) submittedRound.history = history;
+    event.userRounds.push(submittedRound);
     event.rounds[USER_ID][roundNumber - 1] = score;
     submitCpuRoundScoresForEligible(next, event, roundNumber, options && options.cpuScores);
 
