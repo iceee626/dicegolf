@@ -26,6 +26,7 @@ function showCelebration(d, onDone){
 
 function completeHole(){
   const h=HOLES[S.holeIdx];
+  const isProTourRound = S.mode === 'pro-tour';
   const restoringCompletedHole = !!S._resumeCompletedHolePanel;
   const savedScore = S.scorecards?.[S.currentRound - 1]?.[S.holeIdx];
   const savedHistScore = S.histories?.[S.currentRound - 1]?.[S.holeIdx]?.strokes;
