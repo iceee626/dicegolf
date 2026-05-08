@@ -218,7 +218,22 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   btnRow.className = 'sum-btn-row';
   btnRow.style.flexShrink = '0';
   
-  if (S.currentRound < S.totalRounds && S.holeDone) {
+  const isProTourSummary = S.mode === 'pro-tour';
+  const proTourPostRound = isProTourSummary ? (S.proTourPostRound || null) : null;
+
+  if (isProTourSummary && proTourPostRound && proTourPostRound.eventComplete) {
+    const finishBtn=document.createElement('button');
+    finishBtn.style.cssText='width:100%;background:var(--c-fwy);color:#fff;border:none;border-radius:10px;padding:13px;font-family:"Bebas Neue",cursive;font-size:18px;letter-spacing:2px;cursor:pointer;';
+    finishBtn.textContent=proTourPostRound.missedCut ? 'CONTINUE' : 'VIEW EVENT RESULTS';
+    finishBtn.onclick=()=>{
+      if(proTourPostRound.missedCut && window.ProTour && typeof window.ProTour.showMissedCutSplash === 'function'){
+        window.ProTour.showMissedCutSplash();
+        return;
+      }
+      if(window.ProTour && typeof window.ProTour.openLatestEventResults === 'function') window.ProTour.openLatestEventResults('forward');
+    };
+    btnRow.appendChild(finishBtn);
+  } else if (S.currentRound < S.totalRounds && S.holeDone) {
     const nextRndBtn=document.createElement('button');
     nextRndBtn.style.cssText='width:100%;background:var(--c-fwy);color:#fff;border:none;border-radius:10px;padding:13px;font-family:"Bebas Neue",cursive;font-size:18px;letter-spacing:2px;cursor:pointer;';
     nextRndBtn.textContent=`START ROUND ${S.currentRound + 1}`;
@@ -234,11 +249,17 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   } else {
     const returnBtn=document.createElement('button');
     returnBtn.style.cssText='width:100%;background:var(--c-fwy);color:#fff;border:none;border-radius:10px;padding:13px;font-family:"Bebas Neue",cursive;font-size:18px;letter-spacing:2px;cursor:pointer;';
-    returnBtn.textContent='RETURN TO MAIN MENU';
-    returnBtn.onclick=()=>summaryReturnToMenu();
+    returnBtn.textContent=isProTourSummary ? 'VIEW EVENT RESULTS' : 'RETURN TO MAIN MENU';
+    returnBtn.onclick=()=>{
+      if(isProTourSummary && window.ProTour && typeof window.ProTour.openLatestEventResults === 'function'){
+        window.ProTour.openLatestEventResults('forward');
+        return;
+      }
+      summaryReturnToMenu();
+    };
     btnRow.appendChild(returnBtn);
     
-    if (S.currentRound === S.totalRounds && S.holeDone) {
+    if (!isProTourSummary && S.currentRound === S.totalRounds && S.holeDone) {
       const playAgainBtn=document.createElement('button');
       playAgainBtn.style.cssText='width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:13px;font-family:"Bebas Neue",cursive;font-size:18px;letter-spacing:2px;cursor:pointer;';
       playAgainBtn.textContent='PLAY AGAIN';
@@ -321,6 +342,11 @@ function summarySaveAndMenu(){
   closeSummaryHoleModal();
   _summaryBackTarget = null;
   setSummaryContext(null);
+  if(S && S.mode === 'pro-tour' && window.ProTour && typeof window.ProTour.saveAndReturnFromGameMenu === 'function'){
+    window.ProTour.saveAndReturnFromGameMenu();
+    requestAnimationFrame(()=>document.getElementById('summaryModal').classList.remove('show'));
+    return;
+  }
   returnToMenuSave({preserveSummary:true});
   requestAnimationFrame(()=>document.getElementById('summaryModal').classList.remove('show'));
   setTimeout(()=>clearCourseVisualTheme(), 220);
