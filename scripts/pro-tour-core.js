@@ -714,6 +714,45 @@
     return event;
   }
 
+  function getCurrentEventResults(career){
+    if(!career || !career.activeEvent || career.activeEvent.status !== 'in_progress') return null;
+    const event = career.activeEvent;
+    const userRounds = Array.isArray(event.userRounds) ? event.userRounds : [];
+    const throughRound = userRounds.filter(round => typeof round.score === 'number').length;
+    if(throughRound <= 0) return null;
+    const rows = eventRows(career, event, throughRound);
+    let standings;
+    if(event.cutPlayerIds && Array.isArray(event.cutPlayerIds)){
+      const finalists = rows.filter(row => event.cutPlayerIds.includes(row.playerId)).map(row => ({ ...row, madeCut:true }));
+      const missed = rows.filter(row => !event.cutPlayerIds.includes(row.playerId)).map(row => ({ ...row, madeCut:false }));
+      standings = assignTourPoints(finalists).concat(
+        sortStandings(missed).map(row => ({ ...row, points:0, position:null }))
+      );
+    } else {
+      standings = assignTourPoints(rows).map(row => ({ ...row, madeCut:true }));
+    }
+    const mapped = standings.map(row => ({
+      ...row,
+      diffLabel:row.total > 0 ? formatDiff(row.total, row.par || event.par * row.rounds.length) : '-',
+      positionLabel:row.position ? positionLabel(row.position) : 'CUT',
+      points:row.points || 0
+    }));
+    const user = mapped.find(row => row.isUser);
+    const course = COURSES.find(item => item.id === event.courseId);
+    return {
+      eventId:event.id,
+      courseId:event.courseId,
+      courseName:event.courseName,
+      emoji:course ? course.emoji : '',
+      throughRound,
+      roundLabel:`Through Round ${throughRound}`,
+      userPositionLabel:user ? user.positionLabel : '-',
+      userDiffLabel:user ? user.diffLabel : '-',
+      userPoints:user ? user.points || 0 : 0,
+      finalStandings:mapped
+    };
+  }
+
   function getSeasonFinale(career){
     if(!career || !career.currentSeason || career.currentSeason.status !== 'complete') {
       return { shouldShow:false, podium:[] };
@@ -769,6 +808,7 @@
     getCareerStats,
     getDashboard,
     getPastEventResults,
+    getCurrentEventResults,
     getSeasonFinale,
     markSeasonFinaleSeen,
     getSeasonIntro,
