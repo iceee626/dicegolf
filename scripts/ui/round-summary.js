@@ -1,5 +1,10 @@
 // Round Summary, History Detail, and Inline Replay UI
 
+function summaryRoundHasScores(roundNumber){
+  const row = S && S.scorecards ? S.scorecards[roundNumber - 1] : null;
+  return Array.isArray(row) && row.some(score => typeof score === 'number' && score > 0);
+}
+
 function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget){
   if(_summaryContext && _summaryContext.mode === 'versus'){
     openVersusSummary(viewRound, backTarget);
@@ -59,7 +64,7 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
     allPill.onclick = () => openSummary('overall', backTarget);
     pillWrap.appendChild(allPill);
     for(let r=1; r<=S.totalRounds; r++){
-      if(r > S.currentRound && S.currentRound !== S.totalRounds && !S.scorecards[r-1]) continue;
+      if(!summaryRoundHasScores(r)) continue;
       const pill = document.createElement('button');
       pill.className = `sum-tab${!isOverallStats && r === scorecardRound ? ' active' : ''}`;
       pill.textContent = `R${r}`;
