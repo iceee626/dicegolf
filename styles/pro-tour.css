@@ -94,9 +94,9 @@
 .pt-finale-celebration{text-align:center;background:rgba(240,192,64,.1);border:1px solid rgba(240,192,64,.32);border-radius:14px;padding:18px 14px;animation:ptFinalePop .42s cubic-bezier(.34,1.56,.64,1);}
 .pt-finale-burst{font-size:46px;line-height:1;margin-bottom:8px;animation:ptTrophyPulse 1.2s ease-in-out infinite;}
 .pt-finale-celebration strong{display:block;font-family:'Bebas Neue',cursive;font-size:32px;line-height:1;letter-spacing:2px;color:var(--gold);margin-bottom:6px;}
-.pt-finale-podium{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:end;margin-bottom:10px;}
-.pt-podium-place{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;min-height:96px;display:flex;flex-direction:column;justify-content:center;gap:5px;animation:ptPodiumRise .38s ease both;}
-.pt-podium-place:nth-child(1){min-height:122px;border-color:rgba(240,192,64,.45);}
+.pt-finale-podium{display:grid;grid-template-columns:1fr;gap:8px;align-items:stretch;margin-bottom:10px;}
+.pt-podium-place{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;min-height:78px;display:flex;flex-direction:column;justify-content:center;gap:5px;animation:ptPodiumRise .38s ease both;}
+.pt-podium-place.champion{min-height:96px;border-color:rgba(240,192,64,.68);box-shadow:0 0 0 1px rgba(240,192,64,.2),0 10px 24px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.06);}
 .pt-podium-place:nth-child(2){animation-delay:.08s;}
 .pt-podium-place:nth-child(3){animation-delay:.16s;}
 .pt-podium-place.second{border-color:rgba(210,215,224,.72);box-shadow:0 0 0 1px rgba(210,215,224,.18), inset 0 1px 0 rgba(255,255,255,.06);}
@@ -113,6 +113,7 @@
 .pt-season-player strong{font-family:'Bebas Neue',cursive;font-size:28px;letter-spacing:2px;color:var(--text);line-height:1;}
 .pt-season-player small{font-family:'Sen',sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;text-align:center;}
 #proTourCutMissedScreen .pt-main-action{margin-top:22px;margin-bottom:0;}
+#proTourCutMissedScreen.pt-auto-exit .pro-tour-card{animation:ptSeasonFade .24s ease forwards;}
 #proTourSeasonStartScreen.pt-season-exit .pt-season-start-card{animation:ptSeasonFade .24s ease forwards;}
 .pt-long-panel-screen.pro-tour-screen{align-items:stretch;justify-content:center;overflow:hidden;padding:0;}
 .pt-long-panel-screen .pro-tour-card{height:100dvh;min-height:100vh;width:100%;max-width:430px;margin:0 auto;box-sizing:border-box;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 18px);background:var(--dark);}
@@ -133,6 +134,5 @@
 @media (max-width:390px){
   .pt-dashboard-grid,.pt-standing-card,.pt-create-grid,.pt-round-form{grid-template-columns:1fr;}
   .pt-quick-row{grid-template-columns:1fr 1fr;}
-  .pt-finale-podium{grid-template-columns:1fr;}
-  .pt-podium-place,.pt-podium-place:nth-child(1){min-height:78px;}
+  .pt-podium-place,.pt-podium-place.champion{min-height:78px;}
 }
