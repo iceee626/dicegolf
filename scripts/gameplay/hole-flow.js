@@ -287,6 +287,7 @@ function completeHole(){
   if(hcIconEl){ hcIconEl.style.display = 'none'; }
   const hcTitle = document.getElementById('hcTitle');
   hcTitle.textContent = title;
+  hcTitle.classList.toggle('long-result-title', title.length >= 14);
   hcTitle.style.display = '';
 
   // Outcome haptic
