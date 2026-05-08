@@ -26,7 +26,7 @@ const WILDCARDS=[
   {id:'birdie_boost',    weight: 30, icon:'🚀', name:'Birdie Boost',      desc:'Add 8 extra Green cells to next approach grid.'},
   
   // EPIC (Weight 15) - Very powerful
-  {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone (only par 4/5 after tee shot).'},
+  {id:'shortcut',        weight: 15, icon:'⚡', name:'Shortcut',          desc:'Skip straight to Chip zone on par 4/5 after any eligible shot.'},
   {id:'bogey_shield',    weight: 15, icon:'🛡️', name:'Bogey Shield',      desc:'Next Bogey+ result converted into a Par.'},
   {id:'sand_wedge_pro',  weight: 15, icon:'🏖️', name:'Sand Wedge Pro',    desc:'Next Sand shot: 80% of grid converted into Green.'},
   {id:'mulligan',        weight: 15, icon:'↩️', name:'Mulligan',          desc:'Re-roll both dice once, discard previous result.'},
@@ -350,7 +350,7 @@ function renderWcDrawer(){
       if (wc.id === 'bounce_back') statusText = WCS.bounceBackReady ? 'Ready for next tee shot' : 'Waiting for bogey+ result';
       if (wc.id === 'bogey_shield') statusText = 'Waiting for bogey+ result';
       if (wc.id === 'cup_magnet') statusText = 'Waiting for Green...';
-      if (wc.id === 'shortcut') statusText = 'Waiting for NEXT SHOT after Par 4/5 tee shot';
+      if (wc.id === 'shortcut') statusText = 'Waiting for eligible Par 4/5 shot';
 
       const item = document.createElement('div');
       item.className = `wc-active-item${_expandedActiveWcId===wc.id?' expanded':''}`;
