@@ -279,6 +279,12 @@ body[data-course-theme='septembra-national'] #nextShotBtn{
   letter-spacing:.2px;
   line-height:1;
 }
+body[data-course-theme='septembra-national'] .hc-card-title.long-result-title{
+  font-size:clamp(30px,8.2vw,38px);
+  letter-spacing:1px;
+  line-height:.98;
+  overflow-wrap:break-word;
+}
 
 /* RESULT */
 .result-panel{margin:0 16px 8px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:13px 15px;min-height:66px;display:flex;align-items:center;gap:12px;}
