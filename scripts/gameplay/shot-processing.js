@@ -166,9 +166,9 @@ function applyQueuedShortcutAfterTeeShot(){
   if(!WCS || !WCS.shortcutActive) return false;
   const h = HOLES[S.holeIdx];
   if(!h || h.par === 3) return false;
-  if(S._lastShotHoleIdx !== S.holeIdx || S._lastShotOriginZone !== 'tee') return false;
   if(S.holeDone || S._pendingPuttResult) return false;
   if(!['fwy','rgh','sand','chip'].includes(S.zone)) return false;
+  if(S._lastShotHoleIdx != null && S._lastShotHoleIdx !== S.holeIdx) return false;
 
   const prevZone = S.zone;
   const prevYrdRemain = S.yrdRemain;
@@ -178,6 +178,13 @@ function applyQueuedShortcutAfterTeeShot(){
   S._lastShotOriginZone = null;
   S._lastShotResultZone = 'chip';
   addLog('🃏', 'Skipped to Chip (⚡ Shortcut)', 'chip', 'WC', false, null, null, null, prevZone, prevYrdRemain);
+  S._forceGrid = false;
+  S._preserveGrid = false;
+  if(typeof buildGrid === 'function'){
+    buildGrid();
+  } else if(typeof renderGrid === 'function'){
+    renderGrid();
+  }
   updateZonePill(); updateYrd(); updateFloat(); updateTVBanner();
   showWcToast('⚡ Shortcut activated!');
   if(h.par === 5){
