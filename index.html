@@ -22,7 +22,7 @@
 <link rel="stylesheet" href="styles/modals.css">
 <link rel="stylesheet" href="styles/wildcards.css">
 <link rel="stylesheet" href="styles/versus.css">
-<link rel="stylesheet" href="styles/pro-tour.css?v=0.61">
+<link rel="stylesheet" href="styles/pro-tour.css?v=0.62">
 <link rel="stylesheet" href="styles/tutorial.css">
 </head>
 <body class="startup-no-anim">
@@ -322,7 +322,7 @@
           <span class="pt-course-emoji" id="proTourPastEventEmoji" aria-hidden="true"></span>
         </div>
       </article>
-      <article class="pt-info-card active">
+      <article class="pt-info-card active" id="proTourNextEventCard">
         <div class="pt-event-card-layout">
           <div class="pt-event-card-copy">
             <span id="proTourNextEventLabel">Next Event</span>
@@ -371,6 +371,7 @@
       <span class="setup-head-spacer"></span>
     </div>
     <div id="proTourEventResultsBody" class="pt-page-body"></div>
+    <button class="menu-btn-play pt-main-action" id="proTourEventResultsNextBtn" type="button" style="display:none;">NEXT</button>
   </div>
 </div>
 
@@ -717,19 +718,19 @@
 <script src="scripts/courses.js?v=0.54"></script>
 <script src="scripts/state.js?v=0.61"></script>
 <script src="scripts/cpu-field.js?v=0.61"></script>
-<script src="scripts/pro-tour-core.js?v=0.61"></script>
-<script src="scripts/pro-tour.js?v=0.61"></script>
+<script src="scripts/pro-tour-core.js?v=0.62"></script>
+<script src="scripts/pro-tour.js?v=0.62"></script>
 <script src="scripts/ui/scorecard.js?v=177714-fix3"></script>
-<script src="scripts/gameplay/grid.js?v=0.54"></script>
-<script src="scripts/gameplay/shot-processing.js?v=177714-fix16"></script>
+<script src="scripts/gameplay/grid.js?v=0.62"></script>
+<script src="scripts/gameplay/shot-processing.js?v=0.62"></script>
 <script src="scripts/gameplay/hole-flow.js?v=0.61"></script>
-<script src="scripts/ui/round-summary.js?v=0.61"></script>
+<script src="scripts/ui/round-summary.js?v=0.62"></script>
 <script src="scripts/profiles/profile-core.js"></script>
 <script src="scripts/profiles/xp.js?v=0.61"></script>
 <script src="scripts/profiles/achievements.js?v=177714-fix1"></script>
 <script src="scripts/profiles/history.js?v=0.61"></script>
 <script src="scripts/profiles/profile-settings.js"></script>
-<script src="scripts/wildcards.js?v=177714-fix21"></script>
+<script src="scripts/wildcards.js?v=0.62"></script>
 <script src="scripts/storage.js?v=0.61"></script>
 <script src="scripts/rules.js?v=0.60.1"></script>
 <script src="scripts/tutorial.js"></script>
