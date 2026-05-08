@@ -183,6 +183,7 @@ function renderXpAwardCardHtml(award){
   const scoreMulText = award.scoreMultiplierOverride
     ? award.scoreMultiplierOverride
     : `x${award.scoreMultiplier.toFixed(2)}`;
+  const difficultyBonusLabel = `${getDifficultyLabel(award.gameDiff || GAME_DIFF)} Difficulty Bonus`;
   const finalToNext = award.after.level >= XP_MAX_LEVEL
     ? 'MAX LEVEL'
     : `${Math.max(0, Math.ceil(award.after.need - award.after.xpIntoLevel))} XP TO LEVEL UP`;
@@ -193,9 +194,9 @@ function renderXpAwardCardHtml(award){
       </div>
       <div class="xp-award-rows">
         <div class="xp-award-row"><span class="xp-award-lbl">Completed Round</span><span class="xp-award-val">${award.baseXp} XP</span></div>
-        <div class="xp-award-row"><span class="xp-award-lbl">Difficulty Multiplier</span><span class="xp-award-val">x${award.difficultyMultiplier.toFixed(2)}</span></div>
         <div class="xp-award-row"><span class="xp-award-lbl">Score Multiplier</span><span class="xp-award-val">${scoreMulText}</span></div>
-        ${award.difficultyCompletionBonus > 0 ? `<div class="xp-award-row"><span class="xp-award-lbl">Difficulty Completion Bonus</span><span class="xp-award-val">${award.difficultyCompletionBonus} XP</span></div>` : ''}
+        <div class="xp-award-row"><span class="xp-award-lbl">Difficulty Multiplier</span><span class="xp-award-val">x${award.difficultyMultiplier.toFixed(2)}</span></div>
+        ${award.difficultyCompletionBonus > 0 ? `<div class="xp-award-row"><span class="xp-award-lbl">${difficultyBonusLabel}</span><span class="xp-award-val">${award.difficultyCompletionBonus} XP</span></div>` : ''}
         ${award.achievementBonus > 0 ? `<div class="xp-award-row"><span class="xp-award-lbl">Achievement Bonus</span><span class="xp-award-val">${award.achievementBonus} XP</span></div>` : ''}
         ${award.tutorialBonus > 0 ? `<div class="xp-award-row"><span class="xp-award-lbl">Tutorial Completion Bonus</span><span class="xp-award-val">${award.tutorialBonus} XP</span></div>` : ''}
         <div class="xp-award-row"><span class="xp-award-lbl">Total XP</span><span class="xp-award-val total">${award.totalXp} XP</span></div>
@@ -318,6 +319,7 @@ function awardRoundExperience(options = {}){
     baseXp,
     gameplayXp,
     totalXp,
+    gameDiff: options.gameDiff || GAME_DIFF,
     difficultyMultiplier,
     scoreMultiplier,
     scoreMultiplierOverride: options.scoreMultiplierLabel || '',
