@@ -216,6 +216,11 @@ function buildGrid(){
     if(WCS&&typeof applyPendingGridWildcardsToCurrentGrid==='function')applyPendingGridWildcardsToCurrentGrid();
   };
 
+  // CHIP
+  if(S.zone==='chip'){
+    return _emit('Chip Shot Grid',_chipTmpl(h));
+  }
+
   // PUTTING
   if(S.zone==='grn' && S._forceP1PuttGrid){
     S.currentGrid=Array(6).fill(null).map(()=>Array(6).fill('p1'));
@@ -228,7 +233,7 @@ function buildGrid(){
   }
 
   // CHIP (no chip cells — chip→chip loop impossible)
-  if(S.zone==='chip'||(gate==='nearpin'&&S.zone!=='grn'&&S.zone!=='sand') || ((S.zone==='fwy'||S.zone==='rgh') && S.yrdRemain <= 35)){
+  if((gate==='nearpin'&&S.zone!=='grn'&&S.zone!=='sand') || ((S.zone==='fwy'||S.zone==='rgh') && S.yrdRemain <= 35)){
     return _emit('Chip Shot Grid',_chipTmpl(h));
   }
 
