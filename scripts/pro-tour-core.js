@@ -24,6 +24,12 @@
     'RAHMIREZ','FOREST','DESHAMBO','HOLYWOOD','FALDOUGH','NICKELSON','SINGLES','BROOKS','YOONG',
     'WONG','NAKAMURA','LOWRIE','CANTWELL','KUCHARSKI','SCHEFFIELD','ROSS','NIGHT','FITZGERALD','THOMASON'
   ];
+  const COURSE_HOLE_PARS = {
+    'little-pines':[4,5,3,4,5,4,3,5,4,4,4,3,5,4,4,3,4,4],
+    'pacific-beach':[4,5,4,4,3,5,3,4,4,4,4,3,4,5,4,4,3,5],
+    'gator-creek':[4,5,3,4,4,4,4,3,5,4,5,4,3,4,4,5,3,4],
+    'septembra-national':[4,5,4,3,4,3,4,5,4,4,4,3,5,4,5,3,4,4]
+  };
 
   function clone(value){
     return JSON.parse(JSON.stringify(value));
@@ -344,6 +350,69 @@
         madeCut:event.cutPlayerIds ? event.cutPlayerIds.includes(player.id) : null
       };
     });
+  }
+
+  function scorecardTotalAndPar(scorecard, courseId){
+    const pars = COURSE_HOLE_PARS[courseId] || Array(18).fill(4);
+    let total = 0;
+    let par = 0;
+    let holes = 0;
+    if(!Array.isArray(scorecard)) return { total, par, holes };
+    scorecard.slice(0, 18).forEach((score, index) => {
+      if(typeof score !== 'number') return;
+      total += score;
+      par += pars[index] || 4;
+      holes++;
+    });
+    return { total, par, holes };
+  }
+
+  function activeSaveCpuScorecard(activeRoundSave, playerId, roundIdx){
+    const opponents = activeRoundSave
+      && activeRoundSave.gameSave
+      && activeRoundSave.gameSave.cpuField
+      && Array.isArray(activeRoundSave.gameSave.cpuField.opponents)
+        ? activeRoundSave.gameSave.cpuField.opponents
+        : [];
+    const opponent = opponents.find(opp => (opp.careerPlayerId || opp.id) === playerId);
+    const round = opponent && oppRound(opponent, roundIdx);
+    return round && Array.isArray(round.scores) ? round.scores : null;
+  }
+
+  function oppRound(opponent, roundIdx){
+    return opponent && Array.isArray(opponent.rounds) ? opponent.rounds[roundIdx] : null;
+  }
+
+  function activeSaveEventRows(career, event, activeRoundSave){
+    if(!activeRoundSave || !activeRoundSave.gameSave) return null;
+    const save = activeRoundSave.gameSave;
+    const roundNumber = clamp(Number(save.currentRound || (activeRoundSave.context && activeRoundSave.context.roundNumber) || event.currentRound || 1), 1, event.roundsPerEvent || career.roundsPerEvent || 4);
+    const roundIdx = roundNumber - 1;
+    const playerScorecard = Array.isArray(save.scorecards) ? save.scorecards[roundIdx] : null;
+    const playerPartial = scorecardTotalAndPar(playerScorecard, event.courseId);
+    if(playerPartial.holes <= 0) return null;
+    const rows = career.field.map(player => {
+      const priorRounds = (event.rounds[player.id] || []).slice(0, roundIdx);
+      const priorTotal = priorRounds.reduce((sum, score) => sum + (typeof score === 'number' ? score : 0), 0);
+      const priorPlayed = priorRounds.filter(score => typeof score === 'number').length;
+      const partial = player.isUser
+        ? playerPartial
+        : scorecardTotalAndPar(activeSaveCpuScorecard(activeRoundSave, player.id, roundIdx), event.courseId);
+      const total = priorTotal + partial.total;
+      const par = (event.par * priorPlayed) + partial.par;
+      return {
+        playerId:player.id,
+        name:player.name,
+        isUser:!!player.isUser,
+        total,
+        par,
+        diff:total - par,
+        rounds:priorRounds.concat(partial.holes > 0 ? [partial.total] : []),
+        seedOrder:player.seedOrder,
+        madeCut:event.cutPlayerIds ? event.cutPlayerIds.includes(player.id) : null
+      };
+    });
+    return { rows, roundNumber, holes:playerPartial.holes };
   }
 
   function sortStandings(rows){
@@ -737,26 +806,22 @@
     return event;
   }
 
-  function getCurrentEventResults(career){
-    if(!career || !career.activeEvent || career.activeEvent.status !== 'in_progress') return null;
-    const event = career.activeEvent;
-    const userRounds = Array.isArray(event.userRounds) ? event.userRounds : [];
-    const throughRound = userRounds.filter(round => typeof round.score === 'number').length;
-    if(throughRound <= 0) return null;
-    const rows = eventRows(career, event, throughRound);
+  function mapCurrentEventResult(career, event, rows, meta){
     let standings;
     if(event.cutPlayerIds && Array.isArray(event.cutPlayerIds)){
       const finalists = rows.filter(row => event.cutPlayerIds.includes(row.playerId)).map(row => ({ ...row, madeCut:true }));
       const missed = rows.filter(row => !event.cutPlayerIds.includes(row.playerId)).map(row => ({ ...row, madeCut:false }));
-      standings = assignTourPoints(finalists).concat(
+      standings = (meta && meta.partial ? sortStandings(finalists).map(row => ({ ...row, points:0 })) : assignTourPoints(finalists)).concat(
         sortStandings(missed).map(row => ({ ...row, points:0, position:null }))
       );
     } else {
-      standings = assignTourPoints(rows).map(row => ({ ...row, madeCut:true }));
+      standings = meta && meta.partial
+        ? sortStandings(rows).map(row => ({ ...row, madeCut:true, points:0 }))
+        : assignTourPoints(rows).map(row => ({ ...row, madeCut:true }));
     }
     const mapped = standings.map(row => ({
       ...row,
-      diffLabel:row.total > 0 ? formatDiff(row.total, row.par || event.par * row.rounds.length) : '-',
+      diffLabel:row.total > 0 || row.par > 0 ? formatDiff(row.total, row.par || event.par * row.rounds.length) : '-',
       positionLabel:row.position ? positionLabel(row.position) : 'CUT',
       points:row.points || 0
     }));
@@ -767,13 +832,35 @@
       courseId:event.courseId,
       courseName:event.courseName,
       emoji:course ? course.emoji : '',
-      throughRound,
-      roundLabel:`Through Round ${throughRound}`,
+      throughRound:meta.throughRound,
+      roundLabel:meta.roundLabel,
       userPositionLabel:user ? user.positionLabel : '-',
       userDiffLabel:user ? user.diffLabel : '-',
       userPoints:user ? user.points || 0 : 0,
       finalStandings:mapped
     };
+  }
+
+  function getCurrentEventResults(career, activeRoundSave){
+    if(!career || !career.activeEvent || career.activeEvent.status !== 'in_progress') return null;
+    const event = career.activeEvent;
+    const savedRows = activeSaveEventRows(career, event, activeRoundSave || getActiveRoundSave(career));
+    if(savedRows){
+      return mapCurrentEventResult(career, event, savedRows.rows, {
+        partial:true,
+        throughRound:savedRows.roundNumber,
+        roundLabel:`Round ${savedRows.roundNumber} · ${savedRows.holes} ${savedRows.holes === 1 ? 'Hole' : 'Holes'}`
+      });
+    }
+    const userRounds = Array.isArray(event.userRounds) ? event.userRounds : [];
+    const throughRound = userRounds.filter(round => typeof round.score === 'number').length;
+    if(throughRound <= 0) return null;
+    const rows = eventRows(career, event, throughRound);
+    return mapCurrentEventResult(career, event, rows, {
+      partial:false,
+      throughRound,
+      roundLabel:`Through Round ${throughRound}`
+    });
   }
 
   function getSeasonFinale(career){
