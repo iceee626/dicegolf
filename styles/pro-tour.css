@@ -113,15 +113,14 @@
 .pt-season-player small{font-family:'Sen',sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;text-align:center;}
 #proTourCutMissedScreen .pt-main-action{margin-top:22px;margin-bottom:0;}
 #proTourSeasonStartScreen.pt-season-exit .pt-season-start-card{animation:ptSeasonFade .24s ease forwards;}
-.pt-long-panel-screen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:calc(env(safe-area-inset-top) + 18px);padding-bottom:calc(env(safe-area-inset-bottom) + 24px);}
-#proTourEventResultsScreen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:calc(env(safe-area-inset-top) + 18px);padding-bottom:calc(env(safe-area-inset-bottom) + 24px);}
-#proTourEventResultsScreen .pro-tour-card{min-height:auto;}
-#proTourEventResultsScreen .pt-page-body{padding-bottom:8px;min-height:0;}
+.pt-long-panel-screen.pro-tour-screen{align-items:stretch;justify-content:center;overflow:hidden;padding:0;}
+.pt-long-panel-screen .pro-tour-card{height:100dvh;min-height:100vh;width:100%;max-width:430px;margin:0 auto;box-sizing:border-box;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top) + 18px) 18px calc(env(safe-area-inset-bottom) + 18px);background:var(--dark);}
+.pt-long-panel-screen .pt-page-body{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px;}
+#proTourEventResultsScreen .pro-tour-card{min-height:100vh;}
+#proTourEventResultsScreen .pt-page-body{padding-bottom:8px;}
 #proTourEventResultsNextBtn{margin-top:10px;margin-bottom:0;flex-shrink:0;}
-#proTourStatsScreen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
-#proTourStatsScreen .pro-tour-card{min-height:auto;}
-#proTourStatsScreen .pt-page-body{padding-bottom:4px;min-height:0;}
-.pt-long-panel-screen .setup-head-row{position:sticky;top:0;z-index:5;padding:10px 0 12px;margin-bottom:18px;flex-shrink:0;background:var(--dark);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08);}
+#proTourStatsScreen .pt-page-body{padding-bottom:4px;}
+.pt-long-panel-screen .setup-head-row{position:relative;z-index:5;margin-bottom:18px;flex-shrink:0;background:var(--dark);}
 #proTourSettingsOverlay{align-items:flex-start;padding:calc(env(safe-area-inset-top) + 16px) 20px 20px;overflow-y:auto;}
 #proTourSettingsOverlay .profile-card{max-width:430px;max-height:calc(100vh - env(safe-area-inset-top) - 36px);display:flex;flex-direction:column;}
 #proTourSettingsOverlay .profile-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
