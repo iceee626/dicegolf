@@ -407,6 +407,7 @@
         total,
         par,
         diff:total - par,
+        thru:partial.holes,
         rounds:priorRounds.concat(partial.holes > 0 ? [partial.total] : []),
         seedOrder:player.seedOrder,
         madeCut:event.cutPlayerIds ? event.cutPlayerIds.includes(player.id) : null
@@ -417,6 +418,15 @@
 
   function sortStandings(rows){
     return rows.slice().sort((a, b) => {
+      if(a.total !== b.total) return a.total - b.total;
+      return (a.seedOrder || 0) - (b.seedOrder || 0);
+    }).map((row, index) => ({ ...row, position:index + 1 }));
+  }
+
+  function sortPartialStandings(rows){
+    return rows.slice().sort((a, b) => {
+      if(a.diff !== b.diff) return a.diff - b.diff;
+      if((b.thru || 0) !== (a.thru || 0)) return (b.thru || 0) - (a.thru || 0);
       if(a.total !== b.total) return a.total - b.total;
       return (a.seedOrder || 0) - (b.seedOrder || 0);
     }).map((row, index) => ({ ...row, position:index + 1 }));
@@ -811,12 +821,12 @@
     if(event.cutPlayerIds && Array.isArray(event.cutPlayerIds)){
       const finalists = rows.filter(row => event.cutPlayerIds.includes(row.playerId)).map(row => ({ ...row, madeCut:true }));
       const missed = rows.filter(row => !event.cutPlayerIds.includes(row.playerId)).map(row => ({ ...row, madeCut:false }));
-      standings = (meta && meta.partial ? sortStandings(finalists).map(row => ({ ...row, points:0 })) : assignTourPoints(finalists)).concat(
-        sortStandings(missed).map(row => ({ ...row, points:0, position:null }))
+      standings = (meta && meta.partial ? sortPartialStandings(finalists).map(row => ({ ...row, points:0 })) : assignTourPoints(finalists)).concat(
+        (meta && meta.partial ? sortPartialStandings(missed) : sortStandings(missed)).map(row => ({ ...row, points:0, position:null }))
       );
     } else {
       standings = meta && meta.partial
-        ? sortStandings(rows).map(row => ({ ...row, madeCut:true, points:0 }))
+        ? sortPartialStandings(rows).map(row => ({ ...row, madeCut:true, points:0 }))
         : assignTourPoints(rows).map(row => ({ ...row, madeCut:true }));
     }
     const mapped = standings.map(row => ({
