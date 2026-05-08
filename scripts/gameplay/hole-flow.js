@@ -655,7 +655,8 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    btn.textContent = isProTourRound ? 'VIEW SUMMARY' : 'NEXT';
+    const proTourCompleteRoundLabel = `COMPLETE ROUND ${S.currentRound}`;
+    btn.textContent = isProTourRound ? proTourCompleteRoundLabel : 'NEXT';
     btn.onclick = () => {
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
@@ -765,7 +766,8 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    btn.textContent = 'VIEW SUMMARY';
+    const proTourCompleteRoundLabel = `COMPLETE ROUND ${S.currentRound}`;
+    btn.textContent = isProTourRound ? proTourCompleteRoundLabel : 'VIEW SUMMARY';
     btn.onclick = () => {
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
