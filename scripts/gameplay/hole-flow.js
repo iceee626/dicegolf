@@ -519,7 +519,8 @@ function showRoundEnd(){
   hideMainAppImmediate();
   const alreadyProcessed = !!S._roundEndProcessed;
   const roundEndMeta = S._roundEndMeta || null;
-  if(S.currentRound === S.totalRounds || !alreadyProcessed){
+  const isProTourRound = S.mode === 'pro-tour';
+  if(!isProTourRound && (S.currentRound === S.totalRounds || !alreadyProcessed)){
     clearSavedGame();
   }
   const midSection = document.getElementById('hcMidSection');
@@ -540,7 +541,6 @@ function showRoundEnd(){
   const roundTotal = curSc.reduce((a,b)=>a+(b||0),0);
   const roundPar = activeHoles.reduce((a,h)=>a+h.par,0);
   const roundDiff = roundTotal - roundPar;
-  const isProTourRound = S.mode === 'pro-tour';
   
   if (S.currentRound === S.totalRounds) {
     const profiles = loadProfiles();
@@ -577,7 +577,7 @@ function showRoundEnd(){
     const globalDiff = globalTotal - globalPar;
     const finalTotalStr = globalDiff===0?'E':globalDiff>0?`+${globalDiff}`:`${globalDiff}`;
     if(isProTourRound && typeof ProTour === 'object' && typeof ProTour.handleRoundCompleteFromGame === 'function'){
-      ProTour.handleRoundCompleteFromGame();
+      S.proTourPostRound = ProTour.handleRoundCompleteFromGame() || S.proTourPostRound || null;
     }
     
     const hcScreen = document.getElementById('hcScreen');
@@ -655,12 +655,8 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    btn.textContent = isProTourRound ? 'PRO TOUR' : 'NEXT';
+    btn.textContent = isProTourRound ? 'VIEW SUMMARY' : 'NEXT';
     btn.onclick = () => {
-        if(isProTourRound && typeof ProTour === 'object' && typeof ProTour.returnFromRoundComplete === 'function'){
-          ProTour.returnFromRoundComplete();
-          return;
-        }
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
     };
@@ -692,7 +688,12 @@ function showRoundEnd(){
       });
       S._roundEndProcessed = true;
       S._roundEndMeta = { xpAward, achievementIds };
+      if(isProTourRound && typeof ProTour === 'object' && typeof ProTour.handleRoundCompleteFromGame === 'function'){
+        S.proTourPostRound = ProTour.handleRoundCompleteFromGame() || S.proTourPostRound || null;
+      }
       saveGameState();
+    } else if(isProTourRound && !S.proTourPostRound && typeof ProTour === 'object' && typeof ProTour.handleRoundCompleteFromGame === 'function'){
+      S.proTourPostRound = ProTour.handleRoundCompleteFromGame() || S.proTourPostRound || null;
     }
 
     const hcScreen = document.getElementById('hcScreen');
@@ -764,7 +765,7 @@ function showRoundEnd(){
     }
 
     const btn = document.getElementById('hcBtn');
-    btn.textContent = 'NEXT';
+    btn.textContent = 'VIEW SUMMARY';
     btn.onclick = () => {
         setSummaryContext(null);
         openSummaryFromRoundComplete(S.currentRound);
