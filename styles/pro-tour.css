@@ -67,6 +67,7 @@
 .pt-table{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-family:'Sen',sans-serif;font-size:11px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .pt-table th,.pt-table td{height:32px;padding:0 6px;text-align:right;white-space:nowrap;border-right:1px solid rgba(255,255,255,.07);border-bottom:1px solid var(--border);}
 .pt-table th:first-child,.pt-table td:first-child{width:42px;text-align:left;padding-left:6px;padding-right:3px;}
+.pt-table th:first-child{text-align:center;}
 .pt-table th:nth-child(2),.pt-table td:nth-child(2){text-align:left;}
 .pt-table th:nth-child(3),.pt-table td:nth-child(3),.pt-table th:last-child,.pt-table td:last-child{text-align:center;}
 .pt-table th:last-child,.pt-table td:last-child{width:54px;padding-right:6px;}
