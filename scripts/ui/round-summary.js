@@ -229,12 +229,8 @@ function openSummary(viewRound = S.currentRound, backTarget = _summaryBackTarget
   if (isProTourSummary && proTourPostRound && proTourPostRound.eventComplete) {
     const finishBtn=document.createElement('button');
     finishBtn.style.cssText='width:100%;background:var(--c-fwy);color:#fff;border:none;border-radius:10px;padding:13px;font-family:"Bebas Neue",cursive;font-size:18px;letter-spacing:2px;cursor:pointer;';
-    finishBtn.textContent=proTourPostRound.missedCut ? 'CONTINUE' : 'VIEW EVENT RESULTS';
+    finishBtn.textContent='VIEW EVENT RESULTS';
     finishBtn.onclick=()=>{
-      if(proTourPostRound.missedCut && window.ProTour && typeof window.ProTour.showMissedCutSplash === 'function'){
-        window.ProTour.showMissedCutSplash();
-        return;
-      }
       if(window.ProTour && typeof window.ProTour.openLatestEventResults === 'function') window.ProTour.openLatestEventResults('forward');
     };
     btnRow.appendChild(finishBtn);
