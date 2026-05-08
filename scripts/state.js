@@ -241,6 +241,16 @@ function resetGameState(){
       if(idx < S.scorecards.length && Array.isArray(row)) S.scorecards[idx] = row.slice(0, 18);
     });
   }
+  const proTourPreviousHistories = typeof window !== 'undefined' ? window.PRO_TOUR_PREVIOUS_HISTORIES : null;
+  if(S.mode === 'pro-tour' && Array.isArray(proTourPreviousHistories)){
+    proTourPreviousHistories.forEach((row, idx) => {
+      if(idx >= S.histories.length || !Array.isArray(row)) return;
+      S.histories[idx] = Array(18).fill(null);
+      row.slice(0, 18).forEach((entry, holeIdx) => {
+        S.histories[idx][holeIdx] = entry == null ? null : JSON.parse(JSON.stringify(entry));
+      });
+    });
+  }
   S.currentGrid=null; S.holeDone=false; S.rolling=false;
   S.yrdRemain=0; S.yrdTotal=0; S.fwyVisits=0; S.prevZone=null; S.shotCount=0;
   S._nextShotTransitioning=false;
