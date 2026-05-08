@@ -307,9 +307,21 @@
     }
   }
 
+  function discardStaleActiveRoundSave(){
+    const saved = activeCareer ? Core.getActiveRoundSave(activeCareer) : null;
+    if(!saved) return false;
+    const activeEventId = activeCareer.activeEvent && activeCareer.activeEvent.id;
+    const savedEventId = saved.context && saved.context.eventId;
+    if(activeEventId && savedEventId === activeEventId) return false;
+    activeCareer = Core.clearActiveRoundSave(activeCareer);
+    saveActiveCareer();
+    return true;
+  }
+
   function renderCareer(){
     if(!activeCareer) return;
     normalizeLegacyCareer();
+    discardStaleActiveRoundSave();
     const dashboard = Core.getDashboard(activeCareer);
     const hasCompletedEvent = activeCareer.currentSeason.eventsCompleted > 0;
     $('proTourCareerTitle').textContent = activeCareer.playerName;
@@ -441,6 +453,7 @@
 
   function mainAction(){
     if(!activeCareer) return;
+    if(discardStaleActiveRoundSave()) renderCareer();
     if(Core.getActiveRoundSave(activeCareer)){
       restoreActiveRound();
       return;
@@ -567,7 +580,7 @@
     backToCareerFromPanel();
   }
 
-  function showMissedCutSplash(){
+  function showMissedCutSplash(options={}){
     const post = S && S.proTourPostRound;
     if(!post || !post.slotId) return false;
     activeSlot = post.slotId;
@@ -581,7 +594,23 @@
       <strong>${escapeHtml(activeCareer.pastEvent.courseName || 'EVENT')}</strong>
       <small>${escapeHtml(formatDot(activeCareer.pastEvent.userPositionLabel, activeCareer.pastEvent.userDiffLabel))}</small>
     `;
+    const finishBtn = $('proTourCutMissedFinishBtn');
+    if(finishBtn) finishBtn.style.display = options.autoReturn ? 'none' : '';
+    const screen = $('proTourCutMissedScreen');
+    if(screen) screen.classList.remove('pt-auto-exit');
     showTourView('proTourCutMissedScreen', 'forward');
+    if(options.autoReturn){
+      setTimeout(() => {
+        const activeScreen = $('proTourCutMissedScreen');
+        if(activeScreen) activeScreen.classList.add('pt-auto-exit');
+        setTimeout(() => {
+          S.proTour = null;
+          S.proTourPostRound = null;
+          window.PRO_TOUR_PENDING_ROUND = null;
+          backToCareerFromPanel();
+        }, 260);
+      }, 2000);
+    }
     return true;
   }
 
@@ -711,16 +740,15 @@
   }
 
   function renderSeasonFinale(finale){
-    const posText = finale.userPosition === 1 ? 'TOUR CHAMPION' : `SEASON PODIUM ${Core.positionLabel(finale.userPosition)}`;
     $('proTourSeasonFinaleBody').innerHTML = `
       <div class="pt-finale-celebration">
         <div class="pt-finale-burst">\u{1F3C6}</div>
         <div class="pt-section-title">SEASON ${finale.seasonNumber}</div>
-        <strong>${posText}</strong>
+        <strong>TOUR CHAMPION</strong>
       </div>
       <div class="pt-finale-podium">
         ${finale.podium.map(row => `
-          <div class="pt-podium-place ${row.position === 2 ? 'second' : ''} ${row.position === 3 ? 'third' : ''} ${row.isUser ? 'you-row' : ''}">
+          <div class="pt-podium-place ${row.position === 1 ? 'champion' : ''} ${row.position === 2 ? 'second' : ''} ${row.position === 3 ? 'third' : ''} ${row.isUser ? 'you-row' : ''}">
             <span>${row.positionLabel}</span>
             <strong>${escapeHtml(row.name)}</strong>
             <small>${row.points} pts.</small>
@@ -919,11 +947,16 @@
     $('proTourLeaderboardBackBtn').addEventListener('click', backToCareerFromPanel);
     $('proTourEventResultsBackBtn').addEventListener('click', backFromEventResults);
     $('proTourEventResultsNextBtn')?.addEventListener('click', () => {
+      const postRound = S && S.proTourPostRound;
       if(activeSlot){
         store = loadStore();
         activeCareer = Core.loadCareerSlot(store, profileId(), activeSlot);
       }
       document.getElementById('summaryModal')?.classList.remove('show');
+      if(postRound && postRound.missedCut){
+        showMissedCutSplash({ autoReturn:true });
+        return;
+      }
       S.proTour = null;
       S.proTourPostRound = null;
       window.PRO_TOUR_PENDING_ROUND = null;
