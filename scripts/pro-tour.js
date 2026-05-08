@@ -223,7 +223,22 @@
     if(!event || !Array.isArray(event.userRounds)) return [];
     const course = typeof getCourseConfig === 'function' ? getCourseConfig(event.courseId) : null;
     const holes = course && Array.isArray(course.holes) ? course.holes : [];
-    return event.userRounds.map(round => distributeRoundScore(round.score, holes));
+    return event.userRounds.map(round => {
+      if(Array.isArray(round.scorecard)) return round.scorecard.slice(0, 18);
+      return distributeRoundScore(round.score, holes);
+    });
+  }
+
+  function buildPreviousHistories(event){
+    if(!event || !Array.isArray(event.userRounds)) return [];
+    return event.userRounds.map(round => {
+      const row = Array(18).fill(null);
+      if(!Array.isArray(round.history)) return row;
+      round.history.slice(0, 18).forEach((entry, index) => {
+        row[index] = entry == null ? null : JSON.parse(JSON.stringify(entry));
+      });
+      return row;
+    });
   }
 
   function buildProTourCpuOpponents(career, event){
@@ -383,6 +398,7 @@
     SETUP.courseSelected = true;
     GAME_DIFF = activeCareer.difficulty || 1;
     window.PRO_TOUR_PREVIOUS_SCORECARDS = buildPreviousScorecards(event);
+    window.PRO_TOUR_PREVIOUS_HISTORIES = buildPreviousHistories(event);
     window.PRO_TOUR_CPU_FIELD_OPTIONS = {
       totalRounds:SETUP.rounds,
       seed:(activeCareer.seed || Date.now()) + (event.seasonNumber * 1000) + (event.eventIndex * 97),
@@ -429,6 +445,7 @@
     const context = S.proTour || window.PRO_TOUR_PENDING_ROUND;
     if(!context || !context.slotId) return false;
     const roundScores = S.scorecards && S.scorecards[S.currentRound - 1] ? S.scorecards[S.currentRound - 1] : [];
+    const roundHistory = S.histories && S.histories[S.currentRound - 1] ? S.histories[S.currentRound - 1] : [];
     const roundTotal = roundScores.reduce((sum, score) => sum + (Number(score) || 0), 0);
     if(!roundTotal) return false;
     activeSlot = context.slotId;
@@ -438,7 +455,9 @@
     activeCareer = Core.submitUserRound(activeCareer, roundTotal, {
       wildcardsUsed:S._wcUsedThisRound || 0,
       wildcardsDiscarded:S._wcDiscardedThisRound || 0,
-      cpuScores:collectCurrentCpuRoundScores()
+      cpuScores:collectCurrentCpuRoundScores(),
+      scorecard:roundScores.slice(0, 18),
+      history:roundHistory.slice(0, 18)
     });
     if(activeCareer.activeEvent) filterLiveCpuFieldForCut(activeCareer.activeEvent);
     activeCareer = Core.clearActiveRoundSave(activeCareer);
@@ -512,12 +531,14 @@
     const nextBtn = $('proTourEventResultsNextBtn');
     if(nextBtn) nextBtn.style.display = 'none';
     if(target === 'summary' && postRound && typeof openSummaryFromRoundComplete === 'function'){
-      showTourView('proTourCareerScreen', 'back');
+      if(typeof _setNavDir === 'function') _setNavDir('back');
+      VIEW_IDS.forEach(id => {
+        const el = $(id);
+        if(el){ el.classList.remove('visible'); el.style.display = 'none'; }
+      });
+      if(typeof applyCourseVisualTheme === 'function' && S && S.courseId) applyCourseVisualTheme(S.courseId);
       setTimeout(() => {
-        VIEW_IDS.forEach(id => {
-          const el = $(id);
-          if(el){ el.classList.remove('visible'); el.style.display = 'none'; }
-        });
+        if(typeof applyCourseVisualTheme === 'function' && S && S.courseId) applyCourseVisualTheme(S.courseId);
         openSummaryFromRoundComplete(postRound.roundNumber || S.currentRound || 1);
       }, 40);
       return;
