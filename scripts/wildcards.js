@@ -526,7 +526,7 @@ function replaceGridCells(grid, predicate, nextZoneOrFactory, onChange){
       if(typeof onChange === 'function') onChange(r, c, nextZone, currentZone);
     }
   }
-  return changed;
+  return changed || (holeKey || fallbackKey ? 1 : 0);
 }
 
 function readVisibleGridCells(){
@@ -694,17 +694,50 @@ function applyBirdieBoostToCurrentGrid(maxCells = 8){
   return chosen.length;
 }
 
-function applyHoleWallToGrid(grid){
+function applyHoleWallCells(grid, updateCell){
   if(!Array.isArray(grid)) return 0;
-  const changedCells = replaceGridCells(grid, c => c === 'rgh' || c === 'sand' || c === 'fwy' || c === 'ob', 'chip');
-  return changedCells + replaceGridCells(grid, c => c !== 'chip' && c !== 'grn', 'grn');
+  let changed = 0;
+  let holeKey = null;
+  let fallbackKey = null;
+  const setCell = (r, c, value) => {
+    if(!grid[r] || grid[r][c] === value) return;
+    grid[r][c] = value;
+    changed++;
+    if(typeof updateCell === 'function') updateCell(r, c, value);
+  };
+  grid.forEach((row, r) => {
+    if(!Array.isArray(row)) return;
+    row.forEach((cell, c) => {
+      const key = `${r}:${c}`;
+      if(cell === 'hole' && !holeKey){
+        holeKey = key;
+        return;
+      }
+      if(!fallbackKey) fallbackKey = key;
+      if(cell === 'hole'){
+        setCell(r, c, 'grn');
+      } else if(cell === 'grn'){
+        return;
+      } else {
+        setCell(r, c, 'chip');
+      }
+    });
+  });
+  if(!holeKey && fallbackKey){
+    const [r, c] = fallbackKey.split(':').map(Number);
+    setCell(r, c, 'hole');
+  }
+  return changed;
+}
+
+function applyHoleWallToGrid(grid){
+  return applyHoleWallCells(grid);
 }
 
 function applyHoleWallToCurrentGrid(){
   syncCurrentGridFromVisibleCells();
   if(!Array.isArray(S.currentGrid)) return 0;
-  const changedCells = replaceCurrentGridCells(c => c === 'rgh' || c === 'sand' || c === 'fwy' || c === 'ob', 'chip');
-  return changedCells + replaceCurrentGridCells(c => c !== 'chip' && c !== 'grn', 'grn');
+  return applyHoleWallCells(S.currentGrid, updateVisibleGridCell);
 }
 
 function applyHoleInOneToGrid(grid){
