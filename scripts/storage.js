@@ -83,6 +83,7 @@ function createCurrentGameSaveSnapshot(){
     cpuMode:!!S.cpuMode,
     cpuField:(S.cpuMode && typeof snapshotCpuField === 'function') ? snapshotCpuField(S.cpuField) : null,
     proTour:S.proTour || null,
+    proTourPostRound:S.proTourPostRound || null,
     _proTourRoundSubmitted:!!S._proTourRoundSubmitted,
     holeIdx:S.holeIdx, zone:S.zone, strokes:S.strokes, shotNum:S.shotNum, log:S.log,
     scorecards:S.scorecards, histories:S.histories,
@@ -167,6 +168,10 @@ function clearSavedGame(){
   try{localStorage.removeItem(LEGACY_SAVE_KEY);}catch{}
 }
 
+function shouldClearProfileSaveForMode(mode){
+  return mode !== 'pro-tour';
+}
+
 function continueDiffFromScorecards(scorecards, holes){
   let totalScore = 0;
   let totalPar = 0;
@@ -237,6 +242,7 @@ function restoreGameFromSaveSnapshot(save){
     S.cpuMode=!!save.cpuMode;
     S.cpuField=(S.cpuMode && typeof restoreCpuFieldSnapshot === 'function') ? restoreCpuFieldSnapshot(save.cpuField) : null;
     S.proTour=save.proTour||null;
+    S.proTourPostRound=save.proTourPostRound||null;
     S._proTourRoundSubmitted=!!save._proTourRoundSubmitted;
     SETUP.opponent = S.cpuMode ? 'cpu' : 'solo';
     S.holeIdx=save.holeIdx; S.zone=save.zone; S.strokes=save.strokes; S.shotNum=save.shotNum; S.log=save.log||[];
