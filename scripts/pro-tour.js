@@ -60,6 +60,9 @@
       const el = $(id);
       if(!el) return;
       if(id === screenId){
+        el.scrollTop = 0;
+        const body = el.querySelector('.pt-page-body');
+        if(body) body.scrollTop = 0;
         el.style.display = 'flex';
         requestAnimationFrame(() => el.classList.add('visible'));
       } else {
