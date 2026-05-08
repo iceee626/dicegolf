@@ -25,7 +25,8 @@
 .pt-slot-actions .menu-btn-play{min-height:62px;}
 .pt-slot-actions .continue-state{background:linear-gradient(135deg,#1a5f8a,#2a3a6e);box-shadow:0 4px 20px rgba(30,95,138,.4), inset 0 1px 0 rgba(255,255,255,.06);}
 .pt-choice-row{margin-bottom:0;}
-.pt-season-meta{text-align:center;margin:-8px 0 14px;color:var(--gold);}
+.pt-career-head{margin-bottom:8px;}
+.pt-season-meta{text-align:center;margin:0 0 14px;color:var(--gold);}
 .pt-season-pill{display:inline-flex;align-items:center;justify-content:center;min-height:27px;padding:5px 12px;border-radius:999px;background:rgba(240,192,64,.14);border:1px solid rgba(240,192,64,.35);color:var(--gold);font-family:'Sen',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;}
 .pt-settings-btn{background:rgba(255,255,255,.08) url('../assets/settings.svg') center/18px 18px no-repeat;border:1px solid var(--border);color:transparent;border-radius:7px;width:32px;height:32px;font-size:0;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;line-height:1;}
 .pt-dashboard-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:10px;}
@@ -112,15 +113,15 @@
 .pt-season-player small{font-family:'Sen',sans-serif;font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;text-align:center;}
 #proTourCutMissedScreen .pt-main-action{margin-top:22px;margin-bottom:0;}
 #proTourSeasonStartScreen.pt-season-exit .pt-season-start-card{animation:ptSeasonFade .24s ease forwards;}
-#proTourEventResultsScreen.pro-tour-screen{align-items:center;overflow:hidden;padding-top:calc(env(safe-area-inset-top) + 34px);padding-bottom:calc(env(safe-area-inset-bottom) + 24px);}
-#proTourEventResultsScreen .setup-head-row{padding-top:4px;flex-shrink:0;}
-#proTourEventResultsScreen .pro-tour-card{display:flex;flex-direction:column;min-height:0;max-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 58px);}
-#proTourEventResultsScreen .pt-page-body{padding-bottom:8px;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;flex:1 1 auto;}
+.pt-long-panel-screen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:calc(env(safe-area-inset-top) + 18px);padding-bottom:calc(env(safe-area-inset-bottom) + 24px);}
+#proTourEventResultsScreen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-top:calc(env(safe-area-inset-top) + 18px);padding-bottom:calc(env(safe-area-inset-bottom) + 24px);}
+#proTourEventResultsScreen .pro-tour-card{min-height:auto;}
+#proTourEventResultsScreen .pt-page-body{padding-bottom:8px;min-height:0;}
 #proTourEventResultsNextBtn{margin-top:10px;margin-bottom:0;flex-shrink:0;}
 #proTourStatsScreen.pro-tour-screen{align-items:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 #proTourStatsScreen .pro-tour-card{min-height:auto;}
-#proTourStatsScreen .setup-head-row{flex:0 0 auto;}
 #proTourStatsScreen .pt-page-body{padding-bottom:4px;min-height:0;}
+.pt-long-panel-screen .setup-head-row{position:sticky;top:0;z-index:5;padding-top:4px;flex-shrink:0;background:rgba(10,15,18,.92);backdrop-filter:blur(8px);border-radius:0 0 12px 12px;}
 #proTourSettingsOverlay{align-items:flex-start;padding:calc(env(safe-area-inset-top) + 16px) 20px 20px;overflow-y:auto;}
 #proTourSettingsOverlay .profile-card{max-width:430px;max-height:calc(100vh - env(safe-area-inset-top) - 36px);display:flex;flex-direction:column;}
 #proTourSettingsOverlay .profile-body{overflow-y:auto;-webkit-overflow-scrolling:touch;}
