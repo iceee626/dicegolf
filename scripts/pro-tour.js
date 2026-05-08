@@ -51,6 +51,21 @@
     ].forEach(id => hideScreen(id));
   }
 
+  function resetProTourPanelScroll(screenId){
+    const el = $(screenId);
+    if(!el) return;
+    el.scrollTop = 0;
+    const card = el.querySelector('.pro-tour-card');
+    const body = el.querySelector('.pt-page-body');
+    if(card) card.scrollTop = 0;
+    if(body) body.scrollTop = 0;
+    try{
+      window.scrollTo({ top:0, left:0, behavior:'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }catch{}
+  }
+
   function showTourView(screenId, direction){
     if(typeof forceHideGame === 'function') forceHideGame();
     if(typeof clearCourseVisualTheme === 'function') clearCourseVisualTheme();
@@ -60,11 +75,13 @@
       const el = $(id);
       if(!el) return;
       if(id === screenId){
-        el.scrollTop = 0;
-        const body = el.querySelector('.pt-page-body');
-        if(body) body.scrollTop = 0;
+        resetProTourPanelScroll(screenId);
         el.style.display = 'flex';
-        requestAnimationFrame(() => el.classList.add('visible'));
+        requestAnimationFrame(() => {
+          resetProTourPanelScroll(screenId);
+          el.classList.add('visible');
+        });
+        setTimeout(() => resetProTourPanelScroll(screenId), 80);
       } else {
         el.classList.remove('visible');
         setTimeout(() => {
