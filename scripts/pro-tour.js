@@ -269,7 +269,8 @@
       .map(player => ({
         id:player.id,
         careerPlayerId:player.id,
-        name:player.name
+        name:player.name,
+        traits:player.traits
       }));
   }
 
