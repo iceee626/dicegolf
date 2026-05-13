@@ -184,7 +184,7 @@ function cpuRoundTargetBounds(gameDiff, holeCount){
   const raw = {
     1: { center:-2.5, min:-7, max:10 },
     2: { center:1, min:-6, max:12 },
-    3: { center:3.8, min:-3, max:14 }
+    3: { center:-4, min:-11, max:12 }
   }[Math.max(1, Math.min(3, gameDiff || 1))];
   return {
     center: raw.center * scale,
@@ -201,7 +201,7 @@ function cpuEnsureRoundTarget(field, opp, roundIdx, holes, gameDiff){
   const bounds = cpuRoundTargetBounds(gameDiff || field.gameDiff, activeCount);
   const cpuNum = cpuOpponentNumber(opp.id, 1);
   const random = seededRandom((field.seed || 1) + roundIdx * 7001 + cpuNum * 331 + 91);
-  const bell = (random() + random() + random() + random() - 2) * 2.8;
+  const bell = (random() + random() + random() + random() - 2) * 4.1;
   const traits = opp.traits || {};
   const fit = traits.courseFit && field.courseId ? (traits.courseFit[field.courseId] || 0) : 0;
   const skill =
@@ -212,7 +212,7 @@ function cpuEnsureRoundTarget(field, opp, roundIdx, holes, gameDiff){
     ((traits.consistency || 0) * 0.35) +
     (fit * 0.75) +
     ((traits.pressure || 0) * 0.25);
-  const target = Math.round(cpuClamp(bounds.center + bell - skill * 0.75, bounds.min, bounds.max));
+  const target = Math.round(cpuClamp(bounds.center + bell - skill * 1.15, bounds.min, bounds.max));
   roundState.targetDiff = target;
   return target;
 }
@@ -289,9 +289,9 @@ const CPU_SCORE_WEIGHTS = {
     par5: { deltas:[-2,-1,0,1,2,3,4], weights:[0.020,0.24,0.45,0.22,0.055,0.012,0.003] }
   },
   3: {
-    par3: { deltas:[-2,-1,0,1,2,3,4], weights:[0.001,0.08,0.48,0.34,0.075,0.019,0.005] },
-    par4: { deltas:[-1,0,1,2,3,4], weights:[0.10,0.47,0.31,0.085,0.027,0.008] },
-    par5: { deltas:[-2,-1,0,1,2,3,4], weights:[0.012,0.18,0.45,0.27,0.065,0.018,0.005] }
+    par3: { deltas:[-2,-1,0,1,2,3,4], weights:[0.001,0.11,0.52,0.29,0.06,0.015,0.004] },
+    par4: { deltas:[-1,0,1,2,3,4], weights:[0.145,0.50,0.255,0.07,0.023,0.007] },
+    par5: { deltas:[-2,-1,0,1,2,3,4], weights:[0.018,0.235,0.46,0.22,0.052,0.012,0.003] }
   }
 };
 
@@ -424,13 +424,16 @@ function cpuScoreHole(options){
   const target = options.targetContext;
   if(target && typeof target.targetDiff === 'number' && target.remainingHoles > 0){
     const needed = target.targetDiff - (target.currentDiff || 0);
+    const strength = cpuClamp(Number(target.strength == null ? 1 : target.strength), 0, 1);
     if(target.remainingHoles <= 1){
       const targetDelta = deltas[cpuNearestDeltaIndex(deltas, Math.round(needed), needed >= 0)];
-      if(random() < 0.65) return Math.max(1, par + targetDelta);
+      const directChance = cpuClamp(Number(target.directChance == null ? 0.35 : target.directChance), 0, 1) * strength;
+      if(random() < directChance) return Math.max(1, par + targetDelta);
     } else {
       const desiredDelta = needed / target.remainingHoles;
       const expectedDelta = cpuExpectedDelta(weights, deltas);
-      weights = cpuShiftWeights(weights, deltas, cpuClamp((desiredDelta - expectedDelta) * 0.28, -0.24, 0.24));
+      const maxShift = 0.2 * strength;
+      weights = cpuShiftWeights(weights, deltas, cpuClamp((desiredDelta - expectedDelta) * 0.2 * strength, -maxShift, maxShift));
     }
   }
 
@@ -550,6 +553,12 @@ function cpuHoleRandom(field, roundIdx, opp, absIdx){
   return seededRandom((field.seed || 1) + roundIdx * 10007 + cpuNum * 1009 + absIdx * 7919 + 173);
 }
 
+function cpuTargetStrengthForRemaining(remainingHoles){
+  if(remainingHoles <= 1) return 0.75;
+  if(remainingHoles <= 3) return 0.45;
+  return 0.9;
+}
+
 function advanceCpuFieldForPlayerHole(field, options){
   if(!field || !Array.isArray(field.opponents)) return field;
   const holes = options.holes || [];
@@ -568,15 +577,9 @@ function advanceCpuFieldForPlayerHole(field, options){
       const absIdx = activeIndexes[roundState.thru];
       const random = cpuHoleRandom(field, roundIdx, opp, absIdx);
       const compression = cpuCompressionForOpponent(field, opp, context, holeProgress);
-      let roundTargetDiff = cpuEnsureRoundTarget(field, opp, roundIdx, holes, options.gameDiff || field.gameDiff);
-      if(cpuIsFinalRound(field, roundIdx) && holeProgress > 0.72){
-        const currentRoundDiff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, field.endIdx).diff;
-        const currentTotalDiff = cpuOpponentCumulative(opp, holes, field.startIdx, field.endIdx, roundIdx + 1).diff;
-        const projectedTotalDiff = currentTotalDiff - currentRoundDiff + roundTargetDiff;
-        const completedWinnerDiffs = cpuCompletedWinnerDiffs(field, holes, roundIdx, options.playerScores || [], opp.id);
-        if(completedWinnerDiffs.includes(projectedTotalDiff)) roundTargetDiff += 1;
-      }
+      const roundTargetDiff = cpuEnsureRoundTarget(field, opp, roundIdx, holes, options.gameDiff || field.gameDiff);
       const currentDiff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, field.endIdx).diff;
+      const remainingHoles = totalHoles - roundState.thru;
       const latePressure = roundIdx === field.totalRounds - 1 && holeProgress > 0.72
         ? Math.max(0, (opp.traits.pressure || 0)) * 0.015
         : 0;
@@ -591,7 +594,9 @@ function advanceCpuFieldForPlayerHole(field, options){
         targetContext: {
           targetDiff: roundTargetDiff,
           currentDiff,
-          remainingHoles: totalHoles - roundState.thru
+          remainingHoles,
+          strength: cpuTargetStrengthForRemaining(remainingHoles),
+          directChance: 0.35
         }
       });
       score = cpuAvoidFinalCpuWinnerTie(field, opp, roundIdx, absIdx, score, holes, options.playerScores || []);
@@ -623,16 +628,10 @@ function completeCpuFieldRound(field, options){
     while(roundState.thru < activeIndexes.length){
       const absIdx = activeIndexes[roundState.thru];
       const random = cpuHoleRandom(field, roundIdx, opp, absIdx);
-      let roundTargetDiff = cpuEnsureRoundTarget(field, opp, roundIdx, holes, options.gameDiff || field.gameDiff);
+      const roundTargetDiff = cpuEnsureRoundTarget(field, opp, roundIdx, holes, options.gameDiff || field.gameDiff);
       const totalHoles = activeIndexes.length;
       const holeProgress = totalHoles ? roundState.thru / totalHoles : 1;
-      if(cpuIsFinalRound(field, roundIdx) && holeProgress > 0.72){
-        const currentRoundDiff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, field.endIdx).diff;
-        const currentTotalDiff = cpuOpponentCumulative(opp, holes, field.startIdx, field.endIdx, roundIdx + 1).diff;
-        const projectedTotalDiff = currentTotalDiff - currentRoundDiff + roundTargetDiff;
-        const completedWinnerDiffs = cpuCompletedWinnerDiffs(field, holes, roundIdx, options.playerScores || [], opp.id);
-        if(completedWinnerDiffs.includes(projectedTotalDiff)) roundTargetDiff += 1;
-      }
+      const remainingHoles = activeIndexes.length - roundState.thru;
       const currentDiff = cpuRoundScoresTotal(roundState.scores, holes, field.startIdx, field.endIdx).diff;
       let score = cpuScoreHole({
         hole: holes[absIdx],
@@ -643,7 +642,9 @@ function completeCpuFieldRound(field, options){
         targetContext: {
           targetDiff: roundTargetDiff,
           currentDiff,
-          remainingHoles: activeIndexes.length - roundState.thru
+          remainingHoles,
+          strength: cpuTargetStrengthForRemaining(remainingHoles),
+          directChance: 0.35
         }
       });
       score = cpuAvoidFinalCpuWinnerTie(field, opp, roundIdx, absIdx, score, holes, options.playerScores || []);
@@ -661,6 +662,54 @@ function completeCpuFieldRound(field, options){
 }
 
 function resolveCpuFinalWinnerTies(field, options){
+  if(!field || !Array.isArray(field.opponents)) return field;
+  const holes = options.holes || [];
+  const roundIdx = Math.max(0, (options.currentRound || 1) - 1);
+  if(!cpuIsFinalRound(field, roundIdx)) return field;
+
+  const startIdx = field.startIdx || 0;
+  const finalIdx = field.endIdx == null ? 17 : field.endIdx;
+  const totalHoles = Math.max(0, finalIdx - startIdx + 1);
+  if(totalHoles <= 0) return field;
+  if(!field.opponents.every(opp => {
+    const roundState = opp && opp.rounds && opp.rounds[roundIdx];
+    return roundState && roundState.thru >= totalHoles && roundState.complete;
+  })) return field;
+
+  const currentRound = roundIdx + 1;
+  const rows = [];
+  const player = cpuPlayerCumulative(options.playerScores || [], holes, startIdx, finalIdx, currentRound);
+  if(player.thru >= totalHoles){
+    rows.push({ id:'player', isPlayer:true, diff:player.diff, seedOrder:-1, name:'YOU' });
+  }
+  field.opponents.forEach((opp, index) => {
+    const score = cpuOpponentCumulative(opp, holes, startIdx, finalIdx, currentRound);
+    if(score.thru >= totalHoles){
+      rows.push({
+        id:opp.id,
+        isPlayer:false,
+        diff:score.diff,
+        seedOrder:index,
+        name:opp.name || opp.id,
+        opp
+      });
+    }
+  });
+  if(rows.length < 2) return field;
+
+  rows.sort((a, b) => a.diff - b.diff || (a.isPlayer ? -1 : b.isPlayer ? 1 : (a.seedOrder || 0) - (b.seedOrder || 0)));
+  const bestDiff = rows[0].diff;
+  const winners = rows.filter(row => row.diff === bestDiff);
+  if(winners.length <= 1) return field;
+
+  const chosen = winners.find(row => row.isPlayer) || winners[0];
+  winners.forEach(row => {
+    if(row.id === chosen.id || row.isPlayer || !row.opp) return;
+    const roundState = row.opp.rounds && row.opp.rounds[roundIdx];
+    if(!roundState || !Array.isArray(roundState.scores)) return;
+    if(typeof roundState.scores[finalIdx] !== 'number') return;
+    roundState.scores[finalIdx] += 1;
+  });
   return field;
 }
 
