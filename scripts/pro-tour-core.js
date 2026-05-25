@@ -19,6 +19,11 @@
     long: { key:'long', label:'Long Career', roundsPerEvent:4, cutAfterRound:2 },
     short: { key:'short', label:'Short Career', roundsPerEvent:2, cutAfterRound:1 }
   };
+  const CPU_DIFFICULTY_PROFILES = {
+    1: { center:3, spread:5.5 },
+    2: { center:2, spread:6.0 },
+    3: { center:1, spread:6.5 }
+  };
 
   const CPU_NAMES = [
     'RAHMIREZ','FOREST','DESHAMBO','HOLYWOOD','FALDOUGH','NICKELSON','SINGLES','BROOKS','YOONG',
@@ -55,6 +60,10 @@
 
   function clamp(value, min, max){
     return Math.max(min, Math.min(max, value));
+  }
+
+  function cpuDifficultyProfile(difficulty){
+    return CPU_DIFFICULTY_PROFILES[clamp(Number(difficulty) || 1, 1, 3)] || CPU_DIFFICULTY_PROFILES[1];
   }
 
   function normalizeSlotIndex(slotIndex){
@@ -279,6 +288,7 @@
       cutAfterRound:career.cutAfterRound || CAREER_TYPES.long.cutAfterRound,
       userRounds:[],
       rounds:Object.fromEntries(career.field.map(player => [player.id, []])),
+      scorecards:Object.fromEntries(career.field.map(player => [player.id, []])),
       cutPlayerIds:null,
       userMadeCut:null,
       finalStandings:null
@@ -319,10 +329,10 @@
     const courseFit = player.courseFit && player.courseFit[event.courseId] ? player.courseFit[event.courseId] : 0;
     const seed = hashString(`${career.seed}:${event.seasonNumber}:${event.eventIndex}:${roundNumber}:${player.id}`);
     const random = seededRandom(seed);
-    const noise = (random() + random() + random() + random() - 2) * 4.2;
-    const difficultyPush = (career.difficulty - 2) * 1.2;
+    const profile = cpuDifficultyProfile(career.difficulty);
+    const noise = (random() + random() + random() + random() - 2) * (profile.spread * 0.75);
     const pressurePush = roundNumber > (event.cutAfterRound || 2) ? -(player.pressure || 0) * 0.8 : 0;
-    const raw = event.par + difficultyPush + noise - ((player.skill || 0) * 2.4) - (courseFit * 1.2) + pressurePush;
+    const raw = event.par + profile.center + noise - ((player.skill || 0) * 1.9) - (courseFit * 0.9) + pressurePush;
     return clamp(Math.round(raw), event.par - 8, event.par + 14);
   }
 
@@ -336,6 +346,9 @@
     const roundLimit = clamp(Number(throughRound) || maxRounds, 1, maxRounds);
     return career.field.map(player => {
       const rounds = (event.rounds[player.id] || []).slice(0, roundLimit);
+      const scorecards = event.scorecards && Array.isArray(event.scorecards[player.id])
+        ? event.scorecards[player.id].slice(0, roundLimit)
+        : [];
       const total = rounds.reduce((sum, score) => sum + (typeof score === 'number' ? score : 0), 0);
       const played = rounds.filter(score => typeof score === 'number').length;
       return {
@@ -346,6 +359,7 @@
         par:event.par * played,
         diff:total - (event.par * played),
         rounds,
+        scorecards,
         seedOrder:player.seedOrder,
         madeCut:event.cutPlayerIds ? event.cutPlayerIds.includes(player.id) : null
       };
@@ -423,6 +437,64 @@
     }).map((row, index) => ({ ...row, position:index + 1 }));
   }
 
+  function tiebreakIndexes(kind){
+    const active = Array.from({ length:18 }, (_, index) => index);
+    if(kind === 'backHalf') return active.slice(9);
+    if(kind === 'lastThird') return active.slice(12);
+    if(kind === 'last3') return active.slice(15);
+    if(kind === 'finalHole') return active.slice(17);
+    return active;
+  }
+
+  function scorecardSegmentTotal(scorecard, indexes){
+    if(!Array.isArray(scorecard)) return Infinity;
+    return indexes.reduce((sum, index) => {
+      const score = scorecard[index];
+      return sum + (typeof score === 'number' && Number.isFinite(score) ? score : 99);
+    }, 0);
+  }
+
+  function rowRoundTotal(row, roundIndex){
+    const scorecard = row.scorecards && row.scorecards[roundIndex];
+    const scorecardTotal = scorecardSegmentTotal(scorecard, tiebreakIndexes('full'));
+    if(scorecardTotal < Infinity) return scorecardTotal;
+    const gross = row.rounds && row.rounds[roundIndex];
+    return typeof gross === 'number' ? gross : Infinity;
+  }
+
+  function compareFinalScorecardTiebreak(a, b, finalRoundIndex){
+    const segments = ['backHalf', 'lastThird', 'last3', 'finalHole', 'full'];
+    for(const segment of segments){
+      const indexes = tiebreakIndexes(segment);
+      const aTotal = scorecardSegmentTotal(a.scorecards && a.scorecards[finalRoundIndex], indexes);
+      const bTotal = scorecardSegmentTotal(b.scorecards && b.scorecards[finalRoundIndex], indexes);
+      if(aTotal !== bTotal) return aTotal - bTotal;
+    }
+    for(let round = finalRoundIndex - 1; round >= 0; round--){
+      const aTotal = rowRoundTotal(a, round);
+      const bTotal = rowRoundTotal(b, round);
+      if(aTotal !== bTotal) return aTotal - bTotal;
+    }
+    return (a.seedOrder || 0) - (b.seedOrder || 0);
+  }
+
+  function sortFinalStandings(rows, event){
+    const sorted = rows.slice().sort((a, b) => {
+      if(a.total !== b.total) return a.total - b.total;
+      return (a.seedOrder || 0) - (b.seedOrder || 0);
+    });
+    if(!sorted.length) return sorted;
+    const bestTotal = sorted[0].total;
+    const tiedBest = sorted.filter(row => row.total === bestTotal);
+    if(tiedBest.length > 1){
+      const finalRoundIndex = Math.max(0, (event.roundsPerEvent || tiedBest[0].rounds.length || 1) - 1);
+      tiedBest.sort((a, b) => compareFinalScorecardTiebreak(a, b, finalRoundIndex));
+      const rest = sorted.filter(row => row.total !== bestTotal);
+      return tiedBest.concat(rest).map((row, index) => ({ ...row, position:index + 1 }));
+    }
+    return sorted.map((row, index) => ({ ...row, position:index + 1 }));
+  }
+
   function sortPartialStandings(rows){
     return rows.slice().sort((a, b) => {
       if(a.diff !== b.diff) return a.diff - b.diff;
@@ -439,8 +511,11 @@
     return { madeCut, missedCut, cutIds:madeCut.map(row => row.playerId) };
   }
 
-  function assignTourPoints(standings){
-    return sortStandings(standings).map((row, index) => ({
+  function assignTourPoints(standings, options){
+    const sorted = options && options.finalEvent
+      ? sortFinalStandings(standings, options.event || {})
+      : sortStandings(standings);
+    return sorted.map((row, index) => ({
       ...row,
       position:index + 1,
       points:index < POINTS_TABLE.length ? POINTS_TABLE[index] : 0
@@ -458,13 +533,32 @@
     });
   }
 
-  function submitCpuRoundScoresForEligible(career, event, roundNumber, cpuScores){
+  function ensureEventScorecardRows(career, event){
+    if(!event.scorecards || typeof event.scorecards !== 'object') event.scorecards = {};
+    career.field.forEach(player => {
+      if(!Array.isArray(event.scorecards[player.id])) event.scorecards[player.id] = [];
+    });
+  }
+
+  function submitCpuRoundScoresForEligible(career, event, roundNumber, cpuScores, cpuScorecards){
     const scores = cpuScores && typeof cpuScores === 'object' ? cpuScores : null;
+    const scorecards = cpuScorecards && typeof cpuScorecards === 'object' ? cpuScorecards : null;
+    ensureEventScorecardRows(career, event);
     career.field.forEach(player => {
       if(player.isUser) return;
       if(event.cutPlayerIds && !event.cutPlayerIds.includes(player.id)) return;
       const rounds = event.rounds[player.id] || [];
       if(typeof rounds[roundNumber - 1] === 'number') return;
+      const submittedScorecard = scorecards ? normalizeRoundScorecard(scorecards[player.id]) : null;
+      if(submittedScorecard){
+        const cardTotal = scorecardTotalAndPar(submittedScorecard, event.courseId);
+        if(cardTotal.holes > 0){
+          rounds[roundNumber - 1] = clamp(Math.round(cardTotal.total), event.par - 18, event.par + 36);
+          event.rounds[player.id] = rounds;
+          event.scorecards[player.id][roundNumber - 1] = submittedScorecard;
+          return;
+        }
+      }
       const submitted = scores ? Number(scores[player.id]) : NaN;
       rounds[roundNumber - 1] = Number.isFinite(submitted)
         ? clamp(Math.round(submitted), event.par - 18, event.par + 36)
@@ -482,7 +576,7 @@
     });
     const finalists = finalRows.filter(row => row.madeCut);
     const missed = finalRows.filter(row => !row.madeCut);
-    const finalistPoints = assignTourPoints(finalists);
+    const finalistPoints = assignTourPoints(finalists, { finalEvent:true, event });
     const missedWithPoints = sortStandings(missed).map(row => ({ ...row, points:0, position:null }));
     const combined = finalistPoints.concat(missedWithPoints);
     const pointsById = Object.fromEntries(combined.map(row => [row.playerId, row.points || 0]));
@@ -595,9 +689,11 @@
     const history = normalizeRoundHistory(options && options.history);
     if(scorecard) submittedRound.scorecard = scorecard;
     if(history) submittedRound.history = history;
+    ensureEventScorecardRows(next, event);
+    if(scorecard) event.scorecards[USER_ID][roundNumber - 1] = scorecard;
     event.userRounds.push(submittedRound);
     event.rounds[USER_ID][roundNumber - 1] = score;
-    submitCpuRoundScoresForEligible(next, event, roundNumber, options && options.cpuScores);
+    submitCpuRoundScoresForEligible(next, event, roundNumber, options && options.cpuScores, options && options.cpuScorecards);
 
     if(roundNumber === cutAfterRound){
       const cut = applyStrictCut(eventRows(next, event, cutAfterRound), CUT_SIZE);
