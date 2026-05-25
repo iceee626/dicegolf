@@ -285,6 +285,19 @@
     return out;
   }
 
+  function buildProTourCpuRoundScorecards(event){
+    const out = {};
+    if(!event || !event.scorecards) return out;
+    Object.keys(event.scorecards).forEach(playerId => {
+      if(playerId === 'user') return;
+      const scorecards = event.scorecards[playerId];
+      if(Array.isArray(scorecards)){
+        out[playerId] = scorecards.map(row => Array.isArray(row) ? row.slice(0, 18) : row);
+      }
+    });
+    return out;
+  }
+
   function collectCurrentCpuRoundScores(){
     if(!S || !S.cpuField || !Array.isArray(S.cpuField.opponents) || typeof cpuRoundScoresTotal !== 'function') return null;
     const out = {};
@@ -295,6 +308,23 @@
       if(!careerId || !state) return;
       const total = cpuRoundScoresTotal(state.scores || [], HOLES, S.startIdx, S.endIdx).total;
       if(total > 0) out[careerId] = total;
+    });
+    return Object.keys(out).length ? out : null;
+  }
+
+  function collectCurrentCpuRoundScorecards(){
+    if(!S || !S.cpuField || !Array.isArray(S.cpuField.opponents)) return null;
+    const out = {};
+    const roundIdx = Math.max(0, (S.currentRound || 1) - 1);
+    S.cpuField.opponents.forEach(opp => {
+      const careerId = opp.careerPlayerId || opp.id;
+      const state = opp.rounds && opp.rounds[roundIdx];
+      if(!careerId || !state || !Array.isArray(state.scores)) return;
+      const row = state.scores.slice(0, 18);
+      const start = S.startIdx == null ? 0 : S.startIdx;
+      const end = S.endIdx == null ? 17 : S.endIdx;
+      const complete = row.slice(start, end + 1).every(score => typeof score === 'number');
+      if(complete) out[careerId] = row;
     });
     return Object.keys(out).length ? out : null;
   }
@@ -437,7 +467,8 @@
       totalRounds:SETUP.rounds,
       seed:(activeCareer.seed || Date.now()) + (event.seasonNumber * 1000) + (event.eventIndex * 97),
       opponents:buildProTourCpuOpponents(activeCareer, event),
-      roundScoresByOpponentId:buildProTourCpuRoundScores(event)
+      roundScoresByOpponentId:buildProTourCpuRoundScores(event),
+      roundScorecardsByOpponentId:buildProTourCpuRoundScorecards(event)
     };
     window.PRO_TOUR_PENDING_ROUND = {
       slotId:activeSlot,
@@ -491,6 +522,7 @@
       wildcardsUsed:S._wcUsedThisRound || 0,
       wildcardsDiscarded:S._wcDiscardedThisRound || 0,
       cpuScores:collectCurrentCpuRoundScores(),
+      cpuScorecards:collectCurrentCpuRoundScorecards(),
       scorecard:roundScores.slice(0, 18),
       history:roundHistory.slice(0, 18)
     });
